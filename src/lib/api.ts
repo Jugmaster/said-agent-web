@@ -2,11 +2,11 @@
  * Client for the butler-container HTTP API.
  *
  * Server lives in butler-container/said-butler/src/http/server.ts, deployed
- * on Hetzner at api.saidprotocol.com (port 3102 behind nginx).
+ * on Hetzner at butler.saidprotocol.com (port 3102 behind nginx).
  */
 
 const API_BASE =
-  process.env.NEXT_PUBLIC_BUTLER_API ?? "https://api.saidprotocol.com";
+  process.env.NEXT_PUBLIC_BUTLER_API ?? "https://butler.saidprotocol.com";
 
 export interface ChatResponse {
   action: string;
