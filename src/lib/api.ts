@@ -141,6 +141,31 @@ export async function getAgentProfile(
   return res.json();
 }
 
+export interface ClaimResponse {
+  ok: true;
+  platformId: string;
+  linkedPlatformIds: string[];
+  agentName: string | null;
+  walletAddress: string | null;
+}
+
+export async function claimAgent(input: {
+  platformId: string;
+  privyUserId: string;
+  verifiedXUserId?: string;
+}): Promise<ClaimResponse> {
+  const res = await fetch(`${API_BASE}/api/claim`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(input),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`claim failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
