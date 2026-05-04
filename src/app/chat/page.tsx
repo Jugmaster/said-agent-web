@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { chat, type ChatResponse } from "@/lib/api";
+import Link from "next/link";
+import { chat, getBalance, type ChatResponse } from "@/lib/api";
 import { getPlatformId, isTelegramWebApp } from "@/lib/identity";
 
 interface UiMessage {
@@ -10,24 +11,46 @@ interface UiMessage {
   text: string;
 }
 
+type AgentStep =
+  | "unknown"
+  | "provisioned"
+  | "awaiting_name"
+  | "registered"
+  | "registered_unverified"
+  | "verified"
+  | "returning_verified";
+
 export default function ChatPage() {
   const [platformId, setPlatformId] = useState<string>("");
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [agentName, setAgentName] = useState<string>("Your butler");
+  const [step, setStep] = useState<AgentStep>("unknown");
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // Resolve identity on mount + tell Telegram the WebApp is ready
   useEffect(() => {
-    setPlatformId(getPlatformId());
+    const id = getPlatformId();
+    setPlatformId(id);
     if (isTelegramWebApp()) {
       window.Telegram?.WebApp?.ready?.();
       window.Telegram?.WebApp?.expand?.();
     }
+
+    // Pre-load existing agent state so we know whether to show "Say hi" CTA,
+    // "needs funding" banner, or just an empty chat for a returning verified user.
+    getBalance(id)
+      .then((b) => {
+        if (b.displayName) setAgentName(b.displayName);
+        if (b.verified) setStep("returning_verified");
+        else if (b.registered) setStep("registered_unverified");
+        else setStep("awaiting_name");
+      })
+      .catch(() => {
+        // 404 → no agent yet, leave step="unknown" so the welcome card renders
+      });
   }, []);
 
-  // Autoscroll on new message
   useEffect(() => {
     scrollRef.current?.scrollTo({
       top: scrollRef.current.scrollHeight,
@@ -35,22 +58,23 @@ export default function ChatPage() {
     });
   }, [messages]);
 
-  async function send(): Promise<void> {
-    const text = input.trim();
-    if (!text || sending || !platformId) return;
-    setInput("");
+  async function send(text?: string): Promise<void> {
+    const message = (text ?? input).trim();
+    if (!message || sending || !platformId) return;
+    if (!text) setInput("");
     setSending(true);
 
     const userMsg: UiMessage = {
       id: `u-${Date.now()}`,
       role: "user",
-      text,
+      text: message,
     };
     setMessages((prev) => [...prev, userMsg]);
 
     try {
-      const res: ChatResponse = await chat(platformId, text);
+      const res: ChatResponse = await chat(platformId, message);
       if (res.context?.agentName) setAgentName(res.context.agentName);
+      if (res.context?.step) setStep(res.context.step as AgentStep);
       const agentMsg: UiMessage = {
         id: `a-${Date.now()}`,
         role: "agent",
@@ -76,6 +100,11 @@ export default function ChatPage() {
     }
   }
 
+  const needsFunding =
+    step === "registered" || step === "registered_unverified";
+  // Welcome card only for users with no agent yet AND no messages
+  const isFresh = messages.length === 0 && step === "unknown";
+
   return (
     <main className="flex flex-col h-dvh bg-neutral-950 text-neutral-100">
       <header className="px-4 py-3 border-b border-neutral-800 flex items-center justify-between">
@@ -83,19 +112,69 @@ export default function ChatPage() {
           <h1 className="text-base font-semibold">{agentName}</h1>
           <p className="text-xs text-neutral-500">SAID Agent · {platformId || "..."}</p>
         </div>
-        <a
-          href="/portfolio"
-          className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
-        >
-          Wallet
-        </a>
+        <div className="flex gap-2">
+          {needsFunding && (
+            <Link
+              href="/fund"
+              className="text-xs px-3 py-1 rounded-md bg-yellow-600 hover:bg-yellow-500 text-white font-medium animate-pulse"
+            >
+              Activate
+            </Link>
+          )}
+          <Link
+            href="/portfolio"
+            className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
+          >
+            Wallet
+          </Link>
+        </div>
       </header>
 
+      {needsFunding && (
+        <div className="px-4 py-3 bg-yellow-950/40 border-b border-yellow-900">
+          <div className="flex items-start gap-3">
+            <span className="text-lg leading-none">⚠️</span>
+            <div className="flex-1 text-sm">
+              <p className="font-medium text-yellow-200">Your agent needs activation</p>
+              <p className="text-xs text-yellow-300/80 mt-0.5">
+                Send 0.015 SOL to its wallet to unlock swaps, transfers, and more.
+              </p>
+            </div>
+            <Link
+              href="/fund"
+              className="text-xs px-3 py-1.5 rounded-md bg-yellow-600 hover:bg-yellow-500 text-white font-medium whitespace-nowrap"
+            >
+              Fund →
+            </Link>
+          </div>
+        </div>
+      )}
+
       <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
-        {messages.length === 0 && (
+        {isFresh && (
+          <div className="max-w-md mx-auto pt-8">
+            <div className="bg-neutral-900 border border-neutral-800 rounded-2xl p-6 text-center">
+              <h2 className="text-lg font-semibold mb-2">Meet your butler</h2>
+              <p className="text-sm text-neutral-400 mb-5">
+                A personal AI agent on Solana. Your own wallet, your own identity,
+                yours forever. Free, no signup.
+              </p>
+              <button
+                onClick={() => void send("hi")}
+                className="w-full px-4 py-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-sm font-medium"
+              >
+                Say hi to start
+              </button>
+            </div>
+            <p className="text-xs text-neutral-600 text-center mt-4">
+              Or try: &quot;create my agent&quot;, &quot;what can you do?&quot;
+            </p>
+          </div>
+        )}
+        {messages.length === 0 && step !== "unknown" && (
           <div className="text-center text-neutral-500 text-sm pt-12">
-            <p>Say hello — your agent is ready.</p>
-            <p className="mt-2 text-xs">Try: &quot;what can you do?&quot; or &quot;check my portfolio&quot;.</p>
+            <p>Welcome back, {agentName}.</p>
+            <p className="mt-2 text-xs">Try: &quot;portfolio&quot; or &quot;swap 0.01 SOL for USDC&quot;.</p>
           </div>
         )}
         {messages.map((m) => (
