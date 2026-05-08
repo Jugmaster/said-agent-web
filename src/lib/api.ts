@@ -261,6 +261,32 @@ export interface AgentListItem {
   activity: { total: number; swaps: number; stakes: number; transfers: number };
 }
 
+export interface PlatformStats {
+  agents: { total: number; verified: number; pro: number };
+  launches: { total: number };
+  activity: { totalReceipts: number };
+  sweeps: {
+    count: number;
+    totalClaimedSol: number;
+    totalSaidCutSol: number;
+  };
+  pendingSends: { count: number; totalAmount: number };
+}
+
+export async function getStats(
+  options?: { cache?: RequestCache }
+): Promise<PlatformStats | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/stats`, {
+      cache: options?.cache ?? "no-store",
+    });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function getAgentsList(
   sort: "activity" | "recent" | "pro" = "activity",
   limit = 50,
