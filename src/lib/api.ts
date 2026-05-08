@@ -166,6 +166,115 @@ export async function claimAgent(input: {
   return res.json();
 }
 
+export interface InviteResponse {
+  token: string;
+  status: "pending" | "claimed" | "cancelled" | "expired";
+  sender: {
+    platformId: string;
+    displayName: string | null;
+    walletAddress: string | null;
+    platform: "telegram" | "twitter" | null;
+  };
+  recipient: {
+    platform: "telegram" | "x";
+    handle: string;
+  };
+  amount: number;
+  asset: "SOL" | "USDC";
+  sourceChain: string;
+  destinationChain: string;
+  createdAt: string;
+  expiresAt: string;
+  claimedAt: string | null;
+  claimTx: string | null;
+  claimedByPlatformId: string | null;
+}
+
+export async function getInvite(
+  token: string,
+  options?: { cache?: RequestCache; signal?: AbortSignal }
+): Promise<InviteResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/invites/${encodeURIComponent(token)}`, {
+      cache: options?.cache ?? "no-store",
+      signal: options?.signal,
+    });
+    if (res.status === 404) return null;
+    if (!res.ok) {
+      const text = await res.text();
+      throw new Error(`invite lookup failed (${res.status}): ${text.slice(0, 200)}`);
+    }
+    return res.json();
+  } catch (err) {
+    if (err instanceof Error && err.name === "AbortError") throw err;
+    return null;
+  }
+}
+
+export interface LaunchListItem {
+  tokenMint: string;
+  tweetId: string;
+  replyTweetId: string | null;
+  launchTx: string;
+  creator: {
+    xUserId: string;
+    xHandle: string;
+    platformId: string;
+  };
+  tweetExcerpt: string;
+  launchedAt: string;
+  sweeps: {
+    count: number;
+    totalClaimedSol: number;
+    totalSaidCutSol: number;
+    totalUserKeptSol: number;
+    lastSweepAt: string | null;
+  };
+  pumpfunUrl: string;
+  solscanUrl: string;
+}
+
+export async function getLaunches(
+  limit = 50,
+  options?: { cache?: RequestCache }
+): Promise<LaunchListItem[]> {
+  const res = await fetch(
+    `${API_BASE}/api/launches?limit=${encodeURIComponent(limit)}`,
+    { cache: options?.cache ?? "no-store" }
+  );
+  if (!res.ok) {
+    return [];
+  }
+  const data = (await res.json()) as { launches?: LaunchListItem[] };
+  return data.launches ?? [];
+}
+
+export interface AgentListItem {
+  platformId: string;
+  platform: "telegram" | "twitter";
+  displayName: string | null;
+  walletAddress: string | null;
+  saidPda: string | null;
+  verified: boolean;
+  proTier: boolean;
+  createdAt: string;
+  activity: { total: number; swaps: number; stakes: number; transfers: number };
+}
+
+export async function getAgentsList(
+  sort: "activity" | "recent" | "pro" = "activity",
+  limit = 50,
+  options?: { cache?: RequestCache }
+): Promise<AgentListItem[]> {
+  const res = await fetch(
+    `${API_BASE}/api/agents?sort=${sort}&limit=${limit}`,
+    { cache: options?.cache ?? "no-store" }
+  );
+  if (!res.ok) return [];
+  const data = (await res.json()) as { agents?: AgentListItem[] };
+  return data.agents ?? [];
+}
+
 const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
