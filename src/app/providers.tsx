@@ -11,7 +11,10 @@ export default function Providers({ children }: { children: ReactNode }) {
     <PrivyProvider
       appId={PRIVY_APP_ID}
       config={{
-        loginMethods: ["email", "wallet", "google", "twitter"],
+        // Telegram is FIRST — most users come from @saidinfrabot, and logging in
+        // with Telegram links the PWA session to the user's existing tg_<id> agent
+        // automatically. Other methods provision a fresh pwa_<privyId> agent.
+        loginMethods: ["telegram", "email", "wallet", "google", "twitter"],
         appearance: {
           theme: "dark",
           accentColor: "#667eea",

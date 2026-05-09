@@ -39,8 +39,10 @@ export default function AuthGate({ children }: Props) {
           </div>
           <h2 className="text-2xl font-bold mb-2">Log in to use your agent.</h2>
           <p className="text-sm text-zinc-400 mb-6">
-            Sign in with email, Google, X, or a wallet. We provision your
-            on-chain agent the moment you do — no seed phrase, no setup.
+            Sign in with Telegram to pick up where you left off with{" "}
+            <span className="text-zinc-200">@saidinfrabot</span> — same agent,
+            same wallet, same history. Or use email, Google, X, or a wallet for
+            a fresh agent.
           </p>
           <button
             onClick={login}

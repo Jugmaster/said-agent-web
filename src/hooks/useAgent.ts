@@ -1,8 +1,25 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { usePrivy, getAccessToken } from "@privy-io/react-auth";
+import { usePrivy, getAccessToken, type User } from "@privy-io/react-auth";
 import { claimAgent, type ClaimResponse } from "@/lib/api";
+
+/**
+ * Derives the butler `platformId` from the Privy user's linked accounts.
+ *
+ * Priority:
+ *  1. `tg_<telegramUserId>` — if Privy session has a Telegram account.
+ *     Maps directly onto the agent the user has already been chatting with
+ *     via @saidinfrabot. Same wallet, same history.
+ *  2. `pwa_<privyId>` fallback — for users who logged in with email / Google /
+ *     X / wallet without linking Telegram. Butler creates a fresh agent on
+ *     first claim.
+ */
+function derivePlatformId(user: User): string {
+  const tgId = user.telegram?.telegramUserId;
+  if (tgId) return `tg_${tgId}`;
+  return `pwa_${user.id}`;
+}
 
 /**
  * One-shot link between a Privy session and a butler agent.
@@ -60,20 +77,18 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
   const { ready, authenticated, user, logout: privyLogout } = usePrivy();
   const [state, setState] = useState<AgentState>({ status: "not-ready" });
 
-  const performClaim = useCallback(async (privyId: string) => {
+  const performClaim = useCallback(async (privyUser: User) => {
     setState({ status: "linking" });
 
-    // PWA's synthetic platformId — butler treats `pwa_<privyId>` as a first-class
-    // agent identifier and creates one on first claim if it doesn't exist.
-    const platformId = `pwa_${privyId}`;
+    const platformId = derivePlatformId(privyUser);
 
     try {
       const claim: ClaimResponse = await claimAgent({
         platformId,
-        privyUserId: privyId,
+        privyUserId: privyUser.id,
       });
       const cache: LinkedCache = {
-        privyId,
+        privyId: privyUser.id,
         platformId: claim.platformId,
         walletAddress: claim.walletAddress,
         agentName: claim.agentName,
@@ -115,7 +130,7 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
       return;
     }
 
-    void performClaim(user.id);
+    void performClaim(user);
   }, [ready, authenticated, user, performClaim]);
 
   const logout = useCallback(() => {
@@ -124,7 +139,7 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
   }, [privyLogout]);
 
   const refresh = useCallback(() => {
-    if (user?.id) void performClaim(user.id);
+    if (user) void performClaim(user);
   }, [user, performClaim]);
 
   return { ...state, logout, refresh };
