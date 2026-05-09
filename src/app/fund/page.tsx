@@ -4,11 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { getBalance, type BalanceResponse } from "@/lib/api";
-import { getPlatformId } from "@/lib/identity";
+import AuthGate from "@/components/AuthGate";
+import Navbar from "@/components/Navbar";
 
 const VERIFY_AMOUNT_SOL = 0.015;
 
-export default function FundPage() {
+function FundScreen({ platformId }: { platformId: string }) {
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -18,11 +19,9 @@ export default function FundPage() {
 
   // Initial load + poll for verification
   useEffect(() => {
-    const id = getPlatformId();
-
     async function load() {
       try {
-        const b = await getBalance(id);
+        const b = await getBalance(platformId);
         setBalance(b);
         return b;
       } catch (e) {
@@ -46,7 +45,7 @@ export default function FundPage() {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
-  }, []);
+  }, [platformId]);
 
   // Generate QR when wallet known
   useEffect(() => {
@@ -75,7 +74,7 @@ export default function FundPage() {
   }
 
   return (
-    <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-md mx-auto">
+    <main className="px-4 py-6 max-w-md mx-auto">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold">Activate your agent</h1>
         <Link
@@ -175,5 +174,14 @@ export default function FundPage() {
         </div>
       )}
     </main>
+  );
+}
+
+export default function FundPage() {
+  return (
+    <>
+      <Navbar />
+      <AuthGate>{(platformId) => <FundScreen platformId={platformId} />}</AuthGate>
+    </>
   );
 }

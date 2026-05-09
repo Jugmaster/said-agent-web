@@ -8,6 +8,23 @@
 const API_BASE =
   process.env.NEXT_PUBLIC_BUTLER_API ?? "https://butler.saidprotocol.com";
 
+/**
+ * Builds an `Authorization: Bearer <privy-jwt>` header if the caller is logged in.
+ * Lazy-loaded so server components and unauthenticated routes don't pull Privy.
+ * Returns `{}` when no token is available — the API call still goes through; it's
+ * up to butler to enforce auth on protected endpoints.
+ */
+async function authHeaders(): Promise<Record<string, string>> {
+  if (typeof window === "undefined") return {};
+  try {
+    const { getPrivyAccessToken } = await import("@/hooks/useAgent");
+    const token = await getPrivyAccessToken();
+    return token ? { Authorization: `Bearer ${token}` } : {};
+  } catch {
+    return {};
+  }
+}
+
 export interface ChatResponse {
   action: string;
   message: string;
@@ -85,7 +102,7 @@ export async function chat(
 ): Promise<ChatResponse> {
   const res = await fetch(`${API_BASE}/api/chat`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify({ platformId, message }),
   });
   if (!res.ok) {
@@ -97,7 +114,8 @@ export async function chat(
 
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
   const res = await fetch(
-    `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`
+    `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() }
   );
   if (!res.ok) {
     const text = await res.text();
@@ -117,7 +135,8 @@ export async function ping(): Promise<boolean> {
 
 export async function getActivity(platformId: string): Promise<ActivityResponse> {
   const res = await fetch(
-    `${API_BASE}/api/activity/${encodeURIComponent(platformId)}`
+    `${API_BASE}/api/activity/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() }
   );
   if (!res.ok) {
     const text = await res.text();
@@ -132,7 +151,11 @@ export async function getAgentProfile(
 ): Promise<AgentProfileResponse> {
   const res = await fetch(
     `${API_BASE}/api/agents/${encodeURIComponent(platformId)}`,
-    { signal: options?.signal, cache: options?.cache ?? "no-store" }
+    {
+      signal: options?.signal,
+      cache: options?.cache ?? "no-store",
+      headers: await authHeaders(),
+    }
   );
   if (!res.ok) {
     const text = await res.text();
@@ -156,7 +179,7 @@ export async function claimAgent(input: {
 }): Promise<ClaimResponse> {
   const res = await fetch(`${API_BASE}/api/claim`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(input),
   });
   if (!res.ok) {
@@ -192,12 +215,14 @@ export interface InviteResponse {
 
 export async function getInvite(
   token: string,
-  options?: { cache?: RequestCache; signal?: AbortSignal }
+  options?: { cache?: RequestCache; signal?: AbortSignal; revalidate?: number }
 ): Promise<InviteResponse | null> {
   try {
     const res = await fetch(`${API_BASE}/api/invites/${encodeURIComponent(token)}`, {
+      // Per-token, per-user — keep no-store so claim-state flips are seen instantly
       cache: options?.cache ?? "no-store",
       signal: options?.signal,
+      next: typeof options?.revalidate === "number" ? { revalidate: options.revalidate } : undefined,
     });
     if (res.status === 404) return null;
     if (!res.ok) {
@@ -236,11 +261,16 @@ export interface LaunchListItem {
 
 export async function getLaunches(
   limit = 50,
-  options?: { cache?: RequestCache }
+  options?: { cache?: RequestCache; revalidate?: number }
 ): Promise<LaunchListItem[]> {
+  // Public, anonymous data — default revalidate=60s so crawlers + page hits
+  // dedupe through Next's data cache instead of hitting butler every time.
+  const revalidate = options?.revalidate ?? 60;
   const res = await fetch(
     `${API_BASE}/api/launches?limit=${encodeURIComponent(limit)}`,
-    { cache: options?.cache ?? "no-store" }
+    options?.cache
+      ? { cache: options.cache }
+      : { next: { revalidate } }
   );
   if (!res.ok) {
     return [];
@@ -274,12 +304,18 @@ export interface PlatformStats {
 }
 
 export async function getStats(
-  options?: { cache?: RequestCache }
+  options?: { cache?: RequestCache; revalidate?: number }
 ): Promise<PlatformStats | null> {
+  // Public counters — 30s revalidate. "Live" enough; never hits butler more
+  // than ~2/min per Next instance regardless of traffic.
+  const revalidate = options?.revalidate ?? 30;
   try {
-    const res = await fetch(`${API_BASE}/api/stats`, {
-      cache: options?.cache ?? "no-store",
-    });
+    const res = await fetch(
+      `${API_BASE}/api/stats`,
+      options?.cache
+        ? { cache: options.cache }
+        : { next: { revalidate } }
+    );
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -290,11 +326,16 @@ export async function getStats(
 export async function getAgentsList(
   sort: "activity" | "recent" | "pro" = "activity",
   limit = 50,
-  options?: { cache?: RequestCache }
+  options?: { cache?: RequestCache; revalidate?: number }
 ): Promise<AgentListItem[]> {
+  // Public directory — 60s revalidate. Each (sort, limit) tuple is its own
+  // cache key, which is fine: only 3 sorts × 1 default limit = 3 entries.
+  const revalidate = options?.revalidate ?? 60;
   const res = await fetch(
     `${API_BASE}/api/agents?sort=${sort}&limit=${limit}`,
-    { cache: options?.cache ?? "no-store" }
+    options?.cache
+      ? { cache: options.cache }
+      : { next: { revalidate } }
   );
   if (!res.ok) return [];
   const data = (await res.json()) as { agents?: AgentListItem[] };

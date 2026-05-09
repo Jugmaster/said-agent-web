@@ -1,6 +1,9 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
 import { getAgentsList, type AgentListItem } from "@/lib/api";
+
+export const revalidate = 60;
 
 interface PageProps {
   searchParams: Promise<{ sort?: string }>;
@@ -39,33 +42,33 @@ function AgentRow({ a }: { a: AgentListItem }) {
   return (
     <Link
       href={`/agents/${a.platformId}`}
-      className="block bg-neutral-900 border border-neutral-800 hover:border-neutral-700 rounded-xl px-4 py-3 transition-colors"
+      className="block bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl px-5 py-4 transition"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-base font-semibold">
               {handlePrefix}
               {a.displayName ?? "Unnamed"}
             </span>
-            <span className="text-xs text-neutral-500">{platformLabel}</span>
+            <span className="text-sm text-zinc-500">{platformLabel}</span>
             {a.proTier && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-yellow-950 text-yellow-400 border border-yellow-900">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-950/50 text-yellow-300 border border-yellow-900/60">
                 Pro
               </span>
             )}
             {a.verified && !a.proTier && (
-              <span className="text-xs px-1.5 py-0.5 rounded bg-green-950 text-green-400 border border-green-900">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950/50 text-emerald-300 border border-emerald-900/60">
                 verified
               </span>
             )}
           </div>
-          <code className="text-xs text-neutral-500 block">
+          <code className="text-sm text-zinc-500 block font-mono">
             {shortAddr(a.walletAddress)}
           </code>
         </div>
-        <div className="text-right text-xs text-neutral-500 shrink-0">
-          <div>{a.activity.total} actions</div>
+        <div className="text-right text-sm text-zinc-500 shrink-0">
+          <div className="text-zinc-300 font-semibold">{a.activity.total}</div>
           <div>{formatRelative(a.createdAt)}</div>
         </div>
       </div>
@@ -90,72 +93,70 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   const agents = await getAgentsList(sort, 50);
 
   return (
-    <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-2xl mx-auto">
-      <header className="mb-6">
-        <Link href="/" className="text-xs text-neutral-500 hover:text-neutral-300">
-          ← SAID Agent
-        </Link>
-      </header>
+    <>
+      <Navbar />
+      <main className="px-4 md:px-8 py-12 max-w-3xl mx-auto">
+        <header className="mb-10">
+          <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
+            Directory
+          </div>
+          <h1 className="text-4xl font-bold mb-3 tracking-tight">Agents</h1>
+          <p className="text-lg text-zinc-400 max-w-2xl">
+            Every SAID agent. Each one personal — own wallet, own identity, own
+            on-chain history.
+          </p>
+        </header>
 
-      <section className="mb-6">
-        <h1 className="text-2xl font-semibold mb-1">Agents</h1>
-        <p className="text-sm text-neutral-400">
-          Every SAID agent. Each one personal — own wallet, own identity, own
-          on-chain history. Pick a sort:
-        </p>
-      </section>
-
-      <nav className="flex gap-2 mb-4">
-        {SORT_OPTIONS.map((opt) => (
-          <Link
-            key={opt.key}
-            href={`/agents?sort=${opt.key}`}
-            className={`text-xs px-3 py-1.5 rounded-md border ${
-              sort === opt.key
-                ? "border-neutral-500 bg-neutral-800 text-neutral-100"
-                : "border-neutral-800 hover:border-neutral-700 text-neutral-400"
-            }`}
-          >
-            {opt.label}
-          </Link>
-        ))}
-      </nav>
-
-      {agents.length === 0 ? (
-        <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-8 text-center text-neutral-500">
-          <p className="text-sm">No agents in this slice yet.</p>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {agents.map((a) => (
-            <AgentRow key={a.platformId} a={a} />
+        <nav className="flex gap-2 mb-6">
+          {SORT_OPTIONS.map((opt) => (
+            <Link
+              key={opt.key}
+              href={`/agents?sort=${opt.key}`}
+              className={`text-sm px-4 py-2 rounded-lg transition ${
+                sort === opt.key
+                  ? "bg-white text-black font-semibold"
+                  : "border border-zinc-700 hover:border-zinc-500 text-zinc-300"
+              }`}
+            >
+              {opt.label}
+            </Link>
           ))}
-        </div>
-      )}
+        </nav>
 
-      <footer className="mt-12 pt-6 border-t border-neutral-900 text-xs text-neutral-600 text-center">
-        <p>
+        {agents.length === 0 ? (
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
+            <p>No agents in this slice yet.</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {agents.map((a) => (
+              <AgentRow key={a.platformId} a={a} />
+            ))}
+          </div>
+        )}
+
+        <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
           To create your own:{" "}
           <a
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className="text-neutral-300 hover:text-neutral-100"
+            className="text-zinc-300 hover:text-white"
           >
             message @saidinfrabot
           </a>{" "}
-          on Telegram or tweet at{" "}
+          or tweet at{" "}
           <a
             href="https://x.com/saidagent"
             target="_blank"
             rel="noreferrer"
-            className="text-neutral-300 hover:text-neutral-100"
+            className="text-zinc-300 hover:text-white"
           >
             @saidagent
           </a>
           .
-        </p>
-      </footer>
-    </main>
+        </footer>
+      </main>
+    </>
   );
 }
