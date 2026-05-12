@@ -8,7 +8,8 @@ import {
   type BalanceResponse,
   type OnChainBalances,
 } from "@/lib/api";
-import { getPlatformId } from "@/lib/identity";
+import AuthGate from "@/components/AuthGate";
+import Navbar from "@/components/Navbar";
 
 interface WalletState {
   address: string | null;
@@ -71,7 +72,7 @@ function WalletCard({
   );
 }
 
-export default function PortfolioPage() {
+function PortfolioScreen({ platformId }: { platformId: string }) {
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -80,8 +81,7 @@ export default function PortfolioPage() {
   );
 
   useEffect(() => {
-    const id = getPlatformId();
-    getBalance(id)
+    getBalance(platformId)
       .then(async (b) => {
         setBalance(b);
         const initial: Record<string, WalletState> = {
@@ -113,10 +113,10 @@ export default function PortfolioPage() {
       })
       .catch((e) => setError(e instanceof Error ? e.message : "load failed"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [platformId]);
 
   return (
-    <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-2xl mx-auto">
+    <main className="px-4 py-6 max-w-2xl mx-auto">
       <header className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold">Wallet</h1>
@@ -197,5 +197,14 @@ export default function PortfolioPage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function PortfolioPage() {
+  return (
+    <>
+      <Navbar />
+      <AuthGate>{(platformId) => <PortfolioScreen platformId={platformId} />}</AuthGate>
+    </>
   );
 }

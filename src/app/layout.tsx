@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
+import Providers from "./providers";
+import DotGridBackground from "@/components/DotGridBackground";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
 });
 
@@ -24,7 +21,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#0a0a0a",
+  themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -38,13 +35,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${inter.variable} h-full antialiased`}
     >
       <head>
         {/* Telegram Web App SDK — exposes window.Telegram.WebApp inside Telegram */}
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>
-      <body className="min-h-full flex flex-col bg-neutral-950">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <Providers>
+          {/* Animated dot-grid canvas (z-0) + radial vignette (z-1) on every page */}
+          <DotGridBackground />
+          {/* Content sits above the background */}
+          <div className="relative z-10 flex flex-col min-h-dvh">{children}</div>
+        </Providers>
+      </body>
     </html>
   );
 }

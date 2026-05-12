@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getActivity, type ActivityResponse, type ActivityReceipt } from "@/lib/api";
-import { getPlatformId } from "@/lib/identity";
+import AuthGate from "@/components/AuthGate";
+import Navbar from "@/components/Navbar";
 
 function timeAgo(iso: string): string {
   const t = new Date(iso.endsWith("Z") ? iso : iso + "Z").getTime();
@@ -65,21 +66,20 @@ function ReceiptItem({ r }: { r: ActivityReceipt }) {
   );
 }
 
-export default function ActivityPage() {
+function ActivityScreen({ platformId }: { platformId: string }) {
   const [data, setData] = useState<ActivityResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const id = getPlatformId();
-    getActivity(id)
+    getActivity(platformId)
       .then(setData)
       .catch((e) => setError(e instanceof Error ? e.message : "load failed"))
       .finally(() => setLoading(false));
-  }, []);
+  }, [platformId]);
 
   return (
-    <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-2xl mx-auto">
+    <main className="px-4 py-6 max-w-2xl mx-auto">
       <header className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold">Activity</h1>
@@ -172,5 +172,14 @@ export default function ActivityPage() {
         </>
       )}
     </main>
+  );
+}
+
+export default function ActivityPage() {
+  return (
+    <>
+      <Navbar />
+      <AuthGate>{(platformId) => <ActivityScreen platformId={platformId} />}</AuthGate>
+    </>
   );
 }
