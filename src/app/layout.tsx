@@ -13,6 +13,11 @@ export const metadata: Metadata = {
   title: "SAID Agent",
   description: "Your AI butler on Solana — chat, swap, buy real things.",
   manifest: "/manifest.webmanifest",
+  icons: {
+    icon: "/favicon.png",
+    shortcut: "/favicon.png",
+    apple: "/icon-192.png",
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",

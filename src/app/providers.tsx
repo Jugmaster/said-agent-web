@@ -18,7 +18,9 @@ export default function Providers({ children }: { children: ReactNode }) {
         appearance: {
           theme: "dark",
           accentColor: "#667eea",
-          logo: "/icon-512.png",
+          // Canonical SAID brand logo — same asset used by saidprotocol.com
+          // and app.saidprotocol.com in their Privy modals.
+          logo: "/logo-dark.png",
         },
         embeddedWallets: {
           solana: { createOnLogin: "users-without-wallets" },
