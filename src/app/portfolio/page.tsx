@@ -28,24 +28,24 @@ function WalletCard({
   const total =
     state.balances && (state.balances.sol > 0 || state.balances.usdc > 0);
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium">{label}</span>
-        <span className="text-xs text-neutral-500">{state.chain}</span>
+        <span className="text-xs text-zinc-500">{state.chain}</span>
       </div>
       {state.address ? (
         <>
-          <code className="text-xs text-neutral-500 break-all block">
+          <code className="text-xs text-zinc-500 break-all block">
             {state.address}
           </code>
           {state.loading ? (
-            <p className="text-xs text-neutral-600 mt-2">Loading balances…</p>
+            <p className="text-xs text-zinc-600 mt-2">Loading balances…</p>
           ) : state.balances ? (
             total ? (
               <div className="mt-3 flex gap-4 text-sm">
                 {state.balances.sol > 0 && (
                   <div>
-                    <span className="text-neutral-400">SOL </span>
+                    <span className="text-zinc-400">SOL </span>
                     <span className="font-medium">
                       {state.balances.sol.toFixed(4)}
                     </span>
@@ -53,7 +53,7 @@ function WalletCard({
                 )}
                 {state.balances.usdc > 0 && (
                   <div>
-                    <span className="text-neutral-400">USDC </span>
+                    <span className="text-zinc-400">USDC </span>
                     <span className="font-medium">
                       {state.balances.usdc.toFixed(2)}
                     </span>
@@ -61,12 +61,12 @@ function WalletCard({
                 )}
               </div>
             ) : (
-              <p className="text-xs text-neutral-600 mt-2 italic">empty</p>
+              <p className="text-xs text-zinc-600 mt-2 italic">empty</p>
             )
           ) : null}
         </>
       ) : (
-        <span className="text-xs text-neutral-500 italic">not provisioned</span>
+        <span className="text-xs text-zinc-500 italic">not provisioned</span>
       )}
     </div>
   );
@@ -116,11 +116,11 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   }, [platformId]);
 
   return (
-    <main className="px-4 py-6 max-w-2xl mx-auto">
+    <main className="px-4 pt-24 pb-12 max-w-2xl mx-auto">
       <header className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold">Wallet</h1>
-          <p className="text-xs text-neutral-500 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             {balance?.displayName ?? "your agent"}
             {balance && balance.proTier > 0 && (
               <span className="ml-2 text-yellow-400">· Pro</span>
@@ -130,20 +130,20 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
         <div className="flex gap-2">
           <Link
             href="/activity"
-            className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
+            className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
           >
             Activity
           </Link>
           <Link
             href="/chat"
-            className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
+            className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
           >
             Chat
           </Link>
         </div>
       </header>
 
-      {loading && <p className="text-sm text-neutral-500">Loading…</p>}
+      {loading && <p className="text-sm text-zinc-500">Loading…</p>}
 
       {error && (
         <div className="bg-red-950/30 border border-red-900 rounded-xl px-4 py-3 text-sm text-red-300">
@@ -153,21 +153,21 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
       {balance && (
         <>
-          <div className="mb-6 px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800 text-xs">
-            <span className="text-neutral-500">Status: </span>
+          <div className="mb-6 px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs">
+            <span className="text-zinc-500">Status: </span>
             {balance.verified ? (
               <span className="text-green-400">verified</span>
             ) : balance.registered ? (
               <span className="text-yellow-400">registered, awaiting verify</span>
             ) : (
-              <span className="text-neutral-400">not registered</span>
+              <span className="text-zinc-400">not registered</span>
             )}
             {balance.saidPda && (
               <>
-                <span className="text-neutral-700 mx-2">·</span>
+                <span className="text-zinc-700 mx-2">·</span>
                 <Link
                   href={`/agents/${encodeURIComponent(balance.platformId)}`}
-                  className="text-neutral-400 hover:text-neutral-200"
+                  className="text-zinc-400 hover:text-zinc-200"
                 >
                   Public profile →
                 </Link>
@@ -181,15 +181,15 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
             <WalletCard label="Purch" state={walletStates.purch ?? { address: null, chain: "Solana · Purch", balances: null, loading: false }} />
           </div>
 
-          <div className="mt-8 px-4 py-3 rounded-xl bg-neutral-900 border border-neutral-800">
+          <div className="mt-8 px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800">
             <h2 className="text-sm font-medium mb-2">Funding</h2>
-            <p className="text-xs text-neutral-500 mb-3">
+            <p className="text-xs text-zinc-500 mb-3">
               Top up your agent so it can swap, buy real-world goods, and call paid
               services.
             </p>
             <Link
               href="/fund"
-              className="inline-block text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+              className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
             >
               Add funds
             </Link>

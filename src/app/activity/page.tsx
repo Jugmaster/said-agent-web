@@ -27,28 +27,28 @@ function actionLabel(type: string): { emoji: string; text: string; color: string
     case "transfer":
       return { emoji: "📤", text: "Transfer", color: "text-purple-400" };
     case "test_action":
-      return { emoji: "🧪", text: "Test", color: "text-neutral-500" };
+      return { emoji: "🧪", text: "Test", color: "text-zinc-500" };
     default:
-      return { emoji: "•", text: type, color: "text-neutral-300" };
+      return { emoji: "•", text: type, color: "text-zinc-300" };
   }
 }
 
 function ReceiptItem({ r }: { r: ActivityReceipt }) {
   const label = actionLabel(r.type);
   return (
-    <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 flex items-start gap-3">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-start gap-3">
       <span className="text-xl leading-none mt-0.5">{label.emoji}</span>
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <span className={`text-sm font-medium ${label.color}`}>{label.text}</span>
-          <span className="text-xs text-neutral-500">{timeAgo(r.occurredAt)}</span>
+          <span className="text-xs text-zinc-500">{timeAgo(r.occurredAt)}</span>
         </div>
-        <div className="mt-1 flex items-center gap-2 text-xs text-neutral-500">
+        <div className="mt-1 flex items-center gap-2 text-xs text-zinc-500">
           <span>#{r.seq}</span>
           {r.anchored ? (
             <span className="text-green-500">⛓ anchored</span>
           ) : (
-            <span className="text-neutral-600">pending anchor</span>
+            <span className="text-zinc-600">pending anchor</span>
           )}
         </div>
         {r.onChainTx && (
@@ -56,7 +56,7 @@ function ReceiptItem({ r }: { r: ActivityReceipt }) {
             href={`https://solscan.io/tx/${r.onChainTx}`}
             target="_blank"
             rel="noreferrer"
-            className="mt-1 text-xs text-neutral-500 hover:text-neutral-300 break-all block"
+            className="mt-1 text-xs text-zinc-500 hover:text-zinc-300 break-all block"
           >
             {r.onChainTx.slice(0, 16)}…{r.onChainTx.slice(-8)} ↗
           </a>
@@ -79,23 +79,23 @@ function ActivityScreen({ platformId }: { platformId: string }) {
   }, [platformId]);
 
   return (
-    <main className="px-4 py-6 max-w-2xl mx-auto">
+    <main className="px-4 pt-24 pb-12 max-w-2xl mx-auto">
       <header className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold">Activity</h1>
-          <p className="text-xs text-neutral-500 mt-1">
+          <p className="text-xs text-zinc-500 mt-1">
             On-chain receipts and DCA rules
           </p>
         </div>
         <Link
           href="/chat"
-          className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
+          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
         >
           Back to chat
         </Link>
       </header>
 
-      {loading && <p className="text-sm text-neutral-500">Loading…</p>}
+      {loading && <p className="text-sm text-zinc-500">Loading…</p>}
 
       {error && (
         <div className="bg-red-950/30 border border-red-900 rounded-xl px-4 py-3 text-sm text-red-300">
@@ -107,12 +107,12 @@ function ActivityScreen({ platformId }: { platformId: string }) {
         <>
           {data.feeStats.txCount > 0 && (
             <div className="mb-6 grid grid-cols-2 gap-3">
-              <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3">
-                <div className="text-xs text-neutral-500">Total transactions</div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+                <div className="text-xs text-zinc-500">Total transactions</div>
                 <div className="text-lg font-semibold mt-1">{data.feeStats.txCount}</div>
               </div>
-              <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3">
-                <div className="text-xs text-neutral-500">SAID fees paid</div>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+                <div className="text-xs text-zinc-500">SAID fees paid</div>
                 <div className="text-lg font-semibold mt-1">
                   {data.feeStats.totalFee.toFixed(4)}
                 </div>
@@ -122,14 +122,14 @@ function ActivityScreen({ platformId }: { platformId: string }) {
 
           {data.dcaRules.length > 0 && (
             <section className="mb-6">
-              <h2 className="text-sm font-medium text-neutral-400 mb-2">
+              <h2 className="text-sm font-medium text-zinc-400 mb-2">
                 DCA rules ({data.dcaRules.filter((r) => !r.paused).length} active)
               </h2>
               <div className="space-y-2">
                 {data.dcaRules.map((r) => (
                   <div
                     key={r.id}
-                    className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3"
+                    className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3"
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-sm font-medium">
@@ -141,7 +141,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
                         <span className="text-xs text-green-500">active</span>
                       )}
                     </div>
-                    <div className="text-xs text-neutral-500 mt-1">
+                    <div className="text-xs text-zinc-500 mt-1">
                       every {r.cadenceSeconds >= 86400
                         ? `${Math.round(r.cadenceSeconds / 86400)}d`
                         : `${Math.round(r.cadenceSeconds / 3600)}h`}
@@ -154,11 +154,11 @@ function ActivityScreen({ platformId }: { platformId: string }) {
           )}
 
           <section>
-            <h2 className="text-sm font-medium text-neutral-400 mb-2">
+            <h2 className="text-sm font-medium text-zinc-400 mb-2">
               Recent receipts
             </h2>
             {data.receipts.length === 0 ? (
-              <p className="text-sm text-neutral-500 italic">
+              <p className="text-sm text-zinc-500 italic">
                 No on-chain activity yet. Try a swap from chat.
               </p>
             ) : (

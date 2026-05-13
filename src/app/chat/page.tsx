@@ -97,7 +97,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const isFresh = messages.length === 0 && step === "unknown";
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-65px)]">
+    <div className="flex flex-col h-[calc(100dvh-80px)] mt-20">
       <header className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
         <div>
           <h1 className="text-base font-semibold">{agentName}</h1>

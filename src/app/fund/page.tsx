@@ -74,18 +74,18 @@ function FundScreen({ platformId }: { platformId: string }) {
   }
 
   return (
-    <main className="px-4 py-6 max-w-md mx-auto">
+    <main className="px-4 pt-24 pb-12 max-w-md mx-auto">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold">Activate your agent</h1>
         <Link
           href="/portfolio"
-          className="text-xs px-3 py-1 rounded-md border border-neutral-700 hover:border-neutral-500"
+          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
         >
           Back
         </Link>
       </header>
 
-      {loading && <p className="text-sm text-neutral-500">Loading…</p>}
+      {loading && <p className="text-sm text-zinc-500">Loading…</p>}
 
       {error && (
         <div className="bg-red-950/30 border border-red-900 rounded-xl px-4 py-3 text-sm text-red-300">
@@ -99,12 +99,12 @@ function FundScreen({ platformId }: { platformId: string }) {
           <p className="text-sm font-medium text-green-300 mb-1">
             {balance.displayName ?? "Your agent"} is verified
           </p>
-          <p className="text-xs text-neutral-400 mb-4">
+          <p className="text-xs text-zinc-400 mb-4">
             On-chain identity active. Pro features unlocked.
           </p>
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
           >
             Open chat →
           </Link>
@@ -113,8 +113,8 @@ function FundScreen({ platformId }: { platformId: string }) {
 
       {balance && !balance.verified && balance.saidWallet && (
         <>
-          <p className="text-sm text-neutral-400 mb-6">
-            Send <span className="text-neutral-100 font-medium">{VERIFY_AMOUNT_SOL} SOL</span> to
+          <p className="text-sm text-zinc-400 mb-6">
+            Send <span className="text-zinc-100 font-medium">{VERIFY_AMOUNT_SOL} SOL</span> to
             your agent&apos;s wallet to activate it. Verification happens automatically
             within ~30 seconds of the deposit landing.
           </p>
@@ -122,30 +122,30 @@ function FundScreen({ platformId }: { platformId: string }) {
           {qrSvg && (
             <div className="flex justify-center mb-6">
               <div
-                className="bg-neutral-900 border border-neutral-800 rounded-2xl p-4"
+                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
               />
             </div>
           )}
 
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 mb-4">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-neutral-500">Wallet address</span>
+              <span className="text-xs text-zinc-500">Wallet address</span>
               <button
                 onClick={copyAddress}
-                className="text-xs px-2 py-0.5 rounded bg-neutral-800 hover:bg-neutral-700"
+                className="text-xs px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700"
               >
                 {copied ? "copied" : "copy"}
               </button>
             </div>
-            <code className="text-xs text-neutral-300 break-all block">
+            <code className="text-xs text-zinc-300 break-all block">
               {balance.saidWallet}
             </code>
           </div>
 
-          <div className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-neutral-500">
+          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-500">
             <p className="mb-2">
-              <span className="text-neutral-300">Tip:</span> Scan the QR with any
+              <span className="text-zinc-300">Tip:</span> Scan the QR with any
               Solana wallet app (Phantom, Solflare, Backpack) to auto-fill the amount.
             </p>
             <p>
@@ -154,7 +154,7 @@ function FundScreen({ platformId }: { platformId: string }) {
             </p>
           </div>
 
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-neutral-500">
+          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500">
             <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
             <span>Awaiting deposit…</span>
           </div>
@@ -167,7 +167,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           agent gets provisioned on first message.
           <Link
             href="/chat"
-            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 text-white"
+            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition text-white"
           >
             Open chat →
           </Link>

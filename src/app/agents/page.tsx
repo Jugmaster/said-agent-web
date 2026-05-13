@@ -95,7 +95,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
   return (
     <>
       <Navbar />
-      <main className="px-4 md:px-8 py-12 max-w-3xl mx-auto">
+      <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
         <header className="mb-10">
           <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
             Directory
