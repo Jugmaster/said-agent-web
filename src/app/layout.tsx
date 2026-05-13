@@ -13,11 +13,10 @@ export const metadata: Metadata = {
   title: "SAID Agent",
   description: "Your AI butler on Solana — chat, swap, buy real things.",
   manifest: "/manifest.webmanifest",
-  icons: {
-    icon: "/favicon.png",
-    shortcut: "/favicon.png",
-    apple: "/icon-192.png",
-  },
+  // Favicon + apple-touch-icon are picked up automatically from
+  // app/icon.png and app/apple-icon.png via Next's file convention.
+  // (The previously-referenced public/favicon.png had JPEG content under
+  // a .png extension — Safari rejected it.)
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
