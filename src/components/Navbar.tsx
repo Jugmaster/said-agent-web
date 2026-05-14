@@ -54,6 +54,9 @@ export default function Navbar() {
           <Link href="/agents" className={NAV_LINK}>
             Agents
           </Link>
+          <Link href="/docs" className={NAV_LINK}>
+            Docs
+          </Link>
           <a
             href="https://www.saidprotocol.com"
             target="_blank"
