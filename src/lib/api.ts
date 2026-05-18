@@ -176,6 +176,14 @@ export async function claimAgent(input: {
   platformId: string;
   privyUserId: string;
   verifiedXUserId?: string;
+  /** X handle (e.g. "bob_on_x") — used by butler to seed display_name when
+   *  auto-creating an agent for a pre-provisioned recipient logging in for
+   *  the first time. */
+  xUsername?: string;
+  /** Solana wallet from the Privy session — pre-provisioned recipients have
+   *  this attached server-side; PWA forwards so butler can persist it on
+   *  first claim. */
+  walletAddress?: string;
 }): Promise<ClaimResponse> {
   const res = await fetch(`${API_BASE}/api/claim`, {
     method: "POST",

@@ -11,14 +11,41 @@ import { claimAgent, type ClaimResponse } from "@/lib/api";
  *  1. `tg_<telegramUserId>` — if Privy session has a Telegram account.
  *     Maps directly onto the agent the user has already been chatting with
  *     via @saidinfrabot. Same wallet, same history.
- *  2. `pwa_<privyId>` fallback — for users who logged in with email / Google /
- *     X / wallet without linking Telegram. Butler creates a fresh agent on
+ *  2. `tw_<twitterSubject>` — if Privy session has an X (Twitter) account.
+ *     For pre-provisioned recipients (someone sent crypto to their @handle
+ *     before they ever logged in), Privy reconciles to the pre-existing
+ *     user on first OAuth — meaning their pre-funded wallet is already
+ *     attached when this hook fires.
+ *  3. `pwa_<privyId>` fallback — for users who logged in with email / Google /
+ *     wallet without linking either social. Butler creates a fresh agent on
  *     first claim.
  */
 function derivePlatformId(user: User): string {
   const tgId = user.telegram?.telegramUserId;
   if (tgId) return `tg_${tgId}`;
+  const xSubject = user.twitter?.subject;
+  if (xSubject) return `tw_${xSubject}`;
   return `pwa_${user.id}`;
+}
+
+/**
+ * Pull the Solana embedded wallet address out of the Privy user's linked
+ * accounts. For pre-provisioned users this is the wallet that already has
+ * funds in it from someone's send-by-handle.
+ */
+function findSolanaWalletAddress(user: User): string | null {
+  const linked = (user.linkedAccounts ?? []) as Array<{
+    type?: string;
+    chainType?: string;
+    address?: string;
+    connectorType?: string;
+  }>;
+  const embedded = linked.find(
+    (a) => a.chainType === "solana" && a.connectorType === "embedded" && a.address,
+  );
+  if (embedded?.address) return embedded.address;
+  const external = linked.find((a) => a.chainType === "solana" && a.address);
+  return external?.address ?? null;
 }
 
 /**
@@ -82,10 +109,23 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
 
     const platformId = derivePlatformId(privyUser);
 
+    // For X (twitter) users we forward extra context so butler can auto-
+    // create the agent record if the user was pre-provisioned (someone sent
+    // them crypto by handle before they ever logged in). Butler verifies
+    // verifiedXUserId === platformId.slice('tw_'.length) before trusting any
+    // of this — same auth check that's been in place for adopting X-launched
+    // agents.
+    const verifiedXUserId = privyUser.twitter?.subject;
+    const xUsername = privyUser.twitter?.username ?? undefined;
+    const walletAddress = findSolanaWalletAddress(privyUser) ?? undefined;
+
     try {
       const claim: ClaimResponse = await claimAgent({
         platformId,
         privyUserId: privyUser.id,
+        verifiedXUserId,
+        xUsername,
+        walletAddress,
       });
       const cache: LinkedCache = {
         privyId: privyUser.id,
