@@ -21,39 +21,34 @@ export default function HomePage() {
     <>
       <Navbar />
       <main className="min-h-[calc(100dvh-65px)] px-6 flex items-center justify-center">
-        <div className="max-w-md w-full text-center">
+        <div className="max-w-xl w-full text-center">
           <div className="inline-block px-4 py-2 mb-8 text-sm text-zinc-400 border border-zinc-700 rounded-full">
             Now live on Solana Mainnet
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight">
-            Your AI agent
+          <h1 className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight">
+            One conversation.
             <br />
-            on Solana.
+            One identity. One balance.
           </h1>
-          <p className="text-base text-zinc-400 mb-8">
-            Personal on-chain agent — your own wallet, your own identity, cross-chain
-            native. No seed phrases, no setup.
+          <p className="text-base sm:text-lg text-zinc-400 mb-3 max-w-lg mx-auto">
+            <span className="text-zinc-200">Send your friend 20 bucks. Buy those Nikes. Swap your $PEPE for SOL.</span>
+          </p>
+          <p className="text-sm text-zinc-500 mb-10 max-w-lg mx-auto">
+            All from one chat. Your own on-chain AI agent — its own wallet, its own
+            identity, no seed phrases, no setup. Activated in one message.
           </p>
 
           <button
             onClick={login}
             disabled={!ready}
-            className="w-full px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 disabled:opacity-50 transition mb-3"
+            className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 disabled:opacity-50 transition mb-3"
           >
-            {ready ? "Log in / Sign up →" : "Loading…"}
+            {ready ? "Get your agent →" : "Loading…"}
           </button>
 
           <p className="text-xs text-zinc-500">
-            Same login as{" "}
-            <a
-              href="https://www.saidprotocol.com"
-              target="_blank"
-              rel="noreferrer"
-              className="text-zinc-300 hover:text-white underline underline-offset-2"
-            >
-              saidprotocol.com
-            </a>
+            Free to start · sponsored onboarding · no SOL required
           </p>
 
           <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
