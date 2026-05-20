@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
 import DotGridBackground from "@/components/DotGridBackground";
+import InstallNudge from "@/components/InstallNudge";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -51,6 +52,7 @@ export default function RootLayout({
           <DotGridBackground />
           {/* Content sits above the background */}
           <div className="relative z-10 flex flex-col min-h-dvh">{children}</div>
+          <InstallNudge />
         </Providers>
       </body>
     </html>
