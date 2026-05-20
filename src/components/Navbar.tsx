@@ -54,6 +54,9 @@ export default function Navbar() {
           <Link href="/agents" className={NAV_LINK}>
             Agents
           </Link>
+          <Link href="/stats" className={NAV_LINK}>
+            Stats
+          </Link>
           <Link href="/docs" className={NAV_LINK}>
             Docs
           </Link>
