@@ -30,6 +30,9 @@ export const viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  // Extend rendering behind iOS notch / home indicator so safe-area-inset-*
+  // env values become non-zero (and we can pad accordingly in components).
+  viewportFit: "cover" as const,
 };
 
 export default function RootLayout({

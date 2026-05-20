@@ -108,7 +108,10 @@ export default function InstallNudge() {
     <div
       role="dialog"
       aria-label="Install SAID Agent to your home screen"
-      className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
+      style={{
+        bottom: "max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))",
+      }}
+      className="fixed left-1/2 -translate-x-1/2 z-40 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-white flex-shrink-0 overflow-hidden">

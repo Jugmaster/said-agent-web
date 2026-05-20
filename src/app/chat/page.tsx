@@ -190,7 +190,10 @@ function ChatScreen({ platformId }: { platformId: string }) {
       </div>
 
       <form
-        className="px-4 py-3 border-t border-zinc-800 flex items-end gap-2"
+        className="px-4 pt-3 border-t border-zinc-800 flex items-end gap-2"
+        style={{
+          paddingBottom: "max(0.75rem, calc(env(safe-area-inset-bottom) + 0.25rem))",
+        }}
         onSubmit={(e) => {
           e.preventDefault();
           void send();
