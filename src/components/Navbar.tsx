@@ -134,6 +134,13 @@ export default function Navbar() {
                     Chat
                   </Link>
                   <Link
+                    href="/send"
+                    onClick={() => setMenuOpen(false)}
+                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
+                  >
+                    Send
+                  </Link>
+                  <Link
                     href="/portfolio"
                     onClick={() => setMenuOpen(false)}
                     className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
