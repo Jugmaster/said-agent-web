@@ -59,9 +59,13 @@ export default function FundOnrampPage() {
   async function start(): Promise<void> {
     if (!wallet) return;
     if (!authenticated) {
-      // Privy requires an authed session to fund. If they're not logged in
-      // (Mini App context may carry no auth cookie), prompt login first.
-      login();
+      // Mini App auth: force Telegram-only login so the resulting Privy user
+      // reconciles with whatever Privy DID the PWA logged-in version of this
+      // user has. Using Privy's native Telegram OAuth (the same method the
+      // PWA's main login button uses) means one human → one Privy user across
+      // both surfaces. If we used a custom-JWT bridge from initData here, the
+      // two paths would create two separate Privy DIDs for the same human.
+      login({ loginMethods: ["telegram"] } as Parameters<typeof login>[0]);
       return;
     }
     setPhase("funding");
