@@ -1,21 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
 
 export default function HomePage() {
-  const router = useRouter();
-  const { ready, authenticated, login } = usePrivy();
-
-  // Already logged in → straight to chat. No landing page in the way.
-  useEffect(() => {
-    if (ready && authenticated) {
-      router.replace("/chat");
-    }
-  }, [ready, authenticated, router]);
+  const { ready, login } = usePrivy();
 
   return (
     <>
