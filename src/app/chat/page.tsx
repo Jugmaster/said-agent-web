@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { chat, getBalance, type ChatResponse } from "@/lib/api";
+import { chat, getBalance, getConversations, type ChatResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
 
@@ -40,6 +40,25 @@ function ChatScreen({ platformId }: { platformId: string }) {
       })
       .catch(() => {
         // 404 → no agent yet, leave step="unknown" so the welcome card renders
+      });
+
+    // Load conversation history (up to 50 most-recent messages) so users
+    // see their full chat with the agent when they log in on the web. Without
+    // this, the PWA's chat starts blank every session even though butler.db
+    // has logged everything.
+    getConversations(platformId, 50)
+      .then((r) => {
+        if (!r.messages || r.messages.length === 0) return;
+        setMessages(
+          r.messages.map((m) => ({
+            id: `h-${m.id}`,
+            role: m.role === "assistant" ? "agent" : "user",
+            text: m.content,
+          })),
+        );
+      })
+      .catch(() => {
+        // best-effort — empty history is the existing fallback
       });
   }, [platformId]);
 

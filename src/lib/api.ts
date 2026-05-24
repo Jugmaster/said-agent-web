@@ -145,6 +145,39 @@ export async function getActivity(platformId: string): Promise<ActivityResponse>
   return res.json();
 }
 
+export interface ConversationMessage {
+  id: number;
+  role: "user" | "assistant";
+  content: string;
+  createdAt: string;
+}
+
+export interface ConversationsResponse {
+  platformId: string;
+  messages: ConversationMessage[];
+}
+
+/**
+ * Recent conversation history with the user's butler agent. Returned in
+ * chronological order (oldest first) so the chat page can render top-down
+ * without reversing. Loaded once on mount of the /chat page so users see
+ * their full Telegram conversation history when they log in on the web.
+ */
+export async function getConversations(
+  platformId: string,
+  limit: number = 50,
+): Promise<ConversationsResponse> {
+  const res = await fetch(
+    `${API_BASE}/api/conversations/${encodeURIComponent(platformId)}?limit=${limit}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`conversations failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export async function getAgentProfile(
   platformId: string,
   options?: { signal?: AbortSignal; cache?: RequestCache }
@@ -362,18 +395,31 @@ export interface OnChainBalances {
 export async function getOnChainBalances(
   walletAddress: string
 ): Promise<OnChainBalances> {
-  // Two parallel JSON-RPC calls — native SOL and USDC SPL accounts
+  // Route through butler's server-side failover RPC chain. Hitting
+  // api.mainnet-beta.solana.com directly (the old behavior) rate-limited
+  // aggressively → SaladBot's 0.0117 SOL showed as "empty" because the
+  // 429 response defaulted to 0. butler's /api/wallet-balances uses its
+  // QuickNode → publicnode failover so this is reliable + doesn't leak
+  // RPC keys to client bundles.
+  try {
+    const res = await fetch(
+      `${API_BASE}/api/wallet-balances/${encodeURIComponent(walletAddress)}`,
+    );
+    if (res.ok) {
+      const data = (await res.json()) as { sol: number; usdc: number };
+      return { sol: data.sol ?? 0, usdc: data.usdc ?? 0 };
+    }
+  } catch {
+    // fall through to direct-RPC fallback
+  }
+  // Fallback: direct public RPC. Not great (rate-limited) but better than
+  // showing nothing if butler is unreachable.
   const [solRes, tokenRes] = await Promise.all([
     fetch(SOLANA_RPC, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 1,
-        method: "getBalance",
-        params: [walletAddress],
-      }),
-    }).then((r) => r.json()),
+      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [walletAddress] }),
+    }).then((r) => r.json()).catch(() => ({})),
     fetch(SOLANA_RPC, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -381,23 +427,17 @@ export async function getOnChainBalances(
         jsonrpc: "2.0",
         id: 2,
         method: "getTokenAccountsByOwner",
-        params: [
-          walletAddress,
-          { mint: USDC_MINT },
-          { encoding: "jsonParsed" },
-        ],
+        params: [walletAddress, { mint: USDC_MINT }, { encoding: "jsonParsed" }],
       }),
-    }).then((r) => r.json()),
+    }).then((r) => r.json()).catch(() => ({})),
   ]);
-
   const lamports: number = solRes?.result?.value ?? 0;
   const usdc = (tokenRes?.result?.value ?? []).reduce(
     (sum: number, account: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }) => {
       const amount = account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
       return sum + (typeof amount === "number" ? amount : 0);
     },
-    0
+    0,
   );
-
   return { sol: lamports / 1e9, usdc };
 }
