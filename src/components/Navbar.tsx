@@ -115,7 +115,13 @@ export default function Navbar() {
                   <div className="px-4 py-3 border-b border-zinc-800">
                     <div className="text-xs text-zinc-500">signed in as</div>
                     <div className="text-sm text-zinc-200 truncate">
-                      {user?.email?.address ?? user?.wallet?.address ?? user?.id}
+                      {user?.telegram?.username
+                        ? `@${user.telegram.username}`
+                        : user?.twitter?.username
+                          ? `@${user.twitter.username}`
+                          : user?.email?.address ??
+                            user?.wallet?.address ??
+                            user?.id}
                     </div>
                   </div>
                   {agent.status === "ready" && (
