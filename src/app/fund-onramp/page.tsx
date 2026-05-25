@@ -16,7 +16,11 @@
  */
 
 import { useEffect, useState } from "react";
-import { useFundWallet, usePrivy } from "@privy-io/react-auth";
+import {
+  useFundWallet,
+  usePrivy,
+  useLoginWithTelegram,
+} from "@privy-io/react-auth";
 
 // Telegram WebApp SDK types — use the same shape src/lib/identity.ts declares,
 // extended with the methods this page actually uses (close, expand).
@@ -26,16 +30,20 @@ interface TelegramWebApp {
   ready: () => void;
   close: () => void;
   expand: () => void;
+  initData?: string;
 }
 
 export default function FundOnrampPage() {
-  const { ready, authenticated, login } = usePrivy();
+  const { ready, authenticated, login, user, linkTelegram } = usePrivy();
+  const { login: loginWithTelegram } = useLoginWithTelegram();
   const { fundWallet } = useFundWallet();
   const [wallet, setWallet] = useState<string | null>(null);
   const [amount, setAmount] = useState<string | null>(null);
   const [phase, setPhase] = useState<"loading" | "ready" | "funding" | "done" | "error">("loading");
   const [errorMsg, setErrorMsg] = useState<string>("");
   const [isTelegram, setIsTelegram] = useState(false);
+  const [initDataRaw, setInitDataRaw] = useState<string | null>(null);
+  const [autoAuthAttempted, setAutoAuthAttempted] = useState(false);
 
   // Read URL params + initialize Telegram WebApp SDK
   useEffect(() => {
@@ -50,21 +58,49 @@ export default function FundOnrampPage() {
       setIsTelegram(true);
       tg.ready?.();
       tg.expand?.();
+      // Capture the signed initData payload — Privy uses this to silently
+      // authenticate the user via @saidinfrabot's HMAC instead of showing
+      // an OAuth popup. Requires the bot token registered in Privy dashboard.
+      if (tg.initData) setInitDataRaw(tg.initData);
     }
 
     setPhase(w ? "ready" : "error");
     if (!w) setErrorMsg("Missing wallet address in URL.");
   }, []);
 
+  // Auto-auth: when we're inside Telegram and not yet authenticated, trigger
+  // the headless Privy Telegram login. With @saidinfrabot's token configured
+  // in Privy dashboard and BotFather domain set, Privy verifies WebApp.initData
+  // server-side and creates the session WITHOUT a popup.
+  useEffect(() => {
+    if (!ready || !isTelegram || authenticated || autoAuthAttempted) return;
+    setAutoAuthAttempted(true);
+    loginWithTelegram().catch((err) => {
+      console.warn("[fund-onramp] auto-auth failed:", err);
+      // Fall through — user can still tap "Continue to payment" which will
+      // trigger the regular login() path with the visible Privy modal.
+    });
+  }, [ready, isTelegram, authenticated, autoAuthAttempted, loginWithTelegram]);
+
+  // After auth, opportunistically link Telegram if the user doesn't have it
+  // attached yet — covers the case where a user logged in via email/X on the
+  // web and is now opening the Mini App. Cheap no-op if already linked.
+  useEffect(() => {
+    if (!authenticated || !isTelegram || !initDataRaw) return;
+    if (user?.telegram?.telegramUserId) return;
+    try {
+      linkTelegram({ launchParams: { initDataRaw } });
+    } catch (err) {
+      console.warn("[fund-onramp] linkTelegram failed:", err);
+    }
+  }, [authenticated, isTelegram, initDataRaw, user, linkTelegram]);
+
   async function start(): Promise<void> {
     if (!wallet) return;
     if (!authenticated) {
-      // Mini App auth: force Telegram-only login so the resulting Privy user
-      // reconciles with whatever Privy DID the PWA logged-in version of this
-      // user has. Using Privy's native Telegram OAuth (the same method the
-      // PWA's main login button uses) means one human → one Privy user across
-      // both surfaces. If we used a custom-JWT bridge from initData here, the
-      // two paths would create two separate Privy DIDs for the same human.
+      // Outside Telegram (or auto-auth failed): fall through to the standard
+      // Privy modal. Now that the dashboard bot is @saidinfrabot, Telegram-
+      // OAuth on web here uses the same bot users chat with daily.
       login({ loginMethods: ["telegram"] } as Parameters<typeof login>[0]);
       return;
     }
