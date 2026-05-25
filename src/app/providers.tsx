@@ -1,19 +1,10 @@
 "use client";
 
 import { PrivyProvider } from "@privy-io/react-auth";
-import { useSolanaFundingPlugin } from "@privy-io/react-auth/solana";
 import { ReactNode } from "react";
 
 // Shared with saidprotocol.com — single Privy session works across both surfaces.
 const PRIVY_APP_ID = "cmlbxd3qu00jqi80c4pibohzv";
-
-// Registers the Solana funding machinery inside the Privy provider tree so
-// `useFundWallet` from @privy-io/react-auth/solana actually works (otherwise
-// the funding modal can't open and throws chain-resolution errors).
-function SolanaFundingBootstrap() {
-  useSolanaFundingPlugin();
-  return null;
-}
 
 export default function Providers({ children }: { children: ReactNode }) {
   return (
@@ -37,7 +28,6 @@ export default function Providers({ children }: { children: ReactNode }) {
         },
       }}
     >
-      <SolanaFundingBootstrap />
       {children}
     </PrivyProvider>
   );

@@ -16,11 +16,15 @@
  */
 
 import { useEffect, useState } from "react";
-import { usePrivy, useLoginWithTelegram } from "@privy-io/react-auth";
-// SOLANA-specific funding hook. The default useFundWallet from @privy-io/react-auth
-// is EVM-only and tries to resolve a numeric chain ID — which is NaN for Solana
-// addresses, producing "Funding chain NAN is not in privy provider chains list."
-import { useFundWallet } from "@privy-io/react-auth/solana";
+import {
+  useFundWallet,
+  usePrivy,
+  useLoginWithTelegram,
+} from "@privy-io/react-auth";
+// TODO: switch to @privy-io/react-auth/solana once @solana/kit reaches v6 in
+// the dep tree (currently pinned to v5 by @coinbase/cdp-sdk → @base-org/account).
+// Until then, fundWallet() will throw "Funding chain NAN" on Solana — caught
+// below and surfaced as a friendlier UI.
 
 // Telegram WebApp SDK types — use the same shape src/lib/identity.ts declares,
 // extended with the methods this page actually uses (close, expand).
@@ -123,7 +127,18 @@ export default function FundOnrampPage() {
       }, 1500);
     } catch (err) {
       setPhase("error");
-      setErrorMsg(err instanceof Error ? err.message : String(err));
+      const raw = err instanceof Error ? err.message : String(err);
+      // Known issue: useFundWallet from the root privy package is EVM-only.
+      // Until we can upgrade the dep tree to use the Solana variant, surface
+      // a friendlier message + the wallet address so the user can fund
+      // manually from any wallet/exchange.
+      if (raw.toLowerCase().includes("nan") || raw.toLowerCase().includes("chain")) {
+        setErrorMsg(
+          `Card onramp is temporarily unavailable. Send SOL to your agent wallet from any wallet or exchange:\n\n${wallet}`,
+        );
+      } else {
+        setErrorMsg(raw);
+      }
     }
   }
 
