@@ -171,10 +171,17 @@ export default function FundOnrampPage() {
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
         <p className="text-3xl mb-3">✅</p>
-        <p className="text-sm font-medium mb-2">Payment submitted</p>
+        <p className="text-sm font-medium mb-2">Payment window opened</p>
         <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">
-          Funds should land in your wallet in ~30 seconds. I&apos;ll DM you when they do.
+          Finish checkout in the popup above. Funds land in your wallet in
+          ~30 seconds — I&apos;ll DM you when they do.
         </p>
+        <button
+          onClick={close}
+          className="px-6 py-3 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition"
+        >
+          Done — back to chat
+        </button>
       </main>
     );
   }
