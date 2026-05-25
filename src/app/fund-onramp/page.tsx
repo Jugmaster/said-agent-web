@@ -117,11 +117,10 @@ export default function FundOnrampPage() {
           : undefined,
       });
       setPhase("done");
-      // Auto-close after success so user lands back in the Telegram chat.
-      setTimeout(() => {
-        const tg = window.Telegram?.WebApp as TelegramWebApp | undefined;
-        tg?.close?.();
-      }, 1500);
+      // Don't auto-close — Privy's Solana fundWallet resolves the instant the
+      // payment-method picker opens (not after payment completes), so calling
+      // tg.close() here yanks the WebApp out from under the user mid-checkout.
+      // Let them tap the WebApp's native close button when they're done.
     } catch (err) {
       setPhase("error");
       const raw = err instanceof Error ? err.message : String(err);
