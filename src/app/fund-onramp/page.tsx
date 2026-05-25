@@ -16,11 +16,11 @@
  */
 
 import { useEffect, useState } from "react";
-import {
-  useFundWallet,
-  usePrivy,
-  useLoginWithTelegram,
-} from "@privy-io/react-auth";
+import { usePrivy, useLoginWithTelegram } from "@privy-io/react-auth";
+// SOLANA-specific funding hook. The default useFundWallet from @privy-io/react-auth
+// is EVM-only and tries to resolve a numeric chain ID — which is NaN for Solana
+// addresses, producing "Funding chain NAN is not in privy provider chains list."
+import { useFundWallet } from "@privy-io/react-auth/solana";
 
 // Telegram WebApp SDK types — use the same shape src/lib/identity.ts declares,
 // extended with the methods this page actually uses (close, expand).
