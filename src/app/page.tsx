@@ -16,12 +16,18 @@ export default function HomePage() {
             Now live on Solana Mainnet
           </div>
 
-          <h1 className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight">
+          <h1
+            className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight"
+            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 0 60px rgba(102,126,234,0.15)" }}
+          >
             One conversation.
             <br />
             One identity. One balance.
           </h1>
-          <p className="text-base sm:text-lg text-zinc-400 mb-3 max-w-lg mx-auto">
+          <p
+            className="text-base sm:text-lg text-zinc-400 mb-3 max-w-lg mx-auto"
+            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
+          >
             <span className="text-zinc-200">Send your friend 20 bucks. Buy those Nikes. Swap your $PEPE for SOL.</span>
           </p>
           <p className="text-sm text-zinc-500 mb-10 max-w-lg mx-auto">
