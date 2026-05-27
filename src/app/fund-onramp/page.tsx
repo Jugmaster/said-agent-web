@@ -32,6 +32,27 @@ interface TelegramWebApp {
   close: () => void;
   expand: () => void;
   initData?: string;
+  openLink: (url: string, options?: { try_instant_view?: boolean }) => void;
+}
+
+/**
+ * Build a MoonPay hosted URL targeting the agent's wallet directly. Used
+ * inside the Telegram WebApp where Privy's onramp modal can't redirect
+ * cleanly (Telegram's WebView closes when location.href changes off-domain).
+ * We skip Privy's modal entirely and use Telegram.WebApp.openLink to launch
+ * MoonPay in the user's default browser (Safari/Chrome), where their email
+ * + iframe flow actually works.
+ */
+function buildMoonpayUrl(wallet: string, amount: string | null): string {
+  const params = new URLSearchParams({
+    currencyCode: "sol",
+    walletAddress: wallet,
+    defaultCurrencyCode: "sol",
+  });
+  if (amount) {
+    params.set("baseCurrencyAmount", amount);
+  }
+  return `https://buy.moonpay.com/?${params.toString()}`;
 }
 
 export default function FundOnrampPage() {
@@ -98,6 +119,22 @@ export default function FundOnrampPage() {
 
   async function start(): Promise<void> {
     if (!wallet) return;
+
+    // Inside Telegram WebApp: skip Privy's onramp modal entirely. Use
+    // tg.openLink() with a direct MoonPay URL — Telegram opens it in the
+    // user's default browser (NOT the restricted in-app browser), where
+    // MoonPay's email/iframe flow works correctly. WebApp stays open in
+    // background so the user can return to it after paying.
+    if (isTelegram) {
+      const tg = window.Telegram?.WebApp as TelegramWebApp | undefined;
+      if (tg?.openLink) {
+        const moonpayUrl = buildMoonpayUrl(wallet, amount);
+        tg.openLink(moonpayUrl);
+        setPhase("done");
+        return;
+      }
+    }
+
     if (!authenticated) {
       // Outside Telegram (or auto-auth failed): fall through to the standard
       // Privy modal. Now that the dashboard bot is @saidinfrabot, Telegram-
@@ -107,9 +144,9 @@ export default function FundOnrampPage() {
     }
     setPhase("funding");
     try {
-      // Privy v3 useFundWallet signature: fundWallet({ address, options? })
-      // Privy will open its onramp modal (Moonpay / Coinbase Pay), user pays
-      // via card or Apple Pay, funds settle to `wallet` (butler-managed).
+      // Web fallback (not inside Telegram WebApp): use Privy's full onramp
+      // modal. Works in Safari/Chrome because the redirect-to-MoonPay doesn't
+      // hit the WebView restriction.
       await fundWallet({
         address: wallet,
         options: amount
@@ -171,10 +208,11 @@ export default function FundOnrampPage() {
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
         <p className="text-3xl mb-3">✅</p>
-        <p className="text-sm font-medium mb-2">Payment window opened</p>
+        <p className="text-sm font-medium mb-2">Payment opened in your browser</p>
         <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">
-          Finish checkout in the popup above. Funds land in your wallet in
-          ~30 seconds — I&apos;ll DM you when they do.
+          Finish checkout in Safari/Chrome — then come back here. Funds land
+          in your wallet ~30 seconds after payment confirms; I&apos;ll DM you
+          when they do.
         </p>
         <button
           onClick={close}
