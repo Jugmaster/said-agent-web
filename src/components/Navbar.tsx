@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
@@ -43,6 +44,13 @@ export default function Navbar() {
       >
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2 px-2">
+          <Image
+            src="/logo-dark.png"
+            alt="SAID"
+            width={20}
+            height={20}
+            priority
+          />
           <span className="text-sm font-bold tracking-wide">SAID Agent</span>
         </Link>
 
