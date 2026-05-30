@@ -100,45 +100,36 @@ export default function FundOnrampPage() {
   async function start(): Promise<void> {
     if (!wallet) return;
 
-    // Inside Telegram WebApp: Telegram's restricted in-app WebView breaks
-    // Privy's onramp redirect, and a raw MoonPay URL has no merchant
-    // key/signature (MoonPay here is provisioned via Privy, not standalone).
-    // So bounce the user to THIS SAME page in their default browser via
-    // openLink — there window.Telegram.WebApp is absent, isTelegram is false,
-    // and start() runs the working Privy fundWallet path. The wallet/amount
-    // params are already on the current URL, so they carry over.
-    if (isTelegram) {
-      const tg = window.Telegram?.WebApp as TelegramWebApp | undefined;
-      if (tg?.openLink) {
-        tg.openLink(window.location.href);
-        setPhase("done");
-        return;
-      }
-    }
-
+    // Run Privy's EMBEDDED onramp in place — no browser bounce. Privy mounts
+    // the card/MoonPay flow in an in-app iframe (it ships its own MoonPay
+    // merchant key), so the user funds without leaving the Telegram Mini App.
+    // fundWallet on-ramps to ANY Solana address, so funding the butler-managed
+    // agent wallet works even though it isn't the session's own embedded
+    // wallet. Inside Telegram this is the whole point — keep the spark.
     if (!authenticated) {
-      // Outside Telegram (or auto-auth failed): fall through to the standard
-      // Privy modal. Now that the dashboard bot is @saidinfrabot, Telegram-
-      // OAuth on web here uses the same bot users chat with daily.
+      // Need a Privy session to launch the onramp. Inside Telegram the
+      // initData auto-auth above usually handles this; if it hasn't landed
+      // yet, prompt the Telegram login explicitly.
       login({ loginMethods: ["telegram"] } as Parameters<typeof login>[0]);
       return;
     }
     setPhase("funding");
     try {
-      // Web fallback (not inside Telegram WebApp): use Privy's full onramp
-      // modal. Works in Safari/Chrome because the redirect-to-MoonPay doesn't
-      // hit the WebView restriction.
       await fundWallet({
         address: wallet,
-        options: amount
-          ? ({ amount } as unknown as Parameters<typeof fundWallet>[0]["options"])
-          : undefined,
+        options: {
+          // Jump straight to the card flow (MoonPay) — skip the method picker.
+          defaultFundingMethod: "card",
+          card: { preferredProvider: "moonpay" },
+          asset: "native-currency",
+          ...(amount ? { amount } : {}),
+        } as unknown as Parameters<typeof fundWallet>[0]["options"],
       });
       setPhase("done");
-      // Don't auto-close — Privy's Solana fundWallet resolves the instant the
-      // payment-method picker opens (not after payment completes), so calling
-      // tg.close() here yanks the WebApp out from under the user mid-checkout.
-      // Let them tap the WebApp's native close button when they're done.
+      // Privy's Solana fundWallet resolves when the onramp UI opens, NOT when
+      // payment completes — so we don't tg.close() here (would yank the flow
+      // mid-checkout). The deposit-monitor DMs the user when SOL actually
+      // lands on-chain.
     } catch (err) {
       setPhase("error");
       const raw = err instanceof Error ? err.message : String(err);
@@ -189,12 +180,11 @@ export default function FundOnrampPage() {
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
         <p className="text-3xl mb-3">✅</p>
-        <p className="text-sm font-medium mb-2">Opened in your browser</p>
+        <p className="text-sm font-medium mb-2">Payment window open</p>
         <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">
-          Tap <span className="text-zinc-200">Continue to payment</span> in
-          Safari/Chrome to pay with card or Apple Pay. Funds land in your
-          wallet ~30 seconds after payment confirms; I&apos;ll DM you when they
-          do.
+          Complete your card payment in the window that just opened. SOL lands
+          in your wallet ~30 seconds after payment confirms; I&apos;ll DM you
+          when it does.
         </p>
         <button
           onClick={close}
