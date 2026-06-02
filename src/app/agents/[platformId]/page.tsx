@@ -126,21 +126,38 @@ export default async function AgentProfilePage({ params }: PageProps) {
                 className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 flex items-center justify-between"
               >
                 <div>
-                  <span className="text-sm font-medium capitalize">{a.type}</span>
+                  <span className="text-sm font-medium capitalize">
+                    {a.type === "idle_compute"
+                      ? "IDLE compute"
+                      : a.type.replace(/_/g, " ")}
+                  </span>
                   <span className="text-xs text-neutral-500 ml-2">
                     {formatDate(a.occurredAt)}
                   </span>
                 </div>
-                {a.onChainTx && (
-                  <a
-                    href={`https://solscan.io/tx/${a.onChainTx}`}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="text-xs text-neutral-500 hover:text-neutral-300"
-                  >
-                    tx ↗
-                  </a>
-                )}
+                <div className="flex items-center gap-3 shrink-0">
+                  {a.type === "idle_compute" && agent.saidWallet && (
+                    <a
+                      href={`https://api.earnidle.com/api/public/node-earnings?wallet=${agent.saidWallet}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-emerald-400/80 hover:text-emerald-300"
+                      title="Verify this agent's IDLE work at the source"
+                    >
+                      verify on IDLE ↗
+                    </a>
+                  )}
+                  {a.onChainTx && (
+                    <a
+                      href={`https://solscan.io/tx/${a.onChainTx}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-xs text-neutral-500 hover:text-neutral-300"
+                    >
+                      tx ↗
+                    </a>
+                  )}
+                </div>
               </div>
             ))}
           </div>

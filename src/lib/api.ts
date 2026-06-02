@@ -383,6 +383,33 @@ export async function getAgentsList(
   return data.agents ?? [];
 }
 
+export interface IdleLeaderboard {
+  aggregate: { agents: number; jobsCompleted: number; earnedUsd: number };
+  top: Array<{ rank: number; name: string; jobsCompleted: number; earnedUsd: number }>;
+  source: string;
+}
+
+/**
+ * Fleet IDLE-compute earnings — aggregate + top earners. Served by butler
+ * (src/http/server.ts → /api/idle/leaderboard), fed by the idle-collector.
+ * Returns null on any error so the agents page degrades gracefully.
+ */
+export async function getIdleLeaderboard(
+  limit = 10,
+  options?: { revalidate?: number }
+): Promise<IdleLeaderboard | null> {
+  const revalidate = options?.revalidate ?? 60;
+  try {
+    const res = await fetch(`${API_BASE}/api/idle/leaderboard?limit=${limit}`, {
+      next: { revalidate },
+    });
+    if (!res.ok) return null;
+    return (await res.json()) as IdleLeaderboard;
+  } catch {
+    return null;
+  }
+}
+
 const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
