@@ -11,9 +11,25 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://agent.saidprotocol.com"),
   title: "SAID Agent",
-  description: "Your AI butler on Solana — chat, swap, buy real things.",
+  description:
+    "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
   manifest: "/manifest.webmanifest",
+  openGraph: {
+    title: "SAID Agent",
+    description:
+      "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
+    url: "https://agent.saidprotocol.com",
+    siteName: "SAID Agent",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SAID Agent",
+    description:
+      "Your AI agent on Solana — one chat, one wallet, no seed phrases.",
+  },
   // Favicon + apple-touch-icon are picked up automatically from
   // app/icon.png and app/apple-icon.png via Next's file convention.
   // (The previously-referenced public/favicon.png had JPEG content under

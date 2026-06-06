@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
+import HomeBelowFold from "@/components/HomeBelowFold";
 
 export default function HomePage() {
   const { ready, login } = usePrivy();
@@ -20,31 +21,38 @@ export default function HomePage() {
             className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight"
             style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 0 60px rgba(102,126,234,0.15)" }}
           >
-            One conversation.
-            <br />
-            One identity. One balance.
+            Send money. Buy anything. Swap tokens.
           </h1>
           <p
-            className="text-base sm:text-lg text-zinc-400 mb-3 max-w-lg mx-auto"
+            className="text-base sm:text-lg text-zinc-400 mb-8 max-w-md mx-auto"
             style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
           >
-            <span className="text-zinc-200">Send your friend 20 bucks. Buy those Nikes. Swap your $PEPE for SOL.</span>
-          </p>
-          <p className="text-sm text-zinc-500 mb-10 max-w-lg mx-auto">
-            All from one chat. Your own on-chain AI agent — its own wallet, its own
-            identity, no seed phrases, no setup. Activated in one message.
+            All from one chat — your own AI agent on Solana. No seed phrases, no
+            setup.
           </p>
 
-          <button
-            onClick={login}
-            disabled={!ready}
-            className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 disabled:opacity-50 transition mb-3"
-          >
-            {ready ? "Get your agent →" : "Loading…"}
-          </button>
+          {/* Telegram-first (one tap), web app secondary */}
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
+            <a
+              href="https://t.me/saidinfrabot"
+              target="_blank"
+              rel="noreferrer"
+              className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+            >
+              Start in Telegram →
+            </a>
+            <button
+              onClick={login}
+              disabled={!ready}
+              className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 disabled:opacity-50 transition"
+            >
+              {ready ? "Open web app" : "Loading…"}
+            </button>
+          </div>
 
           <p className="text-xs text-zinc-500">
-            Free to start · sponsored onboarding · no SOL required
+            Non-custodial · keys secured by Privy · no seed phrase · no SOL to
+            start
           </p>
 
           <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
@@ -76,6 +84,8 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      <HomeBelowFold />
     </>
   );
 }
