@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePrivy, getAccessToken, type User } from "@privy-io/react-auth";
+import { useWallets } from "@privy-io/react-auth/solana";
 import { claimAgent, type ClaimResponse } from "@/lib/api";
 
 /**
@@ -102,9 +103,19 @@ function clearCache() {
 
 export function useAgent(): AgentState & { logout: () => void; refresh: () => void } {
   const { ready, authenticated, user, logout: privyLogout } = usePrivy();
+  const { wallets: solanaWallets } = useWallets();
   const [state, setState] = useState<AgentState>({ status: "not-ready" });
 
-  const performClaim = useCallback(async (privyUser: User) => {
+  // Reactive Solana embedded-wallet address. Privy provisions the embedded
+  // wallet asynchronously after login, so this hook is the reliable signal —
+  // the snapshot in user.linkedAccounts can lag a beat behind, which is what
+  // caused fresh email/wallet logins to claim before a wallet existed (→ 404).
+  const solanaAddress =
+    solanaWallets?.find((w) => w.address)?.address ??
+    (user ? findSolanaWalletAddress(user) : null);
+
+  const performClaim = useCallback(
+    async (privyUser: User, walletAddress: string | undefined) => {
     setState({ status: "linking" });
 
     const platformId = derivePlatformId(privyUser);
@@ -117,7 +128,6 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
     // agents.
     const verifiedXUserId = privyUser.twitter?.subject;
     const xUsername = privyUser.twitter?.username ?? undefined;
-    const walletAddress = findSolanaWalletAddress(privyUser) ?? undefined;
 
     try {
       const claim: ClaimResponse = await claimAgent({
@@ -170,8 +180,29 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
       return;
     }
 
-    void performClaim(user);
-  }, [ready, authenticated, user, performClaim]);
+    // Telegram agents already exist server-side (created by @saidinfrabot), so
+    // claim just links the session — no web wallet needed. Every other login
+    // provisions a pwa_/tw_ agent whose wallet IS the Privy embedded Solana
+    // wallet, which Privy creates asynchronously. Wait for it before claiming,
+    // otherwise butler gets no wallet and returns 404 (the broken-menus bug).
+    const platformId = derivePlatformId(user);
+    if (!platformId.startsWith("tg_") && !solanaAddress) {
+      setState({ status: "linking" });
+      const t = setTimeout(() => {
+        setState((s) =>
+          s.status === "linking"
+            ? {
+                status: "error",
+                error: "Wallet is taking longer than usual — tap retry.",
+              }
+            : s,
+        );
+      }, 25000);
+      return () => clearTimeout(t);
+    }
+
+    void performClaim(user, solanaAddress ?? undefined);
+  }, [ready, authenticated, user, solanaAddress, performClaim]);
 
   const logout = useCallback(() => {
     clearCache();
@@ -179,8 +210,8 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
   }, [privyLogout]);
 
   const refresh = useCallback(() => {
-    if (user) void performClaim(user);
-  }, [user, performClaim]);
+    if (user) void performClaim(user, solanaAddress ?? undefined);
+  }, [user, solanaAddress, performClaim]);
 
   return { ...state, logout, refresh };
 }
