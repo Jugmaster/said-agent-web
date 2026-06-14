@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 export const metadata: Metadata = {
   title: "Docs · SAID Agent",
   description:
-    "How to use SAID Agent — your AI agent on Solana. Send crypto by Telegram handle, swap tokens, call APIs, and more.",
+    "How to use SAID Agent — your AI agent on Solana. Create one on the web or in Telegram, send crypto by @handle, swap tokens, fund with card, call APIs, and more.",
   openGraph: {
     title: "Docs · SAID Agent",
     description: "How to use your SAID Agent on Solana.",
@@ -20,7 +20,9 @@ const SECTIONS = [
   { id: "swap", title: "Swap & cross-chain" },
   { id: "agentcash", title: "AgentCash" },
   { id: "verify", title: "Verification" },
+  { id: "funding", title: "Funding" },
   { id: "fees", title: "Fees" },
+  { id: "webapp", title: "Web app" },
   { id: "identity", title: "On-chain identity" },
   { id: "surfaces", title: "Surfaces" },
   { id: "faq", title: "FAQ" },
@@ -135,7 +137,7 @@ export default function DocsPage() {
               </h1>
               <p className="text-lg text-zinc-400 max-w-2xl">
                 Your AI agent on Solana — its own wallet, its own identity,
-                yours forever. Lives in Telegram today; X and web app next.
+                yours forever. Live in Telegram and right here on the web.
               </p>
             </header>
 
@@ -181,11 +183,18 @@ bot  →  hey — welcome to SAID Protocol. I create personal AI agents on Solan
 you  →  Vega
 bot  →  ✓ Vega is being registered on-chain.
         wallet: 4Qnf...8vR3
-        profile: saidprotocol.com/agent/Vega`}</Block>
+        profile: agent.saidprotocol.com/agents/Vega`}</Block>
               <p>
                 That&apos;s it. Your agent exists. It has its own wallet, its
                 own on-chain identity, and the full capability surface
                 described below once verified.
+              </p>
+              <p>
+                Prefer the web? You can create and claim an agent right here in
+                the app — sign in with Telegram or X and your agent is
+                provisioned the same way. If you already have one from the bot,
+                signing in links it; the same agent, wallet, and history show
+                up on both surfaces.
               </p>
             </Section>
 
@@ -225,6 +234,18 @@ swap 100 USDC for USDC on arbitrum`}</Block>
                 fees. You get a quote first; nothing executes until you
                 confirm.
               </p>
+              <p>
+                Beyond instant swaps, your agent can place{" "}
+                <span className="text-white font-medium">limit orders</span>{" "}
+                (fill when a price is hit) and{" "}
+                <span className="text-white font-medium">recurring / DCA</span>{" "}
+                buys. In a group chat, it can also run a{" "}
+                <span className="text-white font-medium">group swap</span> and
+                tally everyone&apos;s positions.
+              </p>
+              <Block label="orders">{`buy JUP when it hits $0.40
+dca 10 USDC into SOL every day
+swap 5 USDC to BONK (in a group — everyone joins)`}</Block>
             </Section>
 
             <Section id="agentcash" title="AgentCash">
@@ -284,6 +305,36 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
             </Section>
 
+            <Section id="funding" title="Funding">
+              <p>
+                Your agent&apos;s wallet is a normal Solana wallet — fund it
+                however you like. Three ways:
+              </p>
+              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+                <li>
+                  <span className="text-white font-medium">Card / bank</span> —
+                  buy SOL or USDC straight into your agent&apos;s wallet with a
+                  card, via the in-app on-ramp (MoonPay / Coinbase Pay under the
+                  hood). Works in the web app and inside Telegram.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Crypto deposit</span>{" "}
+                  — send SOL or any SPL token to your agent&apos;s wallet address
+                  from any wallet or exchange.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Scan to pay</span> —
+                  the activation screen shows a Solana Pay QR for the one-time
+                  0.015 SOL verification deposit.
+                </li>
+              </ul>
+              <p>
+                Funding is yours to manage — your agent only ever spends what
+                you put in its wallet, and you can withdraw any time by sending
+                back out.
+              </p>
+            </Section>
+
             <Section id="fees" title="Fees">
               <p>
                 Every action that moves real value takes a 1% fee (0.5% if
@@ -334,16 +385,50 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
             </Section>
 
-            <Section id="surfaces" title="Surfaces">
+            <Section id="webapp" title="Web app">
               <p>
-                One agent, every platform. The Telegram bot is the first door;
-                the web app and X surface are coming. Same wallet, same
-                identity, same on-chain history across all of them.
+                The web app is a full surface, not just a viewer. Sign in with
+                Telegram or X and you get:
               </p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-300">
                 <li>
-                  <span className="text-white font-medium">Telegram</span> — live
-                  now.{" "}
+                  <span className="text-white font-medium">Chat</span> — talk to
+                  your agent and run every action (send, swap, fund, AgentCash)
+                  in natural language, same as Telegram.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Portfolio</span> —
+                  live balances across your agent&apos;s wallet.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Activity</span> —
+                  your agent&apos;s on-chain history (swaps, transfers, stakes),
+                  each linkable to its Solana transaction.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Launches</span> —
+                  tokens launched through the agent ecosystem.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Stats</span> — live
+                  SAID Protocol numbers: agents registered, verified on-chain,
+                  average reputation.
+                </li>
+              </ul>
+              <p>
+                It installs as a PWA, so you can add it to your home screen and
+                it behaves like a native app.
+              </p>
+            </Section>
+
+            <Section id="surfaces" title="Surfaces">
+              <p>
+                One agent, every platform. Same wallet, same identity, same
+                on-chain history no matter where you reach it.
+              </p>
+              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+                <li>
+                  <span className="text-white font-medium">Telegram</span> — live.{" "}
                   <a
                     href="https://t.me/saidinfrabot"
                     target="_blank"
@@ -354,12 +439,14 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                   </a>
                 </li>
                 <li>
-                  <span className="text-white font-medium">Web app</span> —
-                  currently in early access. Log in with Telegram to use your
-                  existing agent.
+                  <span className="text-white font-medium">Web app</span> — live.
+                  Create or claim an agent and run everything in the browser;
+                  sign in with Telegram or X.
                 </li>
                 <li>
-                  <span className="text-white font-medium">X</span> — coming. Tag{" "}
+                  <span className="text-white font-medium">X</span> — used today
+                  for send-by-handle and sign-in; broader in-app support is
+                  expanding. Tag{" "}
                   <a
                     href="https://x.com/saidagent"
                     target="_blank"
@@ -368,7 +455,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                   >
                     @saidagent
                   </a>{" "}
-                  for launch updates.
+                  for updates.
                 </li>
               </ul>
             </Section>
@@ -408,10 +495,22 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </h3>
               <p>
                 Every action lands on Solana with a tx signature, then gets
-                anchored into a Merkle-tree summary periodically. Your
-                agent&apos;s public profile at{" "}
-                <Code>saidprotocol.com/agent/&lt;your-wallet&gt;</Code> shows
-                the verifiable history.
+                anchored into a Merkle-tree summary periodically. The{" "}
+                <Link
+                  href="/activity"
+                  className="text-white underline underline-offset-2 hover:no-underline"
+                >
+                  Activity
+                </Link>{" "}
+                tab shows your agent&apos;s history, and every agent has a public
+                profile in the{" "}
+                <Link
+                  href="/agents"
+                  className="text-white underline underline-offset-2 hover:no-underline"
+                >
+                  directory
+                </Link>
+                .
               </p>
 
               <h3 className="text-base font-semibold text-white mt-6">
