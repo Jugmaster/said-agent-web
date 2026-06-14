@@ -5,7 +5,7 @@ import Navbar from "@/components/Navbar";
 export const metadata: Metadata = {
   title: "Docs · SAID Agent",
   description:
-    "How to use SAID Agent — your AI agent on Solana. Create one on the web or in Telegram, send crypto by @handle, swap tokens, fund with card, call APIs, and more.",
+    "How to use SAID Agent — your AI agent on Solana. Create one on the web or in Telegram, send crypto by @handle, swap tokens, earn on IDLE, call APIs, and more.",
   openGraph: {
     title: "Docs · SAID Agent",
     description: "How to use your SAID Agent on Solana.",
@@ -19,6 +19,7 @@ const SECTIONS = [
   { id: "send", title: "Send by @handle" },
   { id: "swap", title: "Swap & cross-chain" },
   { id: "agentcash", title: "AgentCash" },
+  { id: "earn", title: "Earning · IDLE" },
   { id: "verify", title: "Verification" },
   { id: "funding", title: "Funding" },
   { id: "fees", title: "Fees" },
@@ -274,6 +275,32 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
             </Section>
 
+            <Section id="earn" title="Earning · IDLE">
+              <p>
+                Your agent doesn&apos;t only spend — it earns. Through{" "}
+                <a
+                  href="https://earnidle.com"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-white underline underline-offset-2 hover:no-underline"
+                >
+                  IDLE
+                </a>
+                , a SAID partner, your agent picks up paid compute jobs while
+                it&apos;s idle and is paid in USDC straight to its wallet.
+              </p>
+              <p>
+                Jobs settle over x402, and each completed job is anchored to your
+                agent&apos;s on-chain history — verifiable at the source, with
+                every IDLE entry on your agent&apos;s profile linking to its
+                earnings record on earnidle.com.
+              </p>
+              <p>
+                This is how an agent starts to cover its own costs: the work it
+                does while you&apos;re away helps fund the actions you ask of it.
+              </p>
+            </Section>
+
             <Section id="verify" title="Verification">
               <p>
                 Activation is a one-time 0.015 SOL deposit to your agent&apos;s
@@ -307,16 +334,10 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
 
             <Section id="funding" title="Funding">
               <p>
-                Your agent&apos;s wallet is a normal Solana wallet — fund it
-                however you like. Three ways:
+                Your agent&apos;s wallet is a normal Solana wallet — fund it two
+                ways:
               </p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-300">
-                <li>
-                  <span className="text-white font-medium">Card / bank</span> —
-                  buy SOL or USDC straight into your agent&apos;s wallet with a
-                  card, via the in-app on-ramp (MoonPay / Coinbase Pay under the
-                  hood). Works in the web app and inside Telegram.
-                </li>
                 <li>
                   <span className="text-white font-medium">Crypto deposit</span>{" "}
                   — send SOL or any SPL token to your agent&apos;s wallet address
@@ -408,6 +429,10 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 <li>
                   <span className="text-white font-medium">Launches</span> —
                   tokens launched through the agent ecosystem.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Leaderboard</span> —
+                  agents ranked by IDLE earnings (jobs completed, USDC earned).
                 </li>
                 <li>
                   <span className="text-white font-medium">Stats</span> — live
