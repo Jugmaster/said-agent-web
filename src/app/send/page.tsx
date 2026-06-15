@@ -6,6 +6,7 @@ import { chat } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
 import { useAgent } from "@/hooks/useAgent";
+import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
 
 type Platform = "telegram" | "x";
 type Asset = "USDC" | "SOL";
@@ -22,6 +23,9 @@ function isLikelyWalletAddress(s: string): boolean {
 
 function SendScreen({ platformId }: { platformId: string }) {
   const agent = useAgent();
+  const bal = useSendableBalance(
+    agent.status === "ready" ? agent.walletAddress : null,
+  );
   const [handle, setHandle] = useState("");
   const [platform, setPlatform] = useState<Platform>("telegram");
   const [amount, setAmount] = useState("");
@@ -61,6 +65,8 @@ function SendScreen({ platformId }: { platformId: string }) {
     try {
       const res = await chat(platformId, cmd);
       setResult({ kind: "ok", message: res.message });
+      // Funds just moved — refresh the displayed balance so it isn't stale.
+      bal.refetch();
     } catch (err) {
       setResult({
         kind: "error",
@@ -83,6 +89,35 @@ function SendScreen({ platformId }: { platformId: string }) {
           One handle. Any chain. Your agent figures out the rest.
         </p>
       </div>
+
+      {/* Agent balance — the two sendable assets, live from chain */}
+      {agent.status === "ready" && agent.walletAddress && (
+        <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+          <div>
+            <div className="text-xs text-zinc-500 mb-0.5">Your balance</div>
+            {bal.error ? (
+              <span className="text-sm text-yellow-500">couldn’t load</span>
+            ) : bal.loading ? (
+              <span className="text-sm text-zinc-500">loading…</span>
+            ) : (
+              <div className="flex items-baseline gap-3 text-sm">
+                <span className="text-zinc-200">{bal.sol.toFixed(4)} SOL</span>
+                <span className="text-zinc-500">·</span>
+                <span className="text-zinc-200">{bal.usdc.toFixed(2)} USDC</span>
+              </div>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={() => bal.refetch()}
+            disabled={bal.loading}
+            className="text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-40 transition"
+            aria-label="Refresh balance"
+          >
+            ↻
+          </button>
+        </div>
+      )}
 
       {/* Recipient — handle-first */}
       <label className="block text-xs text-zinc-500 mb-2">RECIPIENT</label>
@@ -176,10 +211,19 @@ function SendScreen({ platformId }: { platformId: string }) {
             ? "Sent on Solana, settles in seconds."
             : "Sent on Solana mainnet."}
         </span>
-        {agent.status === "ready" && agent.walletAddress && (
-          <Link href="/portfolio" className="hover:text-zinc-300">
-            View balance →
-          </Link>
+        {agent.status === "ready" && agent.walletAddress && !bal.loading && !bal.error && (
+          <button
+            type="button"
+            onClick={() => {
+              const max = maxSendable(asset, bal.sol, bal.usdc);
+              setAmount(asset === "SOL" ? max.toFixed(4) : max.toFixed(2));
+            }}
+            className="font-semibold text-zinc-400 hover:text-white transition"
+          >
+            Max: {asset === "SOL"
+              ? `${maxSendable(asset, bal.sol, bal.usdc).toFixed(4)} SOL`
+              : `${maxSendable(asset, bal.sol, bal.usdc).toFixed(2)} USDC`}
+          </button>
         )}
       </div>
 

@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
+import { useSendableBalance } from "@/hooks/useSendableBalance";
 
 function shortAddr(a: string | null | undefined): string {
   if (!a) return "—";
@@ -19,6 +20,11 @@ export default function Navbar() {
   const agent = useAgent();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  // Only fetch while the menu is open — no balance call on every page load.
+  const bal = useSendableBalance(
+    agent.status === "ready" ? agent.walletAddress : null,
+    menuOpen,
+  );
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -138,6 +144,21 @@ export default function Navbar() {
                       <code className="text-xs text-zinc-300 font-mono">
                         {shortAddr(agent.walletAddress)}
                       </code>
+                      {agent.walletAddress && (
+                        <div className="mt-1.5 text-xs">
+                          {bal.error ? (
+                            <span className="text-yellow-600">balance unavailable</span>
+                          ) : bal.loading ? (
+                            <span className="text-zinc-600">loading…</span>
+                          ) : (
+                            <span className="text-zinc-400">
+                              {bal.sol.toFixed(4)} SOL
+                              <span className="text-zinc-600"> · </span>
+                              {bal.usdc.toFixed(2)} USDC
+                            </span>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                   <Link

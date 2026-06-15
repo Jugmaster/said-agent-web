@@ -431,6 +431,11 @@ export async function getOnChainBalances(
   try {
     const res = await fetch(
       `${API_BASE}/api/wallet-balances/${encodeURIComponent(walletAddress)}`,
+      // Endpoint is auth-gated (protects our premium RPC). Without the bearer
+      // token it 401s and we'd silently drop to the rate-limited public RPC
+      // below — which is exactly the "showed as empty" bug the comment warns
+      // about. Send auth so the reliable failover path is actually used.
+      { headers: await authHeaders() },
     );
     if (res.ok) {
       const data = (await res.json()) as { sol: number; usdc: number };
@@ -467,4 +472,35 @@ export async function getOnChainBalances(
     0,
   );
   return { sol: lamports / 1e9, usdc };
+}
+
+export interface PortfolioToken {
+  mint: string;
+  symbol: string;
+  balance: number;
+  usdValue: number | null;
+}
+
+export interface FullPortfolio {
+  solBalance: number;
+  solUsdValue: number | null;
+  tokens: PortfolioToken[];
+  totalUsdValue: number | null;
+}
+
+/**
+ * Full portfolio: SOL + ALL SPL tokens (with known symbols + USD prices), from
+ * butler's `/api/portfolio` (the tested `getPortfolio` enumerator). Use this on
+ * the portfolio page so a wallet holding $SAID / BONK / etc. doesn't read as
+ * "empty" — `getOnChainBalances` only returns SOL + USDC (the sendable assets).
+ */
+export async function getPortfolio(walletAddress: string): Promise<FullPortfolio> {
+  const res = await fetch(
+    `${API_BASE}/api/portfolio/${encodeURIComponent(walletAddress)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    throw new Error(`portfolio fetch failed (${res.status})`);
+  }
+  return (await res.json()) as FullPortfolio;
 }
