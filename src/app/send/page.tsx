@@ -21,6 +21,50 @@ function isLikelyWalletAddress(s: string): boolean {
   return !t.includes("@") && !t.includes(" ") && t.length >= 32 && t.length <= 44;
 }
 
+function truncMiddle(s: string, head = 6, tail = 6): string {
+  return s.length > head + tail + 1 ? `${s.slice(0, head)}…${s.slice(-tail)}` : s;
+}
+
+// Render the butler's free-text result, but turn the two things that blow out
+// the layout into tidy elements: explorer URLs become a short "View on
+// Solscan ↗" link, and bare base58 addresses get middle-truncated. Splitting on
+// whitespace (kept via the capture group) preserves the original line breaks
+// under the parent's whitespace-pre-wrap.
+function ResultText({ text }: { text: string }) {
+  const tokens = text.split(/(\s+)/);
+  return (
+    <>
+      {tokens.map((tok, i) => {
+        if (/^https?:\/\//.test(tok)) {
+          const isExplorer = /solscan\.io|solana\.fm|explorer\.solana/.test(tok);
+          const label = isExplorer
+            ? "View on Solscan ↗"
+            : `${truncMiddle(tok.replace(/^https?:\/\//, ""), 16, 6)} ↗`;
+          return (
+            <a
+              key={i}
+              href={tok}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:opacity-80"
+            >
+              {label}
+            </a>
+          );
+        }
+        if (/^[1-9A-HJ-NP-Za-km-z]{32,}$/.test(tok)) {
+          return (
+            <span key={i} title={tok} className="font-mono">
+              {truncMiddle(tok)}
+            </span>
+          );
+        }
+        return <span key={i}>{tok}</span>;
+      })}
+    </>
+  );
+}
+
 function SendScreen({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const bal = useSendableBalance(
@@ -265,13 +309,13 @@ function SendScreen({ platformId }: { platformId: string }) {
       {/* Result */}
       {result && (
         <div
-          className={`mt-5 px-4 py-3 rounded-xl border whitespace-pre-wrap text-sm ${
+          className={`mt-5 px-4 py-3 rounded-xl border whitespace-pre-wrap break-words text-sm ${
             result.kind === "ok"
               ? "border-emerald-700/60 bg-emerald-950/30 text-emerald-200"
               : "border-red-700/60 bg-red-950/30 text-red-200"
           }`}
         >
-          {result.message}
+          <ResultText text={result.message} />
         </div>
       )}
 

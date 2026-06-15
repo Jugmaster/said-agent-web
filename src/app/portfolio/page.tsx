@@ -107,16 +107,31 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
     try {
       const b = await getBalance(platformId);
       setBalance(b);
-      const initial: Record<string, WalletState> = {
-        said: { address: b.saidWallet, chain: "Solana · Privy", portfolio: null, loading: !!b.saidWallet },
-        agentcash: { address: b.agentcashWallet, chain: "Solana · AgentCash", portfolio: null, loading: !!b.agentcashWallet },
-        purch: { address: b.purchWallet, chain: "Solana · Purch", portfolio: null, loading: !!b.purchWallet },
+      const addrs: Record<string, { address: string | null; chain: string }> = {
+        said: { address: b.saidWallet, chain: "Solana · Privy" },
+        agentcash: { address: b.agentcashWallet, chain: "Solana · AgentCash" },
+        purch: { address: b.purchWallet, chain: "Solana · Purch" },
       };
-      setWalletStates(initial);
+      // Seed/merge WITHOUT clobbering balances we already have — only show the
+      // "Loading…" spinner on first appearance. Otherwise a refresh (incl. the
+      // on-focus one) flashes every card back to loading. Refresh in place.
+      setWalletStates((prev) => {
+        const next: Record<string, WalletState> = {};
+        for (const [key, v] of Object.entries(addrs)) {
+          const existing = prev[key];
+          next[key] = {
+            address: v.address,
+            chain: v.chain,
+            portfolio: existing?.portfolio ?? null,
+            loading: !!v.address && !existing?.portfolio,
+          };
+        }
+        return next;
+      });
 
       // Full portfolio (SOL + all SPL tokens) per provisioned wallet, in parallel.
       const fetches: Array<Promise<[string, FullPortfolio | null]>> = [];
-      for (const [key, state] of Object.entries(initial)) {
+      for (const [key, state] of Object.entries(addrs)) {
         if (state.address) {
           fetches.push(
             getPortfolio(state.address)
@@ -129,7 +144,9 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       setWalletStates((prev) => {
         const next = { ...prev };
         for (const [key, p] of results) {
-          next[key] = { ...next[key], portfolio: p, loading: false };
+          // Keep the prior balance if a refresh fetch failed (p === null) so we
+          // don't flash "unavailable" over good data.
+          next[key] = { ...next[key], portfolio: p ?? next[key]?.portfolio ?? null, loading: false };
         }
         return next;
       });

@@ -25,6 +25,19 @@ export default function Navbar() {
     agent.status === "ready" ? agent.walletAddress : null,
     menuOpen,
   );
+  // Which login the user is actually signed in with — shown in the dropdown so
+  // it's obvious whether they're on Telegram / X / email / wallet.
+  const signedIn = user
+    ? user.telegram?.username
+      ? { platform: "Telegram", handle: `@${user.telegram.username}` }
+      : user.twitter?.username
+        ? { platform: "X", handle: `@${user.twitter.username}` }
+        : user.email?.address
+          ? { platform: "Email", handle: user.email.address }
+          : user.wallet?.address
+            ? { platform: "Wallet", handle: shortAddr(user.wallet.address) }
+            : { platform: "Account", handle: user.id }
+    : { platform: "", handle: "" };
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -127,15 +140,16 @@ export default function Navbar() {
               {menuOpen && (
                 <div className="absolute right-0 top-12 w-64 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-xl overflow-hidden z-50">
                   <div className="px-4 py-3 border-b border-zinc-800">
-                    <div className="text-xs text-zinc-500">signed in as</div>
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <span className="text-xs text-zinc-500">signed in with</span>
+                      {signedIn.platform && (
+                        <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                          {signedIn.platform}
+                        </span>
+                      )}
+                    </div>
                     <div className="text-sm text-zinc-200 truncate">
-                      {user?.telegram?.username
-                        ? `@${user.telegram.username}`
-                        : user?.twitter?.username
-                          ? `@${user.twitter.username}`
-                          : user?.email?.address ??
-                            user?.wallet?.address ??
-                            user?.id}
+                      {signedIn.handle}
                     </div>
                   </div>
                   {agent.status === "ready" && (

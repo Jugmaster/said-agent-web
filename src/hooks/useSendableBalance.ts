@@ -33,6 +33,7 @@ export function useSendableBalance(
     usdc: 0,
     loading: false,
     error: false,
+    loaded: false,
   });
   const [nonce, setNonce] = useState(0);
 
@@ -41,21 +42,25 @@ export function useSendableBalance(
   useEffect(() => {
     if (!walletAddress || !enabled) return;
     let cancelled = false;
-    setState((s) => ({ ...s, loading: true, error: false }));
+    // Only show the "loading…" state before the FIRST successful load. A
+    // refetch keeps the current numbers on screen and swaps them in quietly,
+    // so refreshes don't flash/blank the balance.
+    setState((s) => ({ ...s, loading: !s.loaded, error: false }));
     getOnChainBalances(walletAddress)
       .then((b) => {
         if (cancelled) return;
-        setState({ sol: b.sol ?? 0, usdc: b.usdc ?? 0, loading: false, error: false });
+        setState({ sol: b.sol ?? 0, usdc: b.usdc ?? 0, loading: false, error: false, loaded: true });
       })
       .catch(() => {
-        if (!cancelled) setState((s) => ({ ...s, loading: false, error: true }));
+        // Don't surface an error over already-good data — keep showing it.
+        if (!cancelled) setState((s) => ({ ...s, loading: false, error: !s.loaded }));
       });
     return () => {
       cancelled = true;
     };
   }, [walletAddress, enabled, nonce]);
 
-  return { ...state, refetch };
+  return { sol: state.sol, usdc: state.usdc, loading: state.loading, error: state.error, refetch };
 }
 
 /**
