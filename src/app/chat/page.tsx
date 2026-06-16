@@ -27,7 +27,22 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const [sending, setSending] = useState(false);
   const [agentName, setAgentName] = useState<string>("Your butler");
   const [step, setStep] = useState<AgentStep>("unknown");
+  const [received, setReceived] = useState<{ count: number; lines: string[] } | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Receive celebration: settle-on-login stashes a receipt in sessionStorage
+  // (see useAgent). Read it once on landing, then clear so it shows a single time.
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem("said-agent:received");
+      if (raw) {
+        setReceived(JSON.parse(raw) as { count: number; lines: string[] });
+        sessionStorage.removeItem("said-agent:received");
+      }
+    } catch {
+      // ignore parse/storage errors
+    }
+  }, []);
 
   useEffect(() => {
     if (!platformId) return;
@@ -139,6 +154,54 @@ function ChatScreen({ platformId }: { platformId: string }) {
           </Link>
         </div>
       </header>
+
+      {received && (
+        <div className="px-4 py-4 bg-gradient-to-b from-emerald-950/50 to-transparent border-b border-emerald-900/50">
+          <div className="max-w-md mx-auto text-center">
+            <div className="text-2xl mb-1">🎁</div>
+            <p className="text-base font-semibold text-emerald-200">
+              You received {received.lines
+                .map((l) => l.match(/[\d.]+\s*(?:SOL|USDC)/i)?.[0])
+                .filter(Boolean)
+                .join(" + ") || `${received.count} transfer${received.count > 1 ? "s" : ""}`}
+              !
+            </p>
+            <p className="text-xs text-emerald-300/70 mt-1">
+              It’s in your wallet. Pass some on — send to a friend by @handle.
+            </p>
+            <div className="mt-3 flex items-center justify-center gap-3">
+              {received.lines
+                .map((l) => l.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0])
+                .filter(Boolean)
+                .slice(0, 1)
+                .map((url) => (
+                  <a
+                    key={url}
+                    href={url as string}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+                  >
+                    View on Solscan ↗
+                  </a>
+                ))}
+              <Link
+                href="/send"
+                className="text-xs font-semibold text-emerald-300 hover:text-emerald-200"
+              >
+                Send to a friend →
+              </Link>
+              <button
+                type="button"
+                onClick={() => setReceived(null)}
+                className="text-xs text-zinc-500 hover:text-zinc-300"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {needsFunding && (
         <div className="px-4 py-3 bg-yellow-950/40 border-b border-yellow-900/60">

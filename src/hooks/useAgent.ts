@@ -62,7 +62,15 @@ export type AgentState =
   | { status: "not-ready" }
   | { status: "guest" }
   | { status: "linking" }
-  | { status: "ready"; platformId: string; walletAddress: string | null; agentName: string | null }
+  | {
+      status: "ready";
+      platformId: string;
+      walletAddress: string | null;
+      agentName: string | null;
+      /** Funds settled into this agent at this login — present only on a fresh
+       *  claim (not when restored from cache), so the receive celebration shows once. */
+      received?: { count: number; lines: string[] };
+    }
   | { status: "error"; error: string };
 
 const STORAGE_KEY = "said-agent:linked";
@@ -144,11 +152,22 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
         agentName: claim.agentName,
       };
       writeCache(cache);
+      // Stash a settled-funds receipt for the receive celebration. Survives the
+      // redirect to /chat regardless of which useAgent instance ran the claim;
+      // the home reads-and-clears it so it shows exactly once.
+      if (claim.received && claim.received.count > 0) {
+        try {
+          sessionStorage.setItem("said-agent:received", JSON.stringify(claim.received));
+        } catch {
+          // sessionStorage disabled — celebration just won't show, non-fatal
+        }
+      }
       setState({
         status: "ready",
         platformId: claim.platformId,
         walletAddress: claim.walletAddress,
         agentName: claim.agentName,
+        received: claim.received,
       });
     } catch (err) {
       setState({

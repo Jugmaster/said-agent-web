@@ -65,6 +65,81 @@ function ResultText({ text }: { text: string }) {
   );
 }
 
+function SendSuccessCard({
+  amount,
+  asset,
+  recipient,
+  message,
+  onSendAnother,
+}: {
+  amount: string;
+  asset: Asset;
+  recipient: string;
+  message: string;
+  onSendAnother: () => void;
+}) {
+  const txUrl = message.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0] ?? null;
+  const inviteUrl = message.match(/https?:\/\/[^\s)]*\/invite\/[^\s)]*/)?.[0] ?? null;
+  // Executed = funds moved on-chain now (recipient is/just-became a butler user).
+  // No tx = pending: funds are reserved and auto-deliver when they log in.
+  const executed = !!txUrl;
+
+  return (
+    <div className="mt-5 rounded-2xl border border-emerald-800/50 bg-gradient-to-b from-emerald-950/40 to-zinc-950 px-5 py-6 text-center">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 text-2xl">
+        {executed ? "✓" : "↗"}
+      </div>
+      <div className="text-lg font-semibold text-white">
+        {executed ? "Sent" : "On its way"} {amount} {asset}
+      </div>
+      <div className="mt-0.5 text-sm text-zinc-400">
+        to <span className="text-zinc-200">{recipient}</span>
+      </div>
+
+      {executed ? (
+        <p className="mt-2 text-xs text-emerald-300/80">
+          They’ll see it the moment they open SAID.
+        </p>
+      ) : (
+        <p className="mt-2 text-xs text-zinc-400">
+          They’ll get it the moment they open SAID — even if they’re not on it yet.
+        </p>
+      )}
+
+      <div className="mt-4 flex items-center justify-center gap-3">
+        {txUrl && (
+          <a
+            href={txUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+          >
+            View on Solscan ↗
+          </a>
+        )}
+        {!executed && inviteUrl && (
+          <a
+            href={inviteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs font-medium text-zinc-400 underline underline-offset-2 hover:text-zinc-200"
+          >
+            Share invite link ↗
+          </a>
+        )}
+      </div>
+
+      <button
+        type="button"
+        onClick={onSendAnother}
+        className="mt-5 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+      >
+        Send another
+      </button>
+    </div>
+  );
+}
+
 function SendScreen({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const bal = useSendableBalance(
@@ -78,7 +153,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<
-    | { kind: "ok"; message: string }
+    | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
     | { kind: "error"; message: string }
     | null
   >(null);
@@ -106,9 +181,12 @@ function SendScreen({ platformId }: { platformId: string }) {
       cmd = `send ${amount} ${asset} to @${h} on ${platform}`;
     }
 
+    const recipient = walletAddress.trim()
+      ? walletAddress.trim()
+      : `@${normalizeHandle(handle)}`;
     try {
       const res = await chat(platformId, cmd);
-      setResult({ kind: "ok", message: res.message });
+      setResult({ kind: "ok", message: res.message, amount, asset, recipient });
       // Funds just moved — refresh the displayed balance so it isn't stale.
       bal.refetch();
     } catch (err) {
@@ -303,18 +381,30 @@ function SendScreen({ platformId }: { platformId: string }) {
         disabled={!canSubmit}
         className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
       >
-        {sending ? "Sending…" : `Send ${amount || "—"} ${asset}`}
+        {sending
+          ? "Sending…"
+          : amount && parseFloat(amount) > 0
+            ? `Send ${amount} ${asset}`
+            : "Enter an amount to send"}
       </button>
 
       {/* Result */}
-      {result && (
-        <div
-          className={`mt-5 px-4 py-3 rounded-xl border whitespace-pre-wrap break-words text-sm ${
-            result.kind === "ok"
-              ? "border-emerald-700/60 bg-emerald-950/30 text-emerald-200"
-              : "border-red-700/60 bg-red-950/30 text-red-200"
-          }`}
-        >
+      {result?.kind === "ok" && (
+        <SendSuccessCard
+          amount={result.amount}
+          asset={result.asset}
+          recipient={result.recipient}
+          message={result.message}
+          onSendAnother={() => {
+            setResult(null);
+            setAmount("");
+            setHandle("");
+            setWalletAddress("");
+          }}
+        />
+      )}
+      {result?.kind === "error" && (
+        <div className="mt-5 px-4 py-3 rounded-xl border border-red-700/60 bg-red-950/30 text-red-200 whitespace-pre-wrap break-words text-sm">
           <ResultText text={result.message} />
         </div>
       )}

@@ -203,6 +203,8 @@ export interface ClaimResponse {
   linkedPlatformIds: string[];
   agentName: string | null;
   walletAddress: string | null;
+  /** Pending sends settled into this agent at login (drives the receive UX). */
+  received?: { count: number; lines: string[] };
 }
 
 export async function claimAgent(input: {
