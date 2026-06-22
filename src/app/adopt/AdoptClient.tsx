@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePrivy } from "@privy-io/react-auth";
 import { claimAgent } from "@/lib/api";
 
 interface AdoptClientProps {
   platformId: string;
   /**
-   * For X-launched agents (tw_<id>), this is the X user ID the user must
-   * authenticate as via Privy to prove ownership. For other platforms
-   * this is null and the claim is open (Privy auth alone is sufficient).
+   * For X-launched agents (tw_<id>), this is the X user ID the signed-in Privy
+   * account must match to prove ownership. For other platforms it's null and
+   * any signed-in Privy user may claim (the /api/claim server check still
+   * applies).
    */
   expectedXUserId: string | null;
 }
@@ -23,25 +25,33 @@ type ClaimState =
 /**
  * Client-side adopt flow.
  *
- * Privy SDK isn't wired into this PWA yet (next wave per memory: "Wave 3:
- * Privy onramp + Stripe Link"). For now the claim path uses a stubbed
- * "manual verification" — the user copies their X handle, we trust the
- * server-side check that the platform_id matches. Once Privy ships, the
- * `verifyXOwnership()` placeholder is replaced with `privyClient.login({
- * loginMethods: ['twitter'] })` and the verified X user id flows through.
- *
- * The /api/claim endpoint enforces the actual identity match server-side
- * regardless of how the front-end gets the IDs, so this stub is safe.
+ * Signs the user in with Privy, then claims THIS page's agent (`platformId`)
+ * under their identity. For X-launched agents we check the signed-in X account
+ * (`user.twitter.subject`) matches `expectedXUserId` before calling the server,
+ * so a wrong-account sign-in gets a clear message instead of an opaque 403.
+ * `/api/claim` re-enforces the same match server-side — the front-end check is
+ * just UX. Mirrors the canonical Privy → claim flow in useAgent / AuthGate.
  */
 export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
+  const { ready, authenticated, user, login } = usePrivy();
   const [state, setState] = useState<ClaimState>({ kind: "idle" });
-  const [privyUserId, setPrivyUserId] = useState("");
+
+  const signedInXUserId = user?.twitter?.subject ?? null;
+  const xMismatch =
+    !!expectedXUserId && !!signedInXUserId && signedInXUserId !== expectedXUserId;
 
   async function handleClaim() {
-    if (!privyUserId.trim()) {
+    if (!user) {
+      setState({ kind: "error", message: "Sign in first to claim this agent." });
+      return;
+    }
+    // For X-launched agents, the signed-in X account must be the launcher.
+    // The server enforces this too; we check here for a clearer message.
+    if (expectedXUserId && signedInXUserId !== expectedXUserId) {
       setState({
         kind: "error",
-        message: "Privy user ID is required (paste from your Privy dashboard or wait for the integrated flow).",
+        message:
+          "This agent was launched from a different X account. Sign in with that account to claim it.",
       });
       return;
     }
@@ -50,11 +60,9 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
     try {
       const result = await claimAgent({
         platformId,
-        privyUserId: privyUserId.trim(),
-        // For now we trust the user-supplied X id — the server-side check
-        // in /api/claim enforces match against the platform_id, so a wrong
-        // id just gets a 403 from the server.
-        verifiedXUserId: expectedXUserId ?? undefined,
+        privyUserId: user.id,
+        verifiedXUserId: signedInXUserId ?? undefined,
+        xUsername: user.twitter?.username ?? undefined,
       });
       setState({
         kind: "claimed",
@@ -108,36 +116,48 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
       <h2 className="text-sm font-medium mb-3">Claim this agent</h2>
       <p className="text-xs text-neutral-500 mb-4">
         {expectedXUserId
-          ? `Sign in with the same X account that launched this token (id ${expectedXUserId}). Privy verifies the link, then we attach the agent to your identity.`
+          ? "Sign in with the X account that launched this token. Privy verifies the link, then attaches the agent to your identity."
           : "Sign in with Privy to attach this agent to your identity."}
       </p>
 
-      <input
-        type="text"
-        placeholder="Privy user ID (will be auto-filled when SDK is wired)"
-        value={privyUserId}
-        onChange={(e) => setPrivyUserId(e.target.value)}
-        className="w-full bg-neutral-950 border border-neutral-800 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-neutral-600 mb-3 font-mono"
-        disabled={state.kind === "verifying"}
-      />
+      {!ready ? (
+        <div className="flex justify-center py-2">
+          <div className="w-5 h-5 rounded-full border-2 border-neutral-700 border-t-neutral-300 animate-spin" />
+        </div>
+      ) : !authenticated ? (
+        <button
+          onClick={login}
+          className="w-full text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+        >
+          {expectedXUserId ? "Sign in with X →" : "Sign in →"}
+        </button>
+      ) : (
+        <>
+          <p className="text-xs text-neutral-500 mb-3">
+            Signed in
+            {user?.twitter?.username ? ` as @${user.twitter.username}` : ""}.
+          </p>
 
-      {state.kind === "error" && (
-        <p className="text-xs text-red-400 mb-3">{state.message}</p>
+          {xMismatch && (
+            <p className="text-xs text-amber-400 mb-3">
+              You&apos;re signed in with a different X account than the one that
+              launched this agent. Switch accounts to claim it.
+            </p>
+          )}
+
+          {state.kind === "error" && (
+            <p className="text-xs text-red-400 mb-3">{state.message}</p>
+          )}
+
+          <button
+            onClick={() => void handleClaim()}
+            disabled={state.kind === "verifying" || xMismatch}
+            className="w-full text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+          >
+            {state.kind === "verifying" ? "Claiming…" : "Claim agent"}
+          </button>
+        </>
       )}
-
-      <button
-        onClick={() => void handleClaim()}
-        disabled={state.kind === "verifying"}
-        className="w-full text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
-      >
-        {state.kind === "verifying" ? "Verifying…" : "Claim agent"}
-      </button>
-
-      <p className="mt-3 text-xs text-neutral-600">
-        The Privy login flow is being wired up; for now this accepts a
-        user ID directly. Once the SDK is integrated, you&apos;ll get a one-click
-        &quot;sign in with X&quot; experience.
-      </p>
     </section>
   );
 }
