@@ -65,6 +65,17 @@ export default async function AgentProfilePage({ params }: PageProps) {
 
   const name = agent.displayName || `Agent ${platformId}`;
 
+  const isX = platformId.startsWith("tw_");
+  // Prefer the @handle for X agents (their display_name IS the X handle); fall
+  // back to the identity wallet for everyone else. Either way the visitor lands
+  // in /send pre-filled and must sign in to send — that sign-in is the adoption.
+  const tipHref =
+    isX && agent.displayName
+      ? `/send?to=${encodeURIComponent(agent.displayName)}&platform=x`
+      : agent.saidWallet
+        ? `/send?address=${encodeURIComponent(agent.saidWallet)}`
+        : "/send";
+
   return (
     <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-2xl mx-auto">
       <header className="mb-6">
@@ -105,6 +116,21 @@ export default async function AgentProfilePage({ params }: PageProps) {
           </div>
         )}
       </section>
+
+      {(agent.saidWallet || (isX && agent.displayName)) && (
+        <section className="mb-8">
+          <Link
+            href={tipHref}
+            className="block w-full text-center rounded-xl bg-white text-black font-semibold py-3 hover:bg-neutral-200 transition"
+          >
+            Send {name} a tip →
+          </Link>
+          <p className="mt-2 text-center text-xs text-neutral-500">
+            Sign in with Telegram, X, or email to send — funds move from your own
+            wallet.
+          </p>
+        </section>
+      )}
 
       <section className="mb-8">
         <h2 className="text-sm font-medium text-neutral-400 mb-3">Activity</h2>

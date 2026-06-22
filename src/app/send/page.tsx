@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { chat } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
@@ -145,12 +146,24 @@ function SendScreen({ platformId }: { platformId: string }) {
   const bal = useSendableBalance(
     agent.status === "ready" ? agent.walletAddress : null,
   );
-  const [handle, setHandle] = useState("");
-  const [platform, setPlatform] = useState<Platform>("telegram");
-  const [amount, setAmount] = useState("");
-  const [asset, setAsset] = useState<Asset>("USDC");
-  const [walletAddress, setWalletAddress] = useState("");
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  // Prefill from query params so a "Tip / Send to this agent" link (e.g. from a
+  // public agent page) drops the user into a ready-to-send form. The AuthGate
+  // wrapper means a non-user must sign in to send — that sign-in is the hook.
+  const params = useSearchParams();
+  const [handle, setHandle] = useState(() =>
+    (params.get("to") ?? "").replace(/^@+/, ""),
+  );
+  const [platform, setPlatform] = useState<Platform>(() =>
+    params.get("platform") === "x" ? "x" : "telegram",
+  );
+  const [amount, setAmount] = useState(() => params.get("amount") ?? "");
+  const [asset, setAsset] = useState<Asset>(() =>
+    params.get("asset") === "SOL" ? "SOL" : "USDC",
+  );
+  const [walletAddress, setWalletAddress] = useState(
+    () => params.get("address") ?? "",
+  );
+  const [advancedOpen, setAdvancedOpen] = useState(() => !!params.get("address"));
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
@@ -423,9 +436,12 @@ export default function SendPage() {
   return (
     <>
       <Navbar />
-      <AuthGate>
-        {(platformId) => <SendScreen platformId={platformId} />}
-      </AuthGate>
+      {/* Suspense: SendScreen reads query params via useSearchParams. */}
+      <Suspense fallback={null}>
+        <AuthGate>
+          {(platformId) => <SendScreen platformId={platformId} />}
+        </AuthGate>
+      </Suspense>
     </>
   );
 }
