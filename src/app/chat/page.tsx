@@ -128,7 +128,17 @@ function ChatScreen({ platformId }: { platformId: string }) {
 
   const needsFunding =
     step === "registered" || step === "registered_unverified";
-  const isFresh = messages.length === 0 && step === "unknown";
+  // Fresh = a brand-new agent that still needs to be named/activated. A PWA
+  // login lands here as "awaiting_name" (registered=false), so gating only on
+  // "unknown" (the Telegram-path 404 state) meant fresh web users fell through
+  // to the "Welcome back" branch and were never prompted to name → never
+  // activated (naming is what triggers the free sponsor-funded verify).
+  const isFresh =
+    messages.length === 0 &&
+    (step === "unknown" || step === "provisioned" || step === "awaiting_name");
+  const isReturning =
+    messages.length === 0 &&
+    (step === "verified" || step === "returning_verified");
 
   return (
     <div className="flex flex-col h-[calc(100dvh-80px)] mt-20">
@@ -227,24 +237,43 @@ function ChatScreen({ platformId }: { platformId: string }) {
         {isFresh && (
           <div className="max-w-md mx-auto pt-8">
             <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
-              <h2 className="text-lg font-semibold mb-2">Meet your butler</h2>
+              <h2 className="text-lg font-semibold mb-2">
+                {step === "unknown" ? "Meet your butler" : "Name your agent"}
+              </h2>
               <p className="text-sm text-zinc-400 mb-5">
-                A personal AI agent on Solana. Your own wallet, your own
-                identity, yours forever.
+                {step === "unknown"
+                  ? "A personal AI agent on Solana. Your own wallet, your own identity, yours forever."
+                  : "One step to activate — give your agent a name. It's free, no SOL needed."}
               </p>
-              <button
-                onClick={() => void send("hi")}
-                className="w-full px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
-              >
-                Say hi to start
-              </button>
+              {step === "unknown" ? (
+                <button
+                  onClick={() => void send("hi")}
+                  className="w-full px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
+                >
+                  Say hi to start
+                </button>
+              ) : (
+                <div className="flex flex-wrap items-center justify-center gap-2">
+                  {["Sage", "Apollo", "Rex", "Nova"].map((n) => (
+                    <button
+                      key={n}
+                      onClick={() => void send(n)}
+                      className="px-4 py-2 rounded-xl border border-zinc-700 hover:border-zinc-500 text-sm font-medium transition"
+                    >
+                      {n}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
             <p className="text-xs text-zinc-600 text-center mt-4">
-              Or try: &quot;create my agent&quot;, &quot;what can you do?&quot;
+              {step === "unknown"
+                ? 'Or try: "create my agent", "what can you do?"'
+                : "Or type any name in the box below."}
             </p>
           </div>
         )}
-        {messages.length === 0 && step !== "unknown" && (
+        {isReturning && (
           <div className="text-center text-zinc-500 text-sm pt-12">
             <p>Welcome back, {agentName}.</p>
             <p className="mt-2 text-xs">

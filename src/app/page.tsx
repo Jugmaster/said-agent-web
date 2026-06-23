@@ -1,12 +1,22 @@
 "use client";
 
+import { useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
 import HomeBelowFold from "@/components/HomeBelowFold";
 
 export default function HomePage() {
-  const { ready, login } = usePrivy();
+  const { ready, authenticated, login } = usePrivy();
+  const router = useRouter();
+
+  // Logged-in users belong in the app, not the marketing hero — and this closes
+  // the post-login dead-end: completing the Privy modal flips `authenticated`,
+  // so we route into /chat instead of dropping the user back here unchanged.
+  useEffect(() => {
+    if (ready && authenticated) router.replace("/chat");
+  }, [ready, authenticated, router]);
 
   return (
     <>
