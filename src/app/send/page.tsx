@@ -167,6 +167,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   const [sending, setSending] = useState(false);
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
+    | { kind: "info"; message: string }
     | { kind: "error"; message: string }
     | null
   >(null);
@@ -199,9 +200,25 @@ function SendScreen({ platformId }: { platformId: string }) {
       : `@${normalizeHandle(handle)}`;
     try {
       const res = await chat(platformId, cmd);
-      setResult({ kind: "ok", message: res.message, amount, asset, recipient });
-      // Funds just moved — refresh the displayed balance so it isn't stale.
-      bal.refetch();
+      // Butler returns HTTP 200 even when it REFUSES the send (e.g. an
+      // unverified sender gets an "activate first" prompt). Only show the
+      // success card when there's actual evidence the send happened: a tx
+      // signature (executed) or an invite link (pending — funds reserved). A
+      // not-sent step, or the absence of both, means nothing moved — show
+      // butler's real message instead of a celebratory false success.
+      const step = res.context?.step;
+      const notSent = step
+        ? ["unknown", "awaiting_name", "provisioned", "registered", "registered_unverified"].includes(step)
+        : false;
+      const hasTx = /solscan|solana\.fm|explorer\.solana/i.test(res.message);
+      const hasInvite = /\/invite\/|[?&]start=invite_/i.test(res.message);
+      if (!notSent && (hasTx || hasInvite)) {
+        setResult({ kind: "ok", message: res.message, amount, asset, recipient });
+        // Funds just moved — refresh the displayed balance so it isn't stale.
+        bal.refetch();
+      } else {
+        setResult({ kind: "info", message: res.message });
+      }
     } catch (err) {
       setResult({
         kind: "error",
@@ -415,6 +432,11 @@ function SendScreen({ platformId }: { platformId: string }) {
             setWalletAddress("");
           }}
         />
+      )}
+      {result?.kind === "info" && (
+        <div className="mt-5 px-4 py-4 rounded-xl border border-zinc-700 bg-zinc-900/60 text-zinc-200 whitespace-pre-wrap break-words text-sm">
+          <ResultText text={result.message} />
+        </div>
       )}
       {result?.kind === "error" && (
         <div className="mt-5 px-4 py-3 rounded-xl border border-red-700/60 bg-red-950/30 text-red-200 whitespace-pre-wrap break-words text-sm">
