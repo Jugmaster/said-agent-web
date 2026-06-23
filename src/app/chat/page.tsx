@@ -149,12 +149,13 @@ function ChatScreen({ platformId }: { platformId: string }) {
         </div>
         <div className="flex gap-2">
           {needsFunding && (
-            <Link
-              href="/fund"
-              className="text-xs px-3 py-1.5 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-semibold"
+            <button
+              type="button"
+              onClick={() => void send("verify")}
+              className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold"
             >
-              Activate
-            </Link>
+              Verify
+            </button>
           )}
           <Link
             href="/portfolio"
@@ -214,21 +215,23 @@ function ChatScreen({ platformId }: { platformId: string }) {
       )}
 
       {needsFunding && (
-        <div className="px-4 py-3 bg-yellow-950/40 border-b border-yellow-900/60">
+        <div className="px-4 py-3 bg-blue-950/30 border-b border-blue-900/50">
           <div className="flex items-start gap-3">
-            <span className="text-lg leading-none">⚠️</span>
+            <span className="text-lg leading-none">✨</span>
             <div className="flex-1 text-sm">
-              <p className="font-medium text-yellow-200">Your agent needs activation</p>
-              <p className="text-xs text-yellow-300/80 mt-0.5">
-                Send 0.015 SOL to its wallet to unlock swaps, transfers, and more.
+              <p className="font-medium text-blue-200">Activating your agent…</p>
+              <p className="text-xs text-blue-300/80 mt-0.5">
+                It&apos;s free and automatic — no SOL needed. Usually a few
+                seconds; tap Verify if it doesn&apos;t land.
               </p>
             </div>
-            <Link
-              href="/fund"
-              className="text-xs px-3 py-1.5 rounded-lg bg-yellow-500 hover:bg-yellow-400 text-black font-semibold whitespace-nowrap"
+            <button
+              type="button"
+              onClick={() => void send("verify")}
+              className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold whitespace-nowrap"
             >
-              Fund →
-            </Link>
+              Verify
+            </button>
           </div>
         </div>
       )}

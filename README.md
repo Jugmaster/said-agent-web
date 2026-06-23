@@ -100,7 +100,13 @@ Open [http://localhost:3000](http://localhost:3000).
 Environment variables (`.env.local` for dev):
 
 ```bash
-NEXT_PUBLIC_BUTLER_API_URL=https://butler.saidprotocol.com
+# Butler container HTTP API
+NEXT_PUBLIC_BUTLER_API=https://butler.saidprotocol.com
+# Solana RPC for client balance reads — set a real provider in prod; the public
+# RPC default is rate-limited and can make balances read as empty/$0.
+NEXT_PUBLIC_SOLANA_RPC=
+# Server-side RPC for the /api/research route (falls back to the public RPC).
+SOLANA_RPC=
 ```
 
 The Privy app ID is currently hard-coded in `src/app/providers.tsx` (shared with `saidprotocol.com`).
