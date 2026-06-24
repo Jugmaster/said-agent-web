@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { getInvite, type InviteResponse } from "@/lib/api";
+import InviteWebClaim from "./InviteWebClaim";
 
 interface PageProps {
   params: Promise<{ token: string }>;
@@ -168,34 +169,35 @@ export default async function InvitePage({ params }: PageProps) {
       </section>
 
       <section className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-5 mb-6">
-        <h2 className="text-sm font-medium mb-3">Claim by chatting with the agent</h2>
+        <h2 className="text-sm font-medium mb-3">Claim your crypto</h2>
         <p className="text-xs text-neutral-500 mb-4">
-          Open Telegram or X, message the SAID agent. Your agent gets created
-          on first message — funds drop in once you&apos;re registered.
+          Sign in with the same {platformLabel(invite.recipient.platform)} account
+          (@{invite.recipient.handle}) and your funds drop in automatically — no
+          need to leave the web.
         </p>
 
         <div className="flex flex-col gap-2">
+          <InviteWebClaim
+            platform={invite.recipient.platform}
+            handle={invite.recipient.handle}
+          />
           <a
             href={tgDeepLink}
-            className="w-full text-center text-sm px-4 py-3 rounded-lg bg-blue-600 hover:bg-blue-500 font-medium"
-          >
-            Open Telegram → @saidinfrabot
-          </a>
-          <a
-            href={xDeepLink}
-            target="_blank"
-            rel="noreferrer"
             className="w-full text-center text-sm px-4 py-3 rounded-lg border border-neutral-700 hover:border-neutral-500"
           >
-            Reply on X → @saidagent
+            Or open Telegram → @saidinfrabot
           </a>
+          {invite.recipient.platform === "x" && (
+            <a
+              href={xDeepLink}
+              target="_blank"
+              rel="noreferrer"
+              className="w-full text-center text-sm px-4 py-3 rounded-lg border border-neutral-700 hover:border-neutral-500"
+            >
+              Or reply on X → @saidagent
+            </a>
+          )}
         </div>
-
-        <p className="mt-4 text-xs text-neutral-600">
-          {invite.recipient.platform === "telegram"
-            ? `Use Telegram if your @handle is ${invite.recipient.handle}.`
-            : `Use X if your @handle is ${invite.recipient.handle}.`}
-        </p>
       </section>
 
       <section className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3 text-xs text-neutral-500">
