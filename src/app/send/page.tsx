@@ -397,7 +397,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+            className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-base sm:text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
           />
           <p className="text-xs text-zinc-500 mt-2">
             Overrides the @handle above when filled.

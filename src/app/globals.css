@@ -2,6 +2,10 @@
 
 html {
   scroll-behavior: smooth;
+  /* Stop iOS/Android auto-inflating text; with 16px inputs this kills the
+     focus-zoom dance that left mobile users stuck zoomed in. */
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
 }
 
 :root {

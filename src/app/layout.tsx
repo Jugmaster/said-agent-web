@@ -45,7 +45,12 @@ export const viewport = {
   themeColor: "#09090b",
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // NO maximumScale — locking it at 1 disabled pinch-zoom, so iOS's auto
+  // zoom-on-focus (any input <16px) left users stuck zoomed in with the
+  // navbar/composer shoved off-screen (read as "mobile is broken").
+  // interactiveWidget makes dvh shrink when the keyboard opens so the
+  // bottom-pinned chat composer isn't hidden behind it.
+  interactiveWidget: "resizes-content" as const,
   // Extend rendering behind iOS notch / home indicator so safe-area-inset-*
   // env values become non-zero (and we can pad accordingly in components).
   viewportFit: "cover" as const,

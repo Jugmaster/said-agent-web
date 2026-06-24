@@ -319,7 +319,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
           onKeyDown={onKeyDown}
           placeholder="Message your agent…"
           rows={1}
-          className="flex-1 resize-none rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-sm focus:outline-none focus:border-zinc-600 max-h-32"
+          className="flex-1 resize-none rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
           disabled={sending}
         />
         <button
