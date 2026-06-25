@@ -46,12 +46,19 @@ export default function Navbar() {
         setMenuOpen(false);
       }
     };
-    document.addEventListener("mousedown", onClick);
-    return () => document.removeEventListener("mousedown", onClick);
+    // pointerdown covers touch + mouse; mousedown alone left the menu stuck
+    // open on a tap-outside on mobile.
+    document.addEventListener("pointerdown", onClick);
+    return () => document.removeEventListener("pointerdown", onClick);
   }, [menuOpen]);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4 pt-4">
+    <div
+      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4"
+      // max(1rem, safe-area): in a PWA (no status bar) this drops the pill
+      // below the notch/Dynamic Island instead of riding up under the speaker.
+      style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+    >
       <nav
         className="
           flex items-center gap-1 rounded-full
