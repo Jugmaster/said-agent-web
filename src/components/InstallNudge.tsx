@@ -17,6 +17,7 @@
  */
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 const DISMISS_KEY = "said-agent.install-nudge.dismissed-at";
 const DISMISS_TTL_MS = 14 * 24 * 60 * 60 * 1000; // 2 weeks
@@ -102,7 +103,12 @@ export default function InstallNudge() {
     setDeferred(null);
   }
 
-  if (!visible) return null;
+  const pathname = usePathname();
+  // Don't nag inside the app surfaces — it overlaps the chat composer / tab bar.
+  const onAppRoute = ["/chat", "/send", "/portfolio", "/activity", "/fund"].some(
+    (r) => pathname === r || pathname.startsWith(r + "/"),
+  );
+  if (!visible || onAppRoute) return null;
 
   return (
     <div

@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "./providers";
 import DotGridBackground from "@/components/DotGridBackground";
 import InstallNudge from "@/components/InstallNudge";
+import BottomTabBar from "@/components/BottomTabBar";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -77,6 +78,7 @@ export default function RootLayout({
           {/* Content sits above the background */}
           <div className="relative z-10 flex flex-col min-h-dvh">{children}</div>
           <InstallNudge />
+          <BottomTabBar />
         </Providers>
       </body>
     </html>

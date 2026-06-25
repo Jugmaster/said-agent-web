@@ -79,7 +79,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
   }, [platformId]);
 
   return (
-    <main className="px-4 pt-24 pb-12 max-w-2xl mx-auto">
+    <main className="px-4 pt-24 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-2xl mx-auto">
       <header className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-semibold">Activity</h1>

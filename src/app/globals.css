@@ -15,6 +15,8 @@ html {
   --bg-secondary: #141414;
   --border: #2a2a2a;
   --text-secondary: #999;
+  /* Mobile bottom tab bar height (incl. iOS home-indicator safe area). */
+  --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
 }
 
 html,

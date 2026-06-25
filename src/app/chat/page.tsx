@@ -141,7 +141,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
     (step === "verified" || step === "returning_verified");
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-80px)] mt-20">
+    <div className="flex flex-col h-[calc(100dvh-80px)] mt-20 pb-[var(--tabbar-h)] md:pb-0">
       <header className="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
         <div>
           <h1 className="text-base font-semibold">{agentName}</h1>
