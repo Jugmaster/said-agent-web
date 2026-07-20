@@ -10,6 +10,7 @@ import {
 } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import Navbar from "@/components/Navbar";
+import FundModal from "@/components/FundModal";
 
 interface WalletState {
   address: string | null;
@@ -98,6 +99,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [funding, setFunding] = useState(false);
   const [walletStates, setWalletStates] = useState<Record<string, WalletState>>(
     {}
   );
@@ -250,13 +252,30 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
               Top up your agent so it can swap, buy real-world goods, and call paid
               services.
             </p>
-            <Link
-              href="/fund"
-              className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
-            >
-              Add funds
-            </Link>
+            {balance.saidWallet ? (
+              <button
+                onClick={() => setFunding(true)}
+                className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+              >
+                Add funds
+              </button>
+            ) : (
+              <Link
+                href="/fund"
+                className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+              >
+                Activate agent
+              </Link>
+            )}
           </div>
+
+          {funding && balance.saidWallet && (
+            <FundModal
+              walletAddress={balance.saidWallet}
+              onClose={() => setFunding(false)}
+              onFunded={() => void load()}
+            />
+          )}
         </>
       )}
     </main>
