@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { chat } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
+import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
 
@@ -19,50 +20,6 @@ function isLikelyWalletAddress(s: string): boolean {
   // Solana base58 addresses are 32-44 chars and have no @ / no spaces.
   const t = s.trim();
   return !t.includes("@") && !t.includes(" ") && t.length >= 32 && t.length <= 44;
-}
-
-function truncMiddle(s: string, head = 6, tail = 6): string {
-  return s.length > head + tail + 1 ? `${s.slice(0, head)}…${s.slice(-tail)}` : s;
-}
-
-// Render the butler's free-text result, but turn the two things that blow out
-// the layout into tidy elements: explorer URLs become a short "View on
-// Solscan ↗" link, and bare base58 addresses get middle-truncated. Splitting on
-// whitespace (kept via the capture group) preserves the original line breaks
-// under the parent's whitespace-pre-wrap.
-function ResultText({ text }: { text: string }) {
-  const tokens = text.split(/(\s+)/);
-  return (
-    <>
-      {tokens.map((tok, i) => {
-        if (/^https?:\/\//.test(tok)) {
-          const isExplorer = /solscan\.io|solana\.fm|explorer\.solana/.test(tok);
-          const label = isExplorer
-            ? "View on Solscan ↗"
-            : `${truncMiddle(tok.replace(/^https?:\/\//, ""), 16, 6)} ↗`;
-          return (
-            <a
-              key={i}
-              href={tok}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="underline underline-offset-2 hover:opacity-80"
-            >
-              {label}
-            </a>
-          );
-        }
-        if (/^[1-9A-HJ-NP-Za-km-z]{32,}$/.test(tok)) {
-          return (
-            <span key={i} title={tok} className="font-mono">
-              {truncMiddle(tok)}
-            </span>
-          );
-        }
-        return <span key={i}>{tok}</span>;
-      })}
-    </>
-  );
 }
 
 function SendSuccessCard({
@@ -485,12 +442,12 @@ function SendScreen({ platformId }: { platformId: string }) {
           )}
           {result?.kind === "info" && (
             <div className="mt-5 px-4 py-4 rounded-xl border border-zinc-700 bg-zinc-900/60 text-zinc-200 whitespace-pre-wrap break-words text-sm">
-              <ResultText text={result.message} />
+              <MessageText text={result.message} />
             </div>
           )}
           {result?.kind === "error" && (
             <div className="mt-5 px-4 py-3 rounded-xl border border-red-700/60 bg-red-950/30 text-red-200 whitespace-pre-wrap break-words text-sm">
-              <ResultText text={result.message} />
+              <MessageText text={result.message} />
             </div>
           )}
 

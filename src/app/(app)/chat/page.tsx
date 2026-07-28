@@ -12,6 +12,7 @@ import {
   type ChatResponse,
 } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
+import MessageText from "@/components/MessageText";
 import { actionLabel, timeAgo } from "@/lib/format";
 
 interface UiMessage {
@@ -386,7 +387,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
           </div>
         )}
 
-        <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 py-6 md:px-6">
+        <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 md:px-6">
           <div className="mx-auto w-full max-w-3xl space-y-4">
             {isFresh && (
               <div className="max-w-md mx-auto pt-8">
@@ -440,11 +441,11 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 key={m.id}
                 className={
                   m.role === "user"
-                    ? "ml-auto max-w-[80%] md:max-w-[70%] w-fit bg-white text-black rounded-2xl rounded-br-sm px-4 py-2"
-                    : "mr-auto max-w-[80%] md:max-w-[70%] w-fit bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-2xl rounded-bl-sm px-4 py-2 whitespace-pre-wrap"
+                    ? "ml-auto max-w-[80%] md:max-w-[70%] w-fit min-w-0 bg-white text-black rounded-2xl rounded-br-sm px-4 py-2 whitespace-pre-wrap break-words"
+                    : "mr-auto max-w-[80%] md:max-w-[70%] w-fit min-w-0 bg-zinc-900 border border-zinc-800 text-zinc-100 rounded-2xl rounded-bl-sm px-4 py-2 whitespace-pre-wrap break-words"
                 }
               >
-                {m.text}
+                {m.role === "user" ? m.text : <MessageText text={m.text} />}
               </div>
             ))}
             {sending && (
