@@ -8,6 +8,7 @@ import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
+import { requestRefresh } from "@/lib/refresh";
 
 type Platform = "telegram" | "x";
 type Asset = "USDC" | "SOL";
@@ -219,8 +220,8 @@ function SendScreen({ platformId }: { platformId: string }) {
       const hasInvite = /\/invite\/|[?&]start=invite_/i.test(res.message);
       if (!notSent && (hasTx || hasInvite)) {
         setResult({ kind: "ok", message: res.message, amount, asset, recipient });
-        // Funds just moved — refresh the displayed balance so it isn't stale.
-        bal.refetch();
+        // Funds just moved — refresh every balance surface, not just this one.
+        requestRefresh();
       } else {
         setResult({ kind: "info", message: res.message });
       }

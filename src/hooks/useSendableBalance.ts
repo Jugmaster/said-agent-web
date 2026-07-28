@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { getOnChainBalances } from "@/lib/api";
+import { onRefresh } from "@/lib/refresh";
 
 export interface SendableBalanceState {
   /** On-chain SOL balance (already in SOL units, not lamports). */
@@ -38,6 +39,14 @@ export function useSendableBalance(
   const [nonce, setNonce] = useState(0);
 
   const refetch = useCallback(() => setNonce((n) => n + 1), []);
+
+  // Global refresh bus: an agent reply / send / deposit anywhere re-fetches
+  // every active balance surface (sidebar, send page, navbar dropdown), so
+  // they never disagree after funds move.
+  useEffect(() => {
+    if (!walletAddress || !enabled) return;
+    return onRefresh(refetch);
+  }, [walletAddress, enabled, refetch]);
 
   useEffect(() => {
     if (!walletAddress || !enabled) return;

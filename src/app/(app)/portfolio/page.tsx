@@ -11,6 +11,7 @@ import {
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import { truncMiddle } from "@/lib/format";
+import { requestRefresh } from "@/lib/refresh";
 
 interface WalletState {
   address: string | null;
@@ -328,7 +329,10 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
             <FundModal
               walletAddress={balance.saidWallet}
               onClose={() => setFunding(false)}
-              onFunded={() => void load()}
+              onFunded={() => {
+                requestRefresh();
+                void load();
+              }}
             />
           )}
         </>

@@ -10,6 +10,7 @@ import FundModal from "./FundModal";
 import CommandPalette, { type PaletteAction } from "./CommandPalette";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
+import { requestRefresh } from "@/lib/refresh";
 import {
   ActivityIcon,
   ChatIcon,
@@ -309,7 +310,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         <FundModal
           walletAddress={walletAddress}
           onClose={() => setFunding(false)}
-          onFunded={() => bal.refetch()}
+          onFunded={requestRefresh}
         />
       )}
     </>

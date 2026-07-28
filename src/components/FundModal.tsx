@@ -17,6 +17,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useFundWallet } from "@privy-io/react-auth/solana";
 import { getOnChainBalances } from "@/lib/api";
+import { useModalA11y } from "@/hooks/useModalA11y";
 
 type Phase = "idle" | "opening" | "waiting" | "done" | "error";
 
@@ -41,6 +42,8 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
   const [copied, setCopied] = useState(false);
   const [showAddress, setShowAddress] = useState(false);
   const baselineSol = useRef<number | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useModalA11y(panelRef, onClose);
 
   // Watch the chain for the deposit. Privy's Solana fundWallet resolves when the
   // MoonPay window OPENS, not when payment settles — so this is how a web user
@@ -128,7 +131,12 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
       onClick={onClose}
     >
       <div
-        className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6"
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Add funds"
+        tabIndex={-1}
+        className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {phase === "idle" && (

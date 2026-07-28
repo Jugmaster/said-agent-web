@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
+import { useModalA11y } from "@/hooks/useModalA11y";
 
 export interface PaletteAction {
   id: string;
@@ -31,6 +32,9 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
   const [highlight, setHighlight] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  // Esc, Tab trap, and focus restore — engages only while open.
+  useModalA11y(panelRef, onClose, open);
 
   const matched = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -54,18 +58,6 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
   }, [open]);
 
   useEffect(() => setHighlight(0), [query]);
-
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        e.preventDefault();
-        onClose();
-      }
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
 
   if (!open) return null;
 
@@ -103,6 +95,10 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
       onClick={onClose}
     >
       <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label="Command palette"
         className="w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl shadow-black/60"
         onClick={(e) => e.stopPropagation()}
       >
@@ -113,14 +109,21 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
           onKeyDown={onInputKeyDown}
           placeholder="Type a command — or just tell your agent what to do…"
           spellCheck={false}
+          role="combobox"
+          aria-expanded="true"
+          aria-controls="cmdk-list"
+          aria-activedescendant={rowCount > 0 ? `cmdk-opt-${highlight}` : undefined}
           className="w-full bg-transparent px-4 py-3.5 text-base sm:text-sm text-white placeholder-zinc-600 focus:outline-none border-b border-zinc-800"
         />
 
-        <div ref={listRef} className="max-h-80 overflow-y-auto py-1.5">
+        <div ref={listRef} id="cmdk-list" role="listbox" className="max-h-80 overflow-y-auto py-1.5">
           {matched.map((a, i) => (
             <button
               key={a.id}
               type="button"
+              id={`cmdk-opt-${i}`}
+              role="option"
+              aria-selected={i === highlight}
               onClick={() => runRow(i)}
               onMouseEnter={() => setHighlight(i)}
               className={rowClass(i === highlight)}
@@ -138,6 +141,9 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
           {askRow && (
             <button
               type="button"
+              id={`cmdk-opt-${matched.length}`}
+              role="option"
+              aria-selected={highlight === matched.length}
               onClick={() => runRow(matched.length)}
               onMouseEnter={() => setHighlight(matched.length)}
               className={rowClass(highlight === matched.length)}

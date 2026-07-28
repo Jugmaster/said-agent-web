@@ -91,9 +91,32 @@ export default function DotGridBackground({
     let opacity = 1;
     let resizeTimeout: ReturnType<typeof setTimeout> | null = null;
 
+    // Per-frame cost scales with dot count × noise calls, so big desktop
+    // monitors pay quadratically. Two caps keep it bounded without changing
+    // the look on laptop-sized screens:
+    //  - render at most ~30fps (the drift is far too slow to need 60), and
+    //  - cap the internal canvas resolution; above ~2.6MP the buffer is
+    //    rendered smaller and CSS-upscaled — soft glow dots survive that.
+    const FRAME_MS = 1000 / 30;
+    const MAX_AREA = 2_600_000;
+    let lastFrame = 0;
+
+    // Dot radius + fill quantized to 64 levels, precomputed once — replaces
+    // per-dot `hsla(...)` string formatting (tens of thousands per frame).
+    const LUT = Array.from({ length: 65 }, (_, i) => {
+      const total = i / 64;
+      return {
+        r: 0.5 + total * 3.5,
+        style: `hsla(${Math.round(42 + total * 18)},${Math.round(3 + total * 25)}%,${Math.round(8 + total * 52)}%,${(0.08 + total * 0.58).toFixed(3)})`,
+      };
+    });
+
     function resize() {
-      W = window.innerWidth;
-      H = window.innerHeight;
+      const cssW = window.innerWidth;
+      const cssH = window.innerHeight;
+      const scale = Math.min(1, Math.sqrt(MAX_AREA / (cssW * cssH)));
+      W = Math.round(cssW * scale);
+      H = Math.round(cssH * scale);
       canvas!.width = W;
       canvas!.height = H;
       cols = Math.ceil(W / spacing);
@@ -110,11 +133,16 @@ export default function DotGridBackground({
       if (vignetteRef.current) vignetteRef.current.style.opacity = String(opacity);
     }
 
-    function render() {
+    function render(ts: number) {
       raf = requestAnimationFrame(render);
       if (opacity < 0.05) return;
+      if (ts - lastFrame < FRAME_MS) return;
+      // Delta-based time (clamped across tab-hidden gaps) keeps the drift
+      // speed identical to the old 0.014-per-60fps-frame pacing.
+      const dt = Math.min(ts - lastFrame, 100);
+      lastFrame = ts;
 
-      time += 0.014;
+      time += dt * (0.014 / 16.67);
       currentEnergy += (energyTarget - currentEnergy) * decayRate;
 
       const sp = spacing;
@@ -159,16 +187,11 @@ export default function DotGridBackground({
 
           const total = Math.min(1, nm * (0.25 + en * 0.75));
 
-          // Dot properties — warm amber HSL tint
-          const r = 0.5 + total * 3.5;
-          const a = 0.08 + total * 0.58;
-          const h = Math.round(42 + total * 18);  // 42-60 hue (amber)
-          const s = Math.round(3 + total * 25);   // 3-28% saturation
-          const l = Math.round(8 + total * 52);   // 8-58% lightness
-
+          // Warm amber tint via the precomputed level table
+          const dotStyle = LUT[(total * 64) | 0];
           ctx!.beginPath();
-          ctx!.arc(px, py, r, 0, Math.PI * 2);
-          ctx!.fillStyle = `hsla(${h},${s}%,${l}%,${a})`;
+          ctx!.arc(px, py, dotStyle.r, 0, Math.PI * 2);
+          ctx!.fillStyle = dotStyle.style;
           ctx!.fill();
         }
       }

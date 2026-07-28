@@ -14,6 +14,7 @@ import {
 import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { actionLabel, timeAgo } from "@/lib/format";
+import { onRefresh, requestRefresh } from "@/lib/refresh";
 
 interface UiMessage {
   id: string;
@@ -52,12 +53,17 @@ function ChatContextRail({
   onQuick: (text: string) => void;
 }) {
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
+  const [nonce, setNonce] = useState(0);
+
+  // Re-fetch when anything moves funds (agent reply, send, deposit) so the
+  // rail reflects the action the user just watched happen in chat.
+  useEffect(() => onRefresh(() => setNonce((n) => n + 1)), []);
 
   useEffect(() => {
     getActivity(platformId)
       .then((r) => setReceipts(r.receipts.slice(0, 4)))
-      .catch(() => setReceipts([]));
-  }, [platformId]);
+      .catch(() => setReceipts((prev) => prev ?? []));
+  }, [platformId, nonce]);
 
   return (
     <aside className="hidden xl:flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5">
@@ -212,6 +218,9 @@ function ChatScreen({ platformId }: { platformId: string }) {
         text: res.message,
       };
       setMessages((prev) => [...prev, agentMsg]);
+      // The reply may have moved funds (swap, send, DCA) — let the sidebar
+      // balance and activity rail catch up.
+      requestRefresh();
     } catch (err) {
       const errMsg: UiMessage = {
         id: `e-${Date.now()}`,
