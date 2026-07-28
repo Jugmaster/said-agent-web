@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
@@ -10,13 +10,15 @@ import HomeBelowFold from "@/components/HomeBelowFold";
 export default function HomePage() {
   const { ready, authenticated, login } = usePrivy();
   const router = useRouter();
+  const [loginInitiated, setLoginInitiated] = useState(false);
 
-  // Logged-in users belong in the app, not the marketing hero — and this closes
-  // the post-login dead-end: completing the Privy modal flips `authenticated`,
-  // so we route into /chat instead of dropping the user back here unchanged.
+  // Route into /chat only when the user just logged in FROM this hero — that
+  // closes the post-login dead-end (completing the Privy modal flips
+  // `authenticated`) without trapping already-authed visitors: clicking the
+  // logo or typing the URL while logged in keeps the home page browsable.
   useEffect(() => {
-    if (ready && authenticated) router.replace("/chat");
-  }, [ready, authenticated, router]);
+    if (ready && authenticated && loginInitiated) router.replace("/chat");
+  }, [ready, authenticated, loginInitiated, router]);
 
   return (
     <>
@@ -41,23 +43,48 @@ export default function HomePage() {
             setup.
           </p>
 
-          {/* Telegram-first (one tap), web app secondary */}
+          {/* Guests: Telegram-first (one tap), web app secondary.
+              Signed in: straight into the app — no re-login, no redirect trap. */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-            <a
-              href="https://t.me/saidinfrabot"
-              target="_blank"
-              rel="noreferrer"
-              className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
-            >
-              Start in Telegram →
-            </a>
-            <button
-              onClick={login}
-              disabled={!ready}
-              className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 disabled:opacity-50 transition"
-            >
-              {ready ? "Open web app" : "Loading…"}
-            </button>
+            {ready && authenticated ? (
+              <>
+                <Link
+                  href="/chat"
+                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+                >
+                  Open app →
+                </Link>
+                <a
+                  href="https://t.me/saidinfrabot"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 transition"
+                >
+                  Telegram →
+                </a>
+              </>
+            ) : (
+              <>
+                <a
+                  href="https://t.me/saidinfrabot"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+                >
+                  Start in Telegram →
+                </a>
+                <button
+                  onClick={() => {
+                    setLoginInitiated(true);
+                    login();
+                  }}
+                  disabled={!ready}
+                  className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 disabled:opacity-50 transition"
+                >
+                  {ready ? "Open web app" : "Loading…"}
+                </button>
+              </>
+            )}
           </div>
 
           <p className="text-xs text-zinc-500">
