@@ -23,6 +23,7 @@ const SECTIONS = [
   { id: "verify", title: "Verification" },
   { id: "funding", title: "Funding" },
   { id: "fees", title: "Fees" },
+  { id: "cashback", title: "Cashback" },
   { id: "webapp", title: "Web app" },
   { id: "identity", title: "On-chain identity" },
   { id: "surfaces", title: "Surfaces" },
@@ -79,7 +80,7 @@ export default function DocsPage() {
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* SIDEBAR */}
           <aside className="md:w-56 shrink-0">
-            <div className="md:sticky md:top-28">
+            <div className="md:sticky md:top-28 bg-zinc-900/70 backdrop-blur-md border border-zinc-800 rounded-xl p-4 shadow-lg shadow-black/20">
               <div className="text-xs text-zinc-500 uppercase tracking-wider mb-3">
                 Docs
               </div>
@@ -339,6 +340,13 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-300">
                 <li>
+                  <span className="text-white font-medium">Buy with card</span> —
+                  tap <span className="text-white">Add funds</span> in the web app
+                  to buy with a card or Apple Pay, right inside the app. The funds
+                  land in your agent&apos;s wallet a couple of minutes after
+                  payment confirms — no external wallet needed.
+                </li>
+                <li>
                   <span className="text-white font-medium">Crypto deposit</span>{" "}
                   — send SOL or any SPL token to your agent&apos;s wallet address
                   from any wallet or exchange.
@@ -366,15 +374,72 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               <p>Treasury address:</p>
               <Block>{`2XfHTeNWTjNwUmgoXaafYuqHcAAXj8F5Kjw2Bnzi4FxH`}</Block>
               <p>
-                Nothing is collected off-chain. Nothing accumulates in a
-                database waiting to be swept. Each fee lands in the SAID
-                treasury at the same block as the user-intended action — or
-                neither does.
+                The fee itself is collected on-chain, atomically — it lands in
+                the SAID treasury at the same block as your action, or neither
+                does. Nothing is skimmed off-chain.
+              </p>
+              <p>
+                Depending on your agent&apos;s reputation, part of that fee is
+                rebated straight back to you —{" "}
+                <a
+                  href="#cashback"
+                  className="text-white underline underline-offset-2 hover:text-zinc-300"
+                >
+                  see Cashback
+                </a>
+                .
               </p>
               <p>
                 Verification deposit, transaction fees, AgentCash per-call
                 costs, and Jupiter routing fees are separate from the 1% SAID
                 fee.
+              </p>
+            </Section>
+
+            <Section id="cashback" title="Reputation cashback">
+              <p>
+                The more trusted your agent, the more of every fee it earns
+                back. As your agent builds reputation through real, verified
+                activity, it climbs tiers — and each tier rebates a bigger slice
+                of the 1% fee straight into your wallet.
+              </p>
+              <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden my-4 divide-y divide-zinc-800">
+                {[
+                  { tier: "New", back: "0%", req: "just getting started" },
+                  { tier: "Bronze", back: "15%", req: "verified & active" },
+                  { tier: "Silver", back: "30%", req: "10+ trusted interactions" },
+                  { tier: "Gold", back: "45%", req: "30+ trusted interactions" },
+                  {
+                    tier: "Platinum",
+                    back: "50%",
+                    req: "100+ interactions · top identity",
+                  },
+                ].map((t) => (
+                  <div
+                    key={t.tier}
+                    className="flex items-center gap-3 px-4 py-3 text-sm"
+                  >
+                    <span className="font-medium text-white w-20">{t.tier}</span>
+                    <span className="font-mono text-white w-24">
+                      {t.back} back
+                    </span>
+                    <span className="text-xs text-zinc-500 flex-1 text-right">
+                      {t.req}
+                    </span>
+                  </div>
+                ))}
+              </div>
+              <p>
+                Cashback is paid from the fee you already paid — never out of
+                pocket — so it&apos;s always a rebate, never a subsidy. It
+                accrues as you trade and lands in your agent&apos;s wallet
+                automatically.
+              </p>
+              <p>
+                Reputation is earned, not bought. You build it by using your
+                agent; it decays if the agent goes inactive or acts in bad
+                faith. The cash you&apos;ve already earned is always yours —
+                decay only affects your future rate.
               </p>
             </Section>
 
