@@ -24,8 +24,8 @@ const SECTIONS = [
   { id: "funding", title: "Funding" },
   { id: "fees", title: "Fees" },
   { id: "cashback", title: "Cashback" },
-  { id: "webapp", title: "Web app" },
   { id: "identity", title: "On-chain identity" },
+  { id: "webapp", title: "Web app" },
   { id: "surfaces", title: "Surfaces" },
   { id: "faq", title: "FAQ" },
 ];
