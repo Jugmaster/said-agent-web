@@ -4,33 +4,15 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getActivity, type ActivityResponse, type ActivityReceipt } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
-import Navbar from "@/components/Navbar";
+import { actionLabel, timeAgo } from "@/lib/format";
 
-function timeAgo(iso: string): string {
-  const t = new Date(iso.endsWith("Z") ? iso : iso + "Z").getTime();
-  const diff = Date.now() - t;
-  const m = Math.floor(diff / 60000);
-  if (m < 1) return "just now";
-  if (m < 60) return `${m}m ago`;
-  const h = Math.floor(m / 60);
-  if (h < 24) return `${h}h ago`;
-  const d = Math.floor(h / 24);
-  return `${d}d ago`;
-}
-
-function actionLabel(type: string): { emoji: string; text: string; color: string } {
-  switch (type) {
-    case "swap":
-      return { emoji: "🔄", text: "Swap", color: "text-blue-400" };
-    case "stake":
-      return { emoji: "🔒", text: "Stake", color: "text-green-400" };
-    case "transfer":
-      return { emoji: "📤", text: "Transfer", color: "text-purple-400" };
-    case "test_action":
-      return { emoji: "🧪", text: "Test", color: "text-zinc-500" };
-    default:
-      return { emoji: "•", text: type, color: "text-zinc-300" };
-  }
+function StatTile({ label, value }: { label: string; value: string | number }) {
+  return (
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+      <div className="text-xs text-zinc-500">{label}</div>
+      <div className="text-lg font-semibold mt-1">{value}</div>
+    </div>
+  );
 }
 
 function ReceiptItem({ r }: { r: ActivityReceipt }) {
@@ -66,6 +48,63 @@ function ReceiptItem({ r }: { r: ActivityReceipt }) {
   );
 }
 
+/** Desktop receipts: a dense, scannable table instead of stacked cards. */
+function ReceiptTable({ receipts }: { receipts: ActivityReceipt[] }) {
+  return (
+    <div className="overflow-hidden rounded-xl border border-zinc-800">
+      <table className="w-full text-sm">
+        <thead>
+          <tr className="bg-zinc-900/80 text-left text-xs text-zinc-500">
+            <th className="px-4 py-2.5 font-medium">Type</th>
+            <th className="px-4 py-2.5 font-medium">Receipt</th>
+            <th className="px-4 py-2.5 font-medium">Status</th>
+            <th className="px-4 py-2.5 font-medium">Transaction</th>
+            <th className="px-4 py-2.5 font-medium text-right">Age</th>
+          </tr>
+        </thead>
+        <tbody className="divide-y divide-zinc-800/80">
+          {receipts.map((r) => {
+            const label = actionLabel(r.type);
+            return (
+              <tr key={r.seq} className="transition-colors hover:bg-zinc-900/50">
+                <td className="px-4 py-2.5">
+                  <span className="mr-2">{label.emoji}</span>
+                  <span className={`font-medium ${label.color}`}>{label.text}</span>
+                </td>
+                <td className="px-4 py-2.5 text-zinc-400">#{r.seq}</td>
+                <td className="px-4 py-2.5 text-xs">
+                  {r.anchored ? (
+                    <span className="text-green-500">⛓ anchored</span>
+                  ) : (
+                    <span className="text-zinc-600">pending anchor</span>
+                  )}
+                </td>
+                <td className="px-4 py-2.5">
+                  {r.onChainTx ? (
+                    <a
+                      href={`https://solscan.io/tx/${r.onChainTx}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="font-mono text-xs text-zinc-500 hover:text-zinc-200 transition"
+                    >
+                      {r.onChainTx.slice(0, 8)}…{r.onChainTx.slice(-8)} ↗
+                    </a>
+                  ) : (
+                    <span className="text-xs text-zinc-700">—</span>
+                  )}
+                </td>
+                <td className="px-4 py-2.5 text-right text-xs text-zinc-500 whitespace-nowrap">
+                  {timeAgo(r.occurredAt)}
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+}
+
 function ActivityScreen({ platformId }: { platformId: string }) {
   const [data, setData] = useState<ActivityResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -78,18 +117,20 @@ function ActivityScreen({ platformId }: { platformId: string }) {
       .finally(() => setLoading(false));
   }, [platformId]);
 
+  const activeDca = data?.dcaRules.filter((r) => !r.paused).length ?? 0;
+
   return (
-    <main className="px-4 pt-24 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-2xl mx-auto">
+    <main className="px-4 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-2xl md:max-w-5xl mx-auto w-full">
       <header className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold">Activity</h1>
+          <h1 className="text-xl md:text-2xl font-semibold">Activity</h1>
           <p className="text-xs text-zinc-500 mt-1">
             On-chain receipts and DCA rules
           </p>
         </div>
         <Link
           href="/chat"
-          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
+          className="md:hidden text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
         >
           Back to chat
         </Link>
@@ -106,26 +147,23 @@ function ActivityScreen({ platformId }: { platformId: string }) {
       {data && (
         <>
           {data.feeStats.txCount > 0 && (
-            <div className="mb-6 grid grid-cols-2 gap-3">
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
-                <div className="text-xs text-zinc-500">Total transactions</div>
-                <div className="text-lg font-semibold mt-1">{data.feeStats.txCount}</div>
-              </div>
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
-                <div className="text-xs text-zinc-500">SAID fees paid</div>
-                <div className="text-lg font-semibold mt-1">
-                  {data.feeStats.totalFee.toFixed(4)}
-                </div>
-              </div>
+            <div className="mb-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatTile label="Total transactions" value={data.feeStats.txCount} />
+              <StatTile
+                label="SAID fees paid"
+                value={data.feeStats.totalFee.toFixed(4)}
+              />
+              <StatTile label="Receipts" value={data.receipts.length} />
+              <StatTile label="Active DCA rules" value={activeDca} />
             </div>
           )}
 
           {data.dcaRules.length > 0 && (
             <section className="mb-6">
               <h2 className="text-sm font-medium text-zinc-400 mb-2">
-                DCA rules ({data.dcaRules.filter((r) => !r.paused).length} active)
+                DCA rules ({activeDca} active)
               </h2>
-              <div className="space-y-2">
+              <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-2">
                 {data.dcaRules.map((r) => (
                   <div
                     key={r.id}
@@ -162,11 +200,16 @@ function ActivityScreen({ platformId }: { platformId: string }) {
                 No on-chain activity yet. Try a swap from chat.
               </p>
             ) : (
-              <div className="space-y-2">
-                {data.receipts.map((r) => (
-                  <ReceiptItem key={r.seq} r={r} />
-                ))}
-              </div>
+              <>
+                <div className="hidden md:block">
+                  <ReceiptTable receipts={data.receipts} />
+                </div>
+                <div className="md:hidden space-y-2">
+                  {data.receipts.map((r) => (
+                    <ReceiptItem key={r.seq} r={r} />
+                  ))}
+                </div>
+              </>
             )}
           </section>
         </>
@@ -177,9 +220,6 @@ function ActivityScreen({ platformId }: { platformId: string }) {
 
 export default function ActivityPage() {
   return (
-    <>
-      <Navbar />
-      <AuthGate>{(platformId) => <ActivityScreen platformId={platformId} />}</AuthGate>
-    </>
+    <AuthGate>{(platformId) => <ActivityScreen platformId={platformId} />}</AuthGate>
   );
 }

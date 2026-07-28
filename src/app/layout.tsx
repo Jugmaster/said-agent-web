@@ -66,6 +66,10 @@ export default function RootLayout({
     <html
       lang="en"
       className={`${inter.variable} h-full antialiased`}
+      // The Telegram Web App SDK below stamps --tg-viewport-* style vars onto
+      // <html> before React hydrates, so the attribute never matches the
+      // server HTML. Suppress the mismatch warning for this element only.
+      suppressHydrationWarning
     >
       <head>
         {/* Telegram Web App SDK — exposes window.Telegram.WebApp inside Telegram */}

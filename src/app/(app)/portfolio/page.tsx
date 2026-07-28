@@ -9,8 +9,8 @@ import {
   type FullPortfolio,
 } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
-import Navbar from "@/components/Navbar";
 import FundModal from "@/components/FundModal";
+import { truncMiddle } from "@/lib/format";
 
 interface WalletState {
   address: string | null;
@@ -24,62 +24,100 @@ function fmtUsd(v: number | null | undefined): string | null {
   return `$${v.toFixed(2)}`;
 }
 
+function walletUsdTotal(p: FullPortfolio | null): number {
+  if (!p) return 0;
+  const tokens = p.tokens.reduce((sum, t) => sum + (t.usdValue ?? 0), 0);
+  return (p.solUsdValue ?? 0) + tokens;
+}
+
+function CopyableAddress({ address }: { address: string }) {
+  const [copied, setCopied] = useState(false);
+  async function copy(): Promise<void> {
+    try {
+      await navigator.clipboard.writeText(address);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      // clipboard blocked — tooltip still shows the full address
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={() => void copy()}
+      title={address}
+      className="group flex items-center gap-2 font-mono text-xs text-zinc-500 hover:text-zinc-300 transition"
+    >
+      <span>{truncMiddle(address, 6, 6)}</span>
+      <span className="text-[10px] text-zinc-700 group-hover:text-zinc-400 transition">
+        {copied ? "✓ copied" : "copy"}
+      </span>
+    </button>
+  );
+}
+
 function WalletCard({ label, state }: { label: string; state: WalletState }) {
   const p = state.portfolio;
   const hasHoldings =
     p && (p.solBalance > 0 || p.tokens.some((t) => t.balance > 0));
+  const total = walletUsdTotal(p);
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex flex-col">
       <div className="flex items-center justify-between mb-2">
         <span className="text-sm font-medium">{label}</span>
         <span className="text-xs text-zinc-500">{state.chain}</span>
       </div>
       {state.address ? (
         <>
-          <code className="text-xs text-zinc-500 break-all block">
-            {state.address}
-          </code>
+          <CopyableAddress address={state.address} />
           {state.loading ? (
             <p className="text-xs text-zinc-600 mt-2">Loading balances…</p>
           ) : p ? (
             hasHoldings ? (
-              <div className="mt-3 space-y-1.5">
-                {p.solBalance > 0 && (
-                  <div className="flex items-baseline justify-between text-sm">
-                    <span>
-                      <span className="font-medium">{p.solBalance.toFixed(4)}</span>
-                      <span className="text-zinc-400"> SOL</span>
-                    </span>
-                    {fmtUsd(p.solUsdValue) && (
-                      <span className="text-xs text-zinc-500">
-                        {fmtUsd(p.solUsdValue)}
-                      </span>
-                    )}
+              <>
+                {total > 0 && (
+                  <div className="mt-3 text-lg font-semibold">
+                    {fmtUsd(total)}
                   </div>
                 )}
-                {p.tokens
-                  .filter((t) => t.balance > 0)
-                  .map((t) => (
-                    <div
-                      key={t.mint}
-                      className="flex items-baseline justify-between text-sm"
-                    >
+                <div className="mt-2 space-y-1.5">
+                  {p.solBalance > 0 && (
+                    <div className="flex items-baseline justify-between text-sm">
                       <span>
-                        <span className="font-medium">
-                          {t.balance.toLocaleString(undefined, {
-                            maximumFractionDigits: 4,
-                          })}
-                        </span>
-                        <span className="text-zinc-400"> {t.symbol}</span>
+                        <span className="font-medium">{p.solBalance.toFixed(4)}</span>
+                        <span className="text-zinc-400"> SOL</span>
                       </span>
-                      {fmtUsd(t.usdValue) && (
+                      {fmtUsd(p.solUsdValue) && (
                         <span className="text-xs text-zinc-500">
-                          {fmtUsd(t.usdValue)}
+                          {fmtUsd(p.solUsdValue)}
                         </span>
                       )}
                     </div>
-                  ))}
-              </div>
+                  )}
+                  {p.tokens
+                    .filter((t) => t.balance > 0)
+                    .map((t) => (
+                      <div
+                        key={t.mint}
+                        className="flex items-baseline justify-between text-sm"
+                      >
+                        <span>
+                          <span className="font-medium">
+                            {t.balance.toLocaleString(undefined, {
+                              maximumFractionDigits: 4,
+                            })}
+                          </span>
+                          <span className="text-zinc-400"> {t.symbol}</span>
+                        </span>
+                        {fmtUsd(t.usdValue) && (
+                          <span className="text-xs text-zinc-500">
+                            {fmtUsd(t.usdValue)}
+                          </span>
+                        )}
+                      </div>
+                    ))}
+                </div>
+              </>
             ) : (
               <p className="text-xs text-zinc-600 mt-2 italic">empty</p>
             )
@@ -173,17 +211,32 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
+  const grandTotal = Object.values(walletStates).reduce(
+    (sum, s) => sum + walletUsdTotal(s.portfolio),
+    0,
+  );
+
   return (
-    <main className="px-4 pt-24 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-2xl mx-auto">
-      <header className="flex items-center justify-between mb-6">
+    <main className="px-4 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-2xl md:max-w-5xl mx-auto w-full">
+      <header className="flex items-start justify-between mb-6">
         <div>
-          <h1 className="text-xl font-semibold">Wallet</h1>
+          <h1 className="text-xl md:text-2xl font-semibold">Wallet</h1>
           <p className="text-xs text-zinc-500 mt-1">
             {balance?.displayName ?? "your agent"}
             {balance && balance.proTier > 0 && (
               <span className="ml-2 text-yellow-400">· Pro</span>
             )}
           </p>
+          {grandTotal > 0 && (
+            <div className="mt-3">
+              <div className="text-[11px] uppercase tracking-wider text-zinc-500">
+                Total value
+              </div>
+              <div className="text-3xl font-semibold tabular-nums">
+                ${grandTotal.toFixed(2)}
+              </div>
+            </div>
+          )}
         </div>
         <div className="flex gap-2">
           <button
@@ -195,13 +248,13 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           </button>
           <Link
             href="/activity"
-            className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
+            className="md:hidden text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
           >
             Activity
           </Link>
           <Link
             href="/chat"
-            className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
+            className="md:hidden text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
           >
             Chat
           </Link>
@@ -240,29 +293,31 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
             )}
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 md:space-y-0 md:grid md:grid-cols-2 xl:grid-cols-3 md:gap-3 md:items-start">
             <WalletCard label="SAID identity" state={walletStates.said ?? { address: null, chain: "Solana · Privy", portfolio: null, loading: false }} />
             <WalletCard label="AgentCash" state={walletStates.agentcash ?? { address: null, chain: "Solana · AgentCash", portfolio: null, loading: false }} />
             <WalletCard label="Purch" state={walletStates.purch ?? { address: null, chain: "Solana · Purch", portfolio: null, loading: false }} />
           </div>
 
-          <div className="mt-8 px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800">
-            <h2 className="text-sm font-medium mb-2">Funding</h2>
-            <p className="text-xs text-zinc-500 mb-3">
-              Top up your agent so it can swap, buy real-world goods, and call paid
-              services.
-            </p>
+          <div className="mt-8 px-4 py-3 md:py-4 rounded-xl bg-zinc-900 border border-zinc-800 md:flex md:items-center md:justify-between md:gap-6">
+            <div>
+              <h2 className="text-sm font-medium mb-2 md:mb-1">Funding</h2>
+              <p className="text-xs text-zinc-500 mb-3 md:mb-0">
+                Top up your agent so it can swap, buy real-world goods, and call paid
+                services.
+              </p>
+            </div>
             {balance.saidWallet ? (
               <button
                 onClick={() => setFunding(true)}
-                className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+                className="inline-block shrink-0 text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
               >
                 Add funds
               </button>
             ) : (
               <Link
                 href="/fund"
-                className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+                className="inline-block shrink-0 text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
               >
                 Activate agent
               </Link>
@@ -284,9 +339,6 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
 export default function PortfolioPage() {
   return (
-    <>
-      <Navbar />
-      <AuthGate>{(platformId) => <PortfolioScreen platformId={platformId} />}</AuthGate>
-    </>
+    <AuthGate>{(platformId) => <PortfolioScreen platformId={platformId} />}</AuthGate>
   );
 }

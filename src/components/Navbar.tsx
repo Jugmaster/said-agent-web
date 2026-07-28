@@ -70,11 +70,14 @@ export default function Navbar() {
       >
         {/* Brand */}
         <Link href="/" className="flex items-center gap-2 px-2">
+          {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
+              logo isn't distorted (and Next doesn't warn about it). */}
           <Image
             src="/logo-dark.png"
             alt="SAID"
-            width={20}
-            height={20}
+            width={354}
+            height={370}
+            className="h-5 w-auto"
             priority
           />
           <span className="text-sm font-bold tracking-wide">SAID Agent</span>

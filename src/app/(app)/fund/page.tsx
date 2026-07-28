@@ -5,7 +5,6 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { getBalance, type BalanceResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
-import Navbar from "@/components/Navbar";
 
 const VERIFY_AMOUNT_SOL = 0.015;
 
@@ -74,7 +73,7 @@ function FundScreen({ platformId }: { platformId: string }) {
   }
 
   return (
-    <main className="px-4 pt-24 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md mx-auto">
+    <main className="px-4 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold">Activate your agent</h1>
         <Link
@@ -179,9 +178,6 @@ function FundScreen({ platformId }: { platformId: string }) {
 
 export default function FundPage() {
   return (
-    <>
-      <Navbar />
-      <AuthGate>{(platformId) => <FundScreen platformId={platformId} />}</AuthGate>
-    </>
+    <AuthGate>{(platformId) => <FundScreen platformId={platformId} />}</AuthGate>
   );
 }
