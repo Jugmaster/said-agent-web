@@ -465,8 +465,17 @@ export async function getOnChainBalances(
       }),
     }).then((r) => r.json()).catch(() => ({})),
   ]);
-  const lamports: number = solRes?.result?.value ?? 0;
-  const usdc = (tokenRes?.result?.value ?? []).reduce(
+  // A rate-limited/failed read must THROW, not read as a zero balance —
+  // otherwise every surface confidently renders "0 SOL · 0 USDC" with no
+  // error flag (and FundModal's deposit detection baselines at 0).
+  if (
+    typeof solRes?.result?.value !== "number" ||
+    !Array.isArray(tokenRes?.result?.value)
+  ) {
+    throw new Error("balance read failed: butler unreachable and public RPC errored");
+  }
+  const lamports: number = solRes.result.value;
+  const usdc = (tokenRes.result.value ?? []).reduce(
     (sum: number, account: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }) => {
       const amount = account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
       return sum + (typeof amount === "number" ? amount : 0);

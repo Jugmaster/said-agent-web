@@ -57,8 +57,12 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
       polls += 1;
       try {
         const { sol } = await getOnChainBalances(walletAddress);
-        const base = baselineSol.current ?? 0;
-        if (!cancelled && sol > base + 1e-6) {
+        if (baselineSol.current == null) {
+          // The pre-on-ramp snapshot failed — anchor on the first good read
+          // instead of assuming 0, so pre-existing funds can't be announced
+          // as a fresh deposit.
+          baselineSol.current = sol;
+        } else if (!cancelled && sol > baselineSol.current + 1e-6) {
           setPhase("done");
           onFunded?.();
           return;
@@ -86,8 +90,10 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
     setErrorMsg("");
     setSlow(false);
     // Snapshot the balance BEFORE the on-ramp so we can detect the increase.
-    const before = await getOnChainBalances(walletAddress).catch(() => ({ sol: 0, usdc: 0 }));
-    baselineSol.current = before.sol;
+    // On failure the baseline stays null and the poll anchors on its first
+    // good read — never assume a failed read means an empty wallet.
+    const before = await getOnChainBalances(walletAddress).catch(() => null);
+    baselineSol.current = before?.sol ?? null;
     try {
       await fundWallet({
         address: walletAddress,
