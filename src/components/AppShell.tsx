@@ -126,12 +126,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
   }, [router, walletAddress, platformId]);
 
   // Palette free-text goes to the agent. Already on /chat → hand it to the
-  // mounted chat screen via an event; elsewhere → navigate with the prompt.
+  // mounted chat screen via an event; elsewhere → stash the prompt in
+  // sessionStorage and navigate. Never via URL: a ?prompt= that auto-executes
+  // would let any external link run commands against a logged-in wallet.
   function askAgent(query: string): void {
     if (pathname === "/chat") {
       window.dispatchEvent(new CustomEvent("said:ask", { detail: query }));
     } else {
-      router.push(`/chat?prompt=${encodeURIComponent(query)}`);
+      try {
+        sessionStorage.setItem("said-agent:pending-prompt", query);
+      } catch {
+        // storage unavailable — fall through, prompt is dropped
+      }
+      router.push("/chat");
     }
   }
 

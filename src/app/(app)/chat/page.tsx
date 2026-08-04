@@ -237,16 +237,29 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const sendRef = useRef(send);
   sendRef.current = send;
 
-  // ⌘K palette hand-offs: a ?prompt= from another page (read once, then
-  // stripped from the URL), and the "said:ask" event when already on /chat.
+  // ⌘K palette hand-offs: a pending prompt stashed in sessionStorage by
+  // AppShell (read once, then cleared), and the "said:ask" event when already
+  // on /chat. A ?prompt= in the URL only prefills the composer — external
+  // links must never auto-execute commands against the wallet.
   const autoRan = useRef(false);
   useEffect(() => {
     if (!autoRan.current) {
       autoRan.current = true;
-      const prompt = new URLSearchParams(window.location.search).get("prompt");
-      if (prompt) {
-        router.replace("/chat");
-        void sendRef.current(prompt);
+      let pending: string | null = null;
+      try {
+        pending = sessionStorage.getItem("said-agent:pending-prompt");
+        if (pending) sessionStorage.removeItem("said-agent:pending-prompt");
+      } catch {
+        // storage unavailable
+      }
+      if (pending) {
+        void sendRef.current(pending);
+      } else {
+        const prompt = new URLSearchParams(window.location.search).get("prompt");
+        if (prompt) {
+          router.replace("/chat");
+          setInput(prompt);
+        }
       }
     }
     const onAsk = (e: Event) => {
