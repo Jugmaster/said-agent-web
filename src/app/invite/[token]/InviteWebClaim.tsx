@@ -33,7 +33,7 @@ export default function InviteWebClaim({ platform }: Props) {
       type="button"
       onClick={login}
       disabled={!ready}
-      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-neutral-200 font-medium disabled:opacity-50 transition"
+      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-zinc-200 font-medium disabled:opacity-50 transition"
     >
       Claim here → sign in with {label}
     </button>

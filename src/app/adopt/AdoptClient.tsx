@@ -81,20 +81,20 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
       <section className="bg-green-950/30 border border-green-900 rounded-xl px-4 py-6">
         <p className="text-2xl mb-2">✅</p>
         <p className="text-sm font-medium text-green-300 mb-1">Agent claimed</p>
-        <p className="text-xs text-neutral-400 mb-3">
+        <p className="text-xs text-zinc-400 mb-3">
           Now linked to your account. You can chat with it from Telegram, on
           this site, or any other surface that connects to the same Privy
           identity.
         </p>
         {state.linkedPlatformIds.length > 1 && (
-          <p className="text-xs text-neutral-500 mb-3">
+          <p className="text-xs text-zinc-500 mb-3">
             Linked surfaces: {state.linkedPlatformIds.join(", ")}
           </p>
         )}
         <div className="flex gap-2">
           <Link
             href="/chat"
-            className="text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+            className="text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
           >
             Open chat →
           </Link>
@@ -102,7 +102,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className="text-sm px-4 py-2 rounded-lg border border-neutral-700 hover:border-neutral-500"
+            className="text-sm px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-500"
           >
             Open Telegram
           </a>
@@ -112,9 +112,9 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
   }
 
   return (
-    <section className="bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-5">
+    <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5">
       <h2 className="text-sm font-medium mb-3">Claim this agent</h2>
-      <p className="text-xs text-neutral-500 mb-4">
+      <p className="text-xs text-zinc-500 mb-4">
         {expectedXUserId
           ? "Sign in with the X account that launched this token. Privy verifies the link, then attaches the agent to your identity."
           : "Sign in with Privy to attach this agent to your identity."}
@@ -122,18 +122,18 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
 
       {!ready ? (
         <div className="flex justify-center py-2">
-          <div className="w-5 h-5 rounded-full border-2 border-neutral-700 border-t-neutral-300 animate-spin" />
+          <div className="w-5 h-5 rounded-full border-2 border-zinc-700 border-t-zinc-300 animate-spin" />
         </div>
       ) : !authenticated ? (
         <button
           onClick={login}
-          className="w-full text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+          className="w-full text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
         >
           {expectedXUserId ? "Sign in with X →" : "Sign in →"}
         </button>
       ) : (
         <>
-          <p className="text-xs text-neutral-500 mb-3">
+          <p className="text-xs text-zinc-500 mb-3">
             Signed in
             {user?.twitter?.username ? ` as @${user.twitter.username}` : ""}.
           </p>
@@ -152,7 +152,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
           <button
             onClick={() => void handleClaim()}
             disabled={state.kind === "verifying" || xMismatch}
-            className="w-full text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500 disabled:bg-neutral-800 disabled:text-neutral-500"
+            className="w-full text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-500"
           >
             {state.kind === "verifying" ? "Claiming…" : "Claim agent"}
           </button>

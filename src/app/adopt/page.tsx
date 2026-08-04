@@ -52,17 +52,17 @@ export default async function AdoptPage({ searchParams }: PageProps) {
 
   if (!platformId) {
     return (
-      <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-md mx-auto">
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
         <div className="bg-yellow-950/30 border border-yellow-900 rounded-xl px-4 py-6 mt-12 text-center">
           <p className="text-sm text-yellow-300">
             Missing agent identifier. Adopt links should look like:
           </p>
-          <code className="text-xs text-neutral-400 block mt-2 break-all">
+          <code className="text-xs text-zinc-400 block mt-2 break-all">
             agent.saidprotocol.com/adopt?p=tw_…
           </code>
           <Link
             href="/"
-            className="mt-4 inline-block text-sm px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-500"
+            className="mt-4 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
           >
             Home
           </Link>
@@ -78,9 +78,9 @@ export default async function AdoptPage({ searchParams }: PageProps) {
   const xUserId = isXLaunched ? platformId.slice("tw_".length) : null;
 
   return (
-    <main className="min-h-dvh bg-neutral-950 text-neutral-100 px-4 py-6 max-w-md mx-auto">
+    <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
       <header className="mb-6">
-        <Link href="/" className="text-xs text-neutral-500 hover:text-neutral-300">
+        <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
           ← SAID Agent
         </Link>
       </header>
@@ -89,7 +89,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
         <h1 className="text-2xl font-semibold mb-1">
           {agent.displayName ?? "Your agent"}
         </h1>
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-zinc-400">
           {isXLaunched
             ? "Launched via @saidagent on X. Claim it to chat with it on Telegram or here on the web."
             : "Claim your agent and chat from any device."}
@@ -97,13 +97,13 @@ export default async function AdoptPage({ searchParams }: PageProps) {
       </section>
 
       {agent.saidWallet && (
-        <section className="mb-6 bg-neutral-900 border border-neutral-800 rounded-xl px-4 py-3">
-          <div className="text-xs text-neutral-500 mb-1">Agent wallet</div>
-          <code className="text-xs text-neutral-300 break-all block">
+        <section className="mb-6 bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+          <div className="text-xs text-zinc-500 mb-1">Agent wallet</div>
+          <code className="text-xs text-zinc-300 break-all block">
             {agent.saidWallet}
           </code>
           {agent.activityCounts.total > 0 && (
-            <div className="mt-2 text-xs text-neutral-500">
+            <div className="mt-2 text-xs text-zinc-500">
               {agent.activityCounts.total} on-chain action
               {agent.activityCounts.total === 1 ? "" : "s"} · {agent.activityCounts.swaps} swap
               {agent.activityCounts.swaps === 1 ? "" : "s"} ·{" "}
@@ -116,7 +116,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
 
       <AdoptClient platformId={platformId} expectedXUserId={xUserId} />
 
-      <footer className="mt-12 pt-6 border-t border-neutral-900 text-xs text-neutral-600 text-center">
+      <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
           Your agent is yours. The wallet, identity, and on-chain
           history persist regardless of where you sign in from.
