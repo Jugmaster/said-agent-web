@@ -75,6 +75,24 @@ export type AgentState =
 
 const STORAGE_KEY = "said-agent:linked";
 
+// useAgent is instantiated by several components at once (AppShell, AuthGate,
+// Navbar, pages). On a cache-cold login they all reach performClaim in the
+// same tick — dedupe at module level so exactly one POST /api/claim goes out
+// and every instance settles from the same promise.
+const inflightClaims = new Map<string, Promise<ClaimResponse>>();
+
+function claimAgentOnce(
+  params: Parameters<typeof claimAgent>[0],
+): Promise<ClaimResponse> {
+  const key = params.platformId;
+  let p = inflightClaims.get(key);
+  if (!p) {
+    p = claimAgent(params).finally(() => inflightClaims.delete(key));
+    inflightClaims.set(key, p);
+  }
+  return p;
+}
+
 interface LinkedCache {
   privyId: string;
   platformId: string;
@@ -138,7 +156,7 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
     const xUsername = privyUser.twitter?.username ?? undefined;
 
     try {
-      const claim: ClaimResponse = await claimAgent({
+      const claim: ClaimResponse = await claimAgentOnce({
         platformId,
         privyUserId: privyUser.id,
         verifiedXUserId,
