@@ -6,7 +6,6 @@ import QRCode from "qrcode";
 import { getBalance, type BalanceResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 
-const VERIFY_AMOUNT_SOL = 0.015;
 
 function FundScreen({ platformId }: { platformId: string }) {
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
@@ -53,8 +52,9 @@ function FundScreen({ platformId }: { platformId: string }) {
       setQrSvg(null);
       return;
     }
-    // Solana Pay URI — wallet apps recognize this and prefill amount
-    const uri = `solana:${wallet}?amount=${VERIFY_AMOUNT_SOL}&label=Verify%20Agent&message=Activate%20your%20SAID%20agent`;
+    // Solana Pay URI — wallet apps recognize this and prefill the recipient;
+    // the user picks the amount (activation is free, this is just a top-up).
+    const uri = `solana:${wallet}?label=Fund%20SAID%20Agent&message=Top%20up%20your%20SAID%20agent`;
     QRCode.toString(uri, {
       type: "svg",
       margin: 1,
@@ -75,7 +75,7 @@ function FundScreen({ platformId }: { platformId: string }) {
   return (
     <main className="px-4 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
       <header className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">Activate your agent</h1>
+        <h1 className="text-xl font-semibold">Fund your agent</h1>
         <Link
           href="/portfolio"
           className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
@@ -113,9 +113,9 @@ function FundScreen({ platformId }: { platformId: string }) {
       {balance && !balance.verified && balance.saidWallet && (
         <>
           <p className="text-sm text-zinc-400 mb-6">
-            Send <span className="text-zinc-100 font-medium">{VERIFY_AMOUNT_SOL} SOL</span> to
-            your agent&apos;s wallet to activate it. Verification happens automatically
-            within ~30 seconds of the deposit landing.
+            Activation is <span className="text-zinc-100 font-medium">free and automatic</span> —
+            no deposit needed. Top up your agent&apos;s wallet here so it can
+            swap, send, and buy: send SOL or USDC to the address below.
           </p>
 
           {qrSvg && (
@@ -145,17 +145,13 @@ function FundScreen({ platformId }: { platformId: string }) {
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-500">
             <p className="mb-2">
               <span className="text-zinc-300">Tip:</span> Scan the QR with any
-              Solana wallet app (Phantom, Solflare, Backpack) to auto-fill the amount.
+              Solana wallet app (Phantom, Solflare, Backpack) to auto-fill the
+              address.
             </p>
             <p>
-              Watching this address — when {VERIFY_AMOUNT_SOL} SOL arrives, your
-              agent will activate automatically. You can leave this page open.
+              Your agent verifies its on-chain identity automatically — this
+              page updates once it&apos;s active.
             </p>
-          </div>
-
-          <div className="mt-6 flex items-center justify-center gap-2 text-xs text-zinc-500">
-            <span className="inline-block w-2 h-2 rounded-full bg-yellow-500 animate-pulse" />
-            <span>Awaiting deposit…</span>
           </div>
         </>
       )}
@@ -166,7 +162,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           agent gets provisioned on first message.
           <Link
             href="/chat"
-            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition text-white"
+            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
           >
             Open chat →
           </Link>

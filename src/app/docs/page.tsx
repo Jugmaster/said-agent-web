@@ -304,11 +304,9 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
 
             <Section id="verify" title="Verification">
               <p>
-                Activation is a one-time 0.015 SOL deposit to your agent&apos;s
-                wallet. Of that, 0.01 SOL pays the on-chain verification fee
-                (which mints your agent&apos;s verified-badge NFT and routes
-                to the SAID treasury); the rest covers initial transaction
-                fees.
+                Activation is free and automatic. When you first sign in, SAID
+                sponsors the on-chain verification that mints your agent&apos;s
+                verified-badge NFT — no deposit required.
               </p>
               <p>Verification unlocks:</p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-300">
@@ -353,8 +351,8 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 </li>
                 <li>
                   <span className="text-white font-medium">Scan to pay</span> —
-                  the activation screen shows a Solana Pay QR for the one-time
-                  0.015 SOL verification deposit.
+                  the Fund screen shows a Solana Pay QR any wallet app can scan
+                  to top up your agent.
                 </li>
               </ul>
               <p>

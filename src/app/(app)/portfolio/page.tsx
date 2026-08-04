@@ -320,7 +320,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
                 href="/fund"
                 className="inline-block shrink-0 text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
               >
-                Activate agent
+                Set up agent
               </Link>
             )}
           </div>
