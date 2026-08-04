@@ -102,11 +102,12 @@ Environment variables (`.env.local` for dev):
 ```bash
 # Butler container HTTP API
 NEXT_PUBLIC_BUTLER_API=https://butler.saidprotocol.com
-# Solana RPC for client balance reads — set a real provider in prod; the public
-# RPC default is rate-limited and can make balances read as empty/$0.
-NEXT_PUBLIC_SOLANA_RPC=
-# Server-side RPC for the /api/research route (falls back to the public RPC).
+# Server-side Solana RPC for /api/balances (client balance fallback) and
+# /api/research. Set a real provider in prod — the public RPC default is
+# rate-limited and balance reads will error under load.
 SOLANA_RPC=
+# Optional shared secret for POST /api/research (sent as x-api-key).
+RESEARCH_API_KEY=
 ```
 
 The Privy app ID is currently hard-coded in `src/app/providers.tsx` (shared with `saidprotocol.com`).

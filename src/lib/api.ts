@@ -412,10 +412,6 @@ export async function getIdleLeaderboard(
   }
 }
 
-const SOLANA_RPC =
-  process.env.NEXT_PUBLIC_SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
-const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
-
 export interface OnChainBalances {
   sol: number;
   usdc: number;
@@ -446,43 +442,21 @@ export async function getOnChainBalances(
   } catch {
     // fall through to direct-RPC fallback
   }
-  // Fallback: direct public RPC. Not great (rate-limited) but better than
-  // showing nothing if butler is unreachable.
-  const [solRes, tokenRes] = await Promise.all([
-    fetch(SOLANA_RPC, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method: "getBalance", params: [walletAddress] }),
-    }).then((r) => r.json()).catch(() => ({})),
-    fetch(SOLANA_RPC, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: 2,
-        method: "getTokenAccountsByOwner",
-        params: [walletAddress, { mint: USDC_MINT }, { encoding: "jsonParsed" }],
-      }),
-    }).then((r) => r.json()).catch(() => ({})),
-  ]);
-  // A rate-limited/failed read must THROW, not read as a zero balance —
+  // Fallback: our own server-side /api/balances route (RPC key stays out of
+  // the client bundle). A failed read must THROW, not read as a zero balance —
   // otherwise every surface confidently renders "0 SOL · 0 USDC" with no
   // error flag (and FundModal's deposit detection baselines at 0).
-  if (
-    typeof solRes?.result?.value !== "number" ||
-    !Array.isArray(tokenRes?.result?.value)
-  ) {
-    throw new Error("balance read failed: butler unreachable and public RPC errored");
-  }
-  const lamports: number = solRes.result.value;
-  const usdc = (tokenRes.result.value ?? []).reduce(
-    (sum: number, account: { account: { data: { parsed: { info: { tokenAmount: { uiAmount: number | null } } } } } }) => {
-      const amount = account?.account?.data?.parsed?.info?.tokenAmount?.uiAmount;
-      return sum + (typeof amount === "number" ? amount : 0);
-    },
-    0,
+  const res = await fetch(
+    `/api/balances/${encodeURIComponent(walletAddress)}`,
   );
-  return { sol: lamports / 1e9, usdc };
+  if (!res.ok) {
+    throw new Error("balance read failed: butler unreachable and RPC fallback errored");
+  }
+  const data = (await res.json()) as { sol: number; usdc: number };
+  if (typeof data.sol !== "number" || typeof data.usdc !== "number") {
+    throw new Error("balance read failed: malformed fallback response");
+  }
+  return { sol: data.sol, usdc: data.usdc };
 }
 
 export interface PortfolioToken {
