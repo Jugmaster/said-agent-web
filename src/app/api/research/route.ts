@@ -17,6 +17,34 @@ const SOLANA_RPC =
   process.env.NEXT_PUBLIC_SOLANA_RPC ??
   "https://api.mainnet-beta.solana.com";
 
+// Optional shared secret. When RESEARCH_API_KEY is set, callers must send it
+// as `x-api-key` (configure the same value on the IDLE seller side). Unset →
+// open, but still rate-limited below.
+const API_KEY = process.env.RESEARCH_API_KEY;
+
+// Each request fans out to 3 RPC calls against a possibly-metered provider, so
+// an open endpoint needs a spend ceiling: per-IP and global token windows.
+// In-memory is fine — prod is a single Railway instance.
+const MAX_BODY_BYTES = 4096;
+const WINDOW_MS = 60_000;
+const PER_IP_LIMIT = 10;
+const GLOBAL_LIMIT = 60;
+const ipHits = new Map<string, { count: number; resetAt: number }>();
+let globalHits = { count: 0, resetAt: 0 };
+
+function rateLimited(ip: string): boolean {
+  const now = Date.now();
+  if (now > globalHits.resetAt) globalHits = { count: 0, resetAt: now + WINDOW_MS };
+  if (++globalHits.count > GLOBAL_LIMIT) return true;
+  const entry = ipHits.get(ip);
+  if (!entry || now > entry.resetAt) {
+    if (ipHits.size > 10_000) ipHits.clear();
+    ipHits.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return false;
+  }
+  return ++entry.count > PER_IP_LIMIT;
+}
+
 const TOKEN_PROGRAM = "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA";
 const B58 = /[1-9A-HJ-NP-Za-km-z]{32,44}/;
 
@@ -116,9 +144,21 @@ async function analyze(address: string) {
 }
 
 export async function POST(request: Request) {
+  if (API_KEY && request.headers.get("x-api-key") !== API_KEY) {
+    return Response.json({ error: "unauthorized" }, { status: 401 });
+  }
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  if (rateLimited(ip)) {
+    return Response.json({ error: "rate limited" }, { status: 429 });
+  }
   let body: unknown = {};
   try {
-    body = await request.json();
+    const raw = await request.text();
+    if (raw.length > MAX_BODY_BYTES) {
+      return Response.json({ error: "body too large" }, { status: 413 });
+    }
+    body = JSON.parse(raw);
   } catch {}
   const address = extractAddress(body);
   if (!address) {
