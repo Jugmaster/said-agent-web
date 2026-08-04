@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { chat } from "@/lib/api";
@@ -15,6 +15,17 @@ type Asset = "USDC" | "SOL";
 
 function normalizeHandle(raw: string): string {
   return raw.trim().replace(/^@+/, "").toLowerCase();
+}
+
+// Telegram and X usernames are letters/digits/underscores only. Anything else
+// must not reach the butler: the command is interpolated into an LLM router
+// prompt, so free text in the handle field is a prompt-injection vector.
+function isValidHandle(h: string): boolean {
+  return /^[a-z0-9_]{1,32}$/.test(h);
+}
+
+function isValidSolanaAddress(s: string): boolean {
+  return /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s);
 }
 
 function isLikelyWalletAddress(s: string): boolean {
@@ -171,6 +182,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   );
   const [advancedOpen, setAdvancedOpen] = useState(() => !!params.get("address"));
   const [sending, setSending] = useState(false);
+  const [confirming, setConfirming] = useState(false);
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
     | { kind: "info"; message: string }
@@ -178,32 +190,42 @@ function SendScreen({ platformId }: { platformId: string }) {
     | null
   >(null);
 
+  const addr = walletAddress.trim();
+  const handleNorm = normalizeHandle(handle);
+  const addrInvalid = addr.length > 0 && !isValidSolanaAddress(addr);
+  const handleInvalid = !addr && handle.trim().length > 0 && !isValidHandle(handleNorm);
+  // Client-side ceiling when we have a trustworthy balance read; the butler
+  // enforces the real limit, this just stops obvious over-sends up front.
+  const balanceKnown = !bal.loading && !bal.error;
+  const overBalance =
+    balanceKnown &&
+    amount.trim().length > 0 &&
+    parseFloat(amount) > maxSendable(asset, bal.sol, bal.usdc) + 1e-9;
+
   const canSubmit =
     !sending &&
     amount.trim().length > 0 &&
     parseFloat(amount) > 0 &&
-    (handle.trim().length > 0 || walletAddress.trim().length > 0);
+    !overBalance &&
+    !addrInvalid &&
+    !handleInvalid &&
+    (handle.trim().length > 0 || addr.length > 0);
 
   async function submit(): Promise<void> {
     if (!canSubmit) return;
+    setConfirming(false);
     setSending(true);
     setResult(null);
 
     // Build a natural-language command that the butler's LLM router can
-    // unambiguously parse into the right tool call. Handle is normalized
-    // (no @, lowercased); wallet address fallback overrides handle when
-    // provided in advanced mode.
-    let cmd: string;
-    if (walletAddress.trim()) {
-      cmd = `send ${amount} ${asset} to ${walletAddress.trim()}`;
-    } else {
-      const h = normalizeHandle(handle);
-      cmd = `send ${amount} ${asset} to @${h} on ${platform}`;
-    }
+    // unambiguously parse into the right tool call. Both interpolated values
+    // are strictly validated above (base58 / [a-z0-9_]) so no free text can
+    // ride along into the router prompt.
+    const cmd = addr
+      ? `send ${amount} ${asset} to ${addr}`
+      : `send ${amount} ${asset} to @${handleNorm} on ${platform}`;
 
-    const recipient = walletAddress.trim()
-      ? walletAddress.trim()
-      : `@${normalizeHandle(handle)}`;
+    const recipient = addr ? addr : `@${handleNorm}`;
     try {
       const res = await chat(platformId, cmd);
       // Butler returns HTTP 200 even when it REFUSES the send (e.g. an
@@ -238,6 +260,12 @@ function SendScreen({ platformId }: { platformId: string }) {
   // If user pastes a wallet address into the @handle field, gently nudge
   // them to use the advanced fallback so we don't double-route.
   const handleLooksLikeAddress = isLikelyWalletAddress(handle);
+
+  // Any edit invalidates a pending confirmation — the user must re-confirm
+  // exactly what will be sent.
+  useEffect(() => {
+    setConfirming(false);
+  }, [handle, platform, amount, asset, walletAddress]);
 
   return (
     <div className="mt-24 md:mt-0 md:pt-10 px-5 md:px-8 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16 w-full max-w-md lg:max-w-4xl mx-auto">
@@ -327,7 +355,12 @@ function SendScreen({ platformId }: { platformId: string }) {
               address instead.
             </p>
           )}
-          {!handleLooksLikeAddress && handle.trim() && (
+          {!handleLooksLikeAddress && handleInvalid && (
+            <p className="text-xs text-yellow-500 mb-3">
+              Handles can only contain letters, numbers and underscores.
+            </p>
+          )}
+          {!handleLooksLikeAddress && !handleInvalid && handle.trim() && (
             <p className="text-xs text-zinc-500 mb-3">
               If they don’t have a SAID agent yet, your funds stay in your wallet
               and they get an invite link to claim them.
@@ -407,24 +440,72 @@ function SendScreen({ platformId }: { platformId: string }) {
                 spellCheck={false}
                 className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-base sm:text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
               />
-              <p className="text-xs text-zinc-500 mt-2">
-                Overrides the @handle above when filled.
-              </p>
+              {addrInvalid ? (
+                <p className="text-xs text-yellow-500 mt-2">
+                  That doesn’t look like a valid Solana address.
+                </p>
+              ) : (
+                <p className="text-xs text-zinc-500 mt-2">
+                  Overrides the @handle above when filled.
+                </p>
+              )}
             </div>
           </details>
 
-          {/* Submit */}
-          <button
-            onClick={() => void submit()}
-            disabled={!canSubmit}
-            className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
-          >
-            {sending
-              ? "Sending…"
-              : amount && parseFloat(amount) > 0
-                ? `Send ${amount} ${asset}`
-                : "Enter an amount to send"}
-          </button>
+          {/* Submit — two-step: review, then confirm. Money only moves on the
+              explicit confirm click. */}
+          {overBalance && (
+            <p className="mb-2 text-xs text-yellow-500">
+              That’s more than you can send — max{" "}
+              {asset === "SOL"
+                ? `${maxSendable(asset, bal.sol, bal.usdc).toFixed(4)} SOL`
+                : `${maxSendable(asset, bal.sol, bal.usdc).toFixed(2)} USDC`}
+              .
+            </p>
+          )}
+          {confirming && canSubmit ? (
+            <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-4">
+              <p className="text-sm text-zinc-200 text-center">
+                Send{" "}
+                <span className="font-semibold text-white">
+                  {amount} {asset}
+                </span>{" "}
+                to{" "}
+                <span className="font-semibold text-white break-all">
+                  {addr ? addr : `@${handleNorm} on ${platform === "x" ? "X" : "Telegram"}`}
+                </span>
+                ?
+              </p>
+              <div className="mt-3 flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirming(false)}
+                  className="flex-1 py-3 rounded-xl border border-zinc-700 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => void submit()}
+                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition"
+                >
+                  Confirm send
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirming(true)}
+              disabled={!canSubmit}
+              className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
+            >
+              {sending
+                ? "Sending…"
+                : amount && parseFloat(amount) > 0
+                  ? `Send ${amount} ${asset}`
+                  : "Enter an amount to send"}
+            </button>
+          )}
 
           {/* Result */}
           {result?.kind === "ok" && (
