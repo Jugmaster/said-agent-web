@@ -1,3 +1,4 @@
+import { cache } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
@@ -8,15 +9,17 @@ interface PageProps {
   searchParams: Promise<{ p?: string }>;
 }
 
-async function fetchAgent(
-  platformId: string
-): Promise<AgentProfileResponse | null> {
-  try {
-    return await getAgentProfile(platformId, { cache: "no-store" });
-  } catch {
-    return null;
-  }
-}
+// React cache(): generateMetadata and the page body share one butler fetch
+// per request (no-store skips the framework's own dedupe).
+const fetchAgent = cache(
+  async (platformId: string): Promise<AgentProfileResponse | null> => {
+    try {
+      return await getAgentProfile(platformId, { cache: "no-store" });
+    } catch {
+      return null;
+    }
+  },
+);
 
 export async function generateMetadata({
   searchParams,
