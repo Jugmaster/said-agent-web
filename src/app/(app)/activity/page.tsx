@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getActivity, type ActivityResponse, type ActivityReceipt } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import { actionLabel, timeAgo } from "@/lib/format";
+import { onRefresh } from "@/lib/refresh";
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
@@ -111,10 +112,29 @@ function ActivityScreen({ platformId }: { platformId: string }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    getActivity(platformId)
-      .then(setData)
-      .catch((e) => setError(e instanceof Error ? e.message : "load failed"))
-      .finally(() => setLoading(false));
+    let cancelled = false;
+    const load = () => {
+      getActivity(platformId)
+        .then((d) => {
+          if (!cancelled) setData(d);
+        })
+        .catch((e) => {
+          if (!cancelled) setError(e instanceof Error ? e.message : "load failed");
+        })
+        .finally(() => {
+          if (!cancelled) setLoading(false);
+        });
+    };
+    load();
+    // Re-fetch when funds move anywhere (refresh bus) and when the tab
+    // regains focus, so a swap done in chat shows up here without a reload.
+    const offRefresh = onRefresh(load);
+    window.addEventListener("focus", load);
+    return () => {
+      cancelled = true;
+      offRefresh();
+      window.removeEventListener("focus", load);
+    };
   }, [platformId]);
 
   const activeDca = data?.dcaRules.filter((r) => !r.paused).length ?? 0;

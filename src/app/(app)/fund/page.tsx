@@ -32,11 +32,13 @@ function FundScreen({ platformId }: { platformId: string }) {
 
     load();
 
-    // Poll every 5s for verification status
+    // Poll every 5s for verification status — bounded (~10 min) so a tab
+    // parked here doesn't hammer the butler forever.
+    let polls = 0;
     pollRef.current = setInterval(async () => {
       const b = await load();
-      if (b?.verified) {
-        if (pollRef.current) clearInterval(pollRef.current);
+      if ((b?.verified || ++polls >= 120) && pollRef.current) {
+        clearInterval(pollRef.current);
       }
     }, 5000);
 
