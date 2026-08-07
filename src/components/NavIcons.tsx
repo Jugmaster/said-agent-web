@@ -40,6 +40,17 @@ export function ActivityIcon({ className = ICON }: { className?: string }) {
   );
 }
 
+export function TradeIcon({ className = ICON }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <polyline points="17 3 21 7 17 11" />
+      <path d="M21 7H8a4 4 0 0 0-4 4" />
+      <polyline points="7 21 3 17 7 13" />
+      <path d="M3 17h13a4 4 0 0 0 4-4" />
+    </svg>
+  );
+}
+
 export function PlusIcon({ className = ICON }: { className?: string }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
