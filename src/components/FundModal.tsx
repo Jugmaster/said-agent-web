@@ -98,10 +98,10 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
       await fundWallet({
         address: walletAddress,
         options: {
-          // Jump straight to the card flow (MoonPay); user enters the amount in
-          // MoonPay's own UI. Mirrors /fund-onramp's proven option shape.
-          defaultFundingMethod: "card",
-          card: { preferredProvider: "moonpay" },
+          // Let Privy show the payment-method chooser and auto-route to the best
+          // ENABLED onramp provider (Stripe/MoonPay/Coinbase) for the user's
+          // device + geo — that's what surfaces Apple Pay. Do NOT force a single
+          // provider or skip the picker (the old moonpay/card lock hid Apple Pay).
           asset: "native-currency",
         } as unknown as Parameters<typeof fundWallet>[0]["options"],
       });

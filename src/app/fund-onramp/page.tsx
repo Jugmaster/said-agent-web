@@ -118,9 +118,9 @@ export default function FundOnrampPage() {
       await fundWallet({
         address: wallet,
         options: {
-          // Jump straight to the card flow (MoonPay) — skip the method picker.
-          defaultFundingMethod: "card",
-          card: { preferredProvider: "moonpay" },
+          // Let Privy show the payment-method chooser + auto-route to the best
+          // ENABLED onramp (Stripe/MoonPay/Coinbase) for device + geo, which is
+          // what surfaces Apple Pay. No forced provider, no skipped picker.
           asset: "native-currency",
           ...(amount ? { amount } : {}),
         } as unknown as Parameters<typeof fundWallet>[0]["options"],
