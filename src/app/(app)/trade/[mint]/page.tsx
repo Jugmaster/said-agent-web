@@ -3,10 +3,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useWallets, useSignAndSendTransaction } from "@privy-io/react-auth/solana";
 import AuthGate from "@/components/AuthGate";
 import TokenChart, { type ChartPoint } from "@/components/TokenChart";
-import { useAgent } from "@/hooks/useAgent";
+import { agentTrade } from "@/lib/api";
 import {
   getToken,
   getPriceSeries,
@@ -20,9 +19,6 @@ import {
   TOKENS,
   type JupQuote,
   getQuote,
-  getSwapTransaction,
-  base64ToBytes,
-  bytesToBase58,
   toBaseUnits,
   fromBaseUnits,
 } from "@/lib/jupiter";
@@ -36,9 +32,6 @@ export default function TokenPage() {
 }
 
 function TokenInner({ mint, platformId }: { mint: string; platformId: string }) {
-  const agent = useAgent();
-  const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
-  const isCustodial = platformId.startsWith("tg_");
 
   const [meta, setMeta] = useState<TokenMeta | null>(null);
   const [metaErr, setMetaErr] = useState<string | null>(null);
@@ -154,14 +147,7 @@ function TokenInner({ mint, platformId }: { mint: string; platformId: string }) 
           </div>
 
           {/* Trade panel */}
-          {isCustodial ? (
-            <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-5 py-6 text-center text-sm text-zinc-300">
-              Web trading is rolling out for Telegram agents next — swap in{" "}
-              <Link href="/chat" className="text-zinc-100 underline">chat</Link> for now.
-            </div>
-          ) : meta ? (
-            <TradePanel meta={meta} walletAddress={walletAddress} />
-          ) : null}
+          {meta ? <TradePanel meta={meta} platformId={platformId} /> : null}
         </>
       )}
     </div>
@@ -187,10 +173,7 @@ function CopyCA({ mint }: { mint: string }) {
   );
 }
 
-function TradePanel({ meta, walletAddress }: { meta: TokenMeta; walletAddress: string | null }) {
-  const { wallets } = useWallets();
-  const { signAndSendTransaction } = useSignAndSendTransaction();
-
+function TradePanel({ meta, platformId }: { meta: TokenMeta; platformId: string }) {
   const [side, setSide] = useState<"buy" | "sell">("buy");
   const [amount, setAmount] = useState("");
   const [quote, setQuote] = useState<JupQuote | null>(null);
@@ -238,30 +221,30 @@ function TradePanel({ meta, walletAddress }: { meta: TokenMeta; walletAddress: s
   }, [amountNum, inputMint, outputMint, payDecimals]);
 
   const execute = useCallback(async () => {
-    if (!quote || !walletAddress) return;
-    const wallet = wallets.find((w) => w.address === walletAddress);
-    if (!wallet) {
-      setErr("Wallet not ready.");
-      return;
-    }
+    if (!quote) return;
     setExecuting(true);
     setErr(null);
     try {
-      const swapB64 = await getSwapTransaction({ quote, userPublicKey: walletAddress });
-      const { signature } = await signAndSendTransaction({
-        transaction: base64ToBytes(swapB64),
-        wallet,
-        chain: "solana:mainnet",
+      const r = await agentTrade({
+        platformId,
+        inputMint,
+        outputMint,
+        amount: amountNum,
+        inputDecimals: payDecimals,
       });
-      setSig(bytesToBase58(signature));
-      setAmount("");
-      setQuote(null);
+      if (r.ok && r.signature) {
+        setSig(r.signature);
+        setAmount("");
+        setQuote(null);
+      } else {
+        setErr(r.message || "Swap failed");
+      }
     } catch (e) {
       setErr(e instanceof Error ? e.message : "Swap failed");
     } finally {
       setExecuting(false);
     }
-  }, [quote, walletAddress, wallets, signAndSendTransaction]);
+  }, [quote, platformId, inputMint, outputMint, amountNum, payDecimals]);
 
   const out = quote ? fromBaseUnits(quote.outAmount, outDecimals) : null;
   const payLabel = side === "buy" ? "SOL" : meta.symbol;
@@ -312,7 +295,7 @@ function TradePanel({ meta, walletAddress }: { meta: TokenMeta; walletAddress: s
 
       <button
         type="button"
-        disabled={!quote || executing || !walletAddress}
+        disabled={!quote || executing}
         onClick={execute}
         className={`mt-3 w-full rounded-xl py-3 text-sm font-semibold transition disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500 ${
           side === "buy" ? "bg-emerald-500 text-black hover:bg-emerald-400" : "bg-red-500 text-black hover:bg-red-400"

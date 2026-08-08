@@ -1,22 +1,18 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useWallets, useSignAndSendTransaction } from "@privy-io/react-auth/solana";
 import AuthGate from "@/components/AuthGate";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
 import { requestRefresh } from "@/lib/refresh";
+import { agentTrade } from "@/lib/api";
 import { isMint } from "@/lib/marketdata";
 import {
   TOKENS,
   type TokenKey,
   type JupQuote,
   getQuote,
-  getSwapTransaction,
-  base64ToBytes,
-  bytesToBase58,
   toBaseUnits,
   fromBaseUnits,
 } from "@/lib/jupiter";
@@ -58,13 +54,6 @@ function TradeInner({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
 
-  // tg_ agents keep their funds in the custodial hosting wallet, not the Privy
-  // embedded wallet the browser can sign with — so client-side trading can't
-  // work for them yet. Route them to chat.
-  const isCustodial = platformId.startsWith("tg_");
-
-  const { wallets } = useWallets();
-  const { signAndSendTransaction } = useSignAndSendTransaction();
   const bal = useSendableBalance(walletAddress);
 
   const [fromKey, setFromKey] = useState<TokenKey>("SOL");
@@ -128,34 +117,33 @@ function TradeInner({ platformId }: { platformId: string }) {
   }, [amountNum, from.mint, to.mint, from.decimals]);
 
   const execute = useCallback(async () => {
-    if (!quote || !walletAddress) return;
-    const wallet = wallets.find((w) => w.address === walletAddress);
-    if (!wallet) {
-      setExecErr("Wallet not ready — reopen the app and try again.");
-      return;
-    }
+    if (!quote) return;
     setExecuting(true);
     setExecErr(null);
     setSig(null);
     try {
-      const swapB64 = await getSwapTransaction({ quote, userPublicKey: walletAddress });
-      const bytes = base64ToBytes(swapB64);
-      const { signature } = await signAndSendTransaction({
-        transaction: bytes,
-        wallet,
-        chain: "solana:mainnet",
+      const r = await agentTrade({
+        platformId,
+        inputMint: from.mint,
+        outputMint: to.mint,
+        amount: amountNum,
+        inputDecimals: from.decimals,
       });
-      setSig(bytesToBase58(signature));
-      setAmount("");
-      setQuote(null);
-      requestRefresh();
-      bal.refetch();
+      if (r.ok && r.signature) {
+        setSig(r.signature);
+        setAmount("");
+        setQuote(null);
+        requestRefresh();
+        bal.refetch();
+      } else {
+        setExecErr(r.message || "Swap failed");
+      }
     } catch (e) {
       setExecErr(e instanceof Error ? e.message : "Swap failed");
     } finally {
       setExecuting(false);
     }
-  }, [quote, walletAddress, wallets, signAndSendTransaction, bal]);
+  }, [quote, platformId, from.mint, to.mint, amountNum, from.decimals, bal]);
 
   const outUi = quote ? fromBaseUnits(quote.outAmount, to.decimals) : null;
   const rate = quote && amountNum > 0 && outUi != null ? outUi / amountNum : null;
@@ -179,21 +167,7 @@ function TradeInner({ platformId }: { platformId: string }) {
         <div className="h-px flex-1 bg-zinc-800" />
       </div>
 
-      {isCustodial ? (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 px-5 py-6 text-center">
-          <p className="text-sm text-zinc-300">
-            Web trading is rolling out for Telegram agents next. For now, ask your
-            agent to swap for you in chat.
-          </p>
-          <Link
-            href="/chat"
-            className="mt-4 inline-block rounded-xl border border-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:border-zinc-500 hover:text-white transition"
-          >
-            Open chat
-          </Link>
-        </div>
-      ) : (
-        <>
+      <>
           {/* You pay */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
             <div className="flex items-center justify-between text-xs text-zinc-500">
@@ -287,7 +261,7 @@ function TradeInner({ platformId }: { platformId: string }) {
 
           <button
             type="button"
-            disabled={!quote || executing || overBalance || !walletAddress}
+            disabled={!quote || executing || overBalance}
             onClick={execute}
             className="mt-5 w-full rounded-xl bg-white py-3 text-sm font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
           >
@@ -313,7 +287,6 @@ function TradeInner({ platformId }: { platformId: string }) {
             </div>
           )}
         </>
-      )}
     </div>
   );
 }

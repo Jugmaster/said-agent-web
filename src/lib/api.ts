@@ -112,6 +112,37 @@ export async function chat(
   return res.json();
 }
 
+export interface TradeResult {
+  ok: boolean;
+  signature: string | null;
+  message: string;
+}
+
+/**
+ * Execute a swap FROM THE AGENT'S wallet via the butler (hosting-signed) — the
+ * same path chat uses. The browser can't sign the agent's Privy wallet, so all
+ * trades route through the box. `amount` is in UI units of the input mint.
+ */
+export async function agentTrade(input: {
+  platformId: string;
+  inputMint: string;
+  outputMint: string;
+  amount: number;
+  inputDecimals?: number;
+}): Promise<TradeResult> {
+  const res = await fetch(`${API_BASE}/api/trade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as Partial<TradeResult> & { error?: string };
+  return {
+    ok: !!data.ok,
+    signature: data.signature ?? null,
+    message: data.message ?? data.error ?? `Trade failed (${res.status})`,
+  };
+}
+
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
   const res = await fetch(
     `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
