@@ -143,6 +143,53 @@ export async function agentTrade(input: {
   };
 }
 
+export interface SendResult {
+  /** Request succeeded (auth + validation passed and the send was attempted). */
+  ok: boolean;
+  /** Funds moved on-chain now (recipient was a verified agent). */
+  executed: boolean;
+  /** On-chain tx signature when executed. */
+  signature: string | null;
+  /** Set when funds are held pending — recipient isn't a SAID agent yet and
+   * settles on their next login. */
+  inviteToken: string | null;
+  /** Resolved recipient platform, when known. */
+  resolvedPlatform: string | null;
+  /** Human-readable message from butler (or the error). */
+  message: string;
+}
+
+/**
+ * Send SOL/USDC to a @handle FROM THE SENDER'S wallet via the typed butler
+ * endpoint — the same `sendToHandle` path chat uses, but structured: no LLM in
+ * the money path, no regex-scraping the reply. A verified recipient transfers
+ * immediately (`executed`); an unverified one is held as a pending invite
+ * (`inviteToken`) until they log in and claim. Handle-only — raw-address sends
+ * still go through chat().
+ */
+export async function agentSend(input: {
+  platformId: string;
+  handle: string;
+  platform: "telegram" | "x";
+  asset: "SOL" | "USDC";
+  amount: number;
+}): Promise<SendResult> {
+  const res = await fetch(`${API_BASE}/api/send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as Partial<SendResult> & { error?: string };
+  return {
+    ok: !!data.ok,
+    executed: !!data.executed,
+    signature: data.signature ?? null,
+    inviteToken: data.inviteToken ?? null,
+    resolvedPlatform: data.resolvedPlatform ?? null,
+    message: data.message ?? data.error ?? `Send failed (${res.status})`,
+  };
+}
+
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
   const res = await fetch(
     `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
