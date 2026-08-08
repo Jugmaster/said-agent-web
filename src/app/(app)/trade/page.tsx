@@ -2,11 +2,13 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useWallets, useSignAndSendTransaction } from "@privy-io/react-auth/solana";
 import AuthGate from "@/components/AuthGate";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
 import { requestRefresh } from "@/lib/refresh";
+import { isMint } from "@/lib/marketdata";
 import {
   TOKENS,
   type TokenKey,
@@ -21,6 +23,35 @@ import {
 
 export default function TradePage() {
   return <AuthGate>{(platformId) => <TradeInner platformId={platformId} />}</AuthGate>;
+}
+
+function CaSearch() {
+  const router = useRouter();
+  const [value, setValue] = useState("");
+  const valid = isMint(value);
+  function go() {
+    if (valid) router.push(`/trade/${value.trim()}`);
+  }
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 focus-within:border-zinc-600">
+      <span className="text-zinc-600">⌕</span>
+      <input
+        value={value}
+        onChange={(e) => setValue(e.target.value.trim())}
+        onKeyDown={(e) => e.key === "Enter" && go()}
+        placeholder="Paste a token contract address…"
+        className="min-w-0 flex-1 bg-transparent font-mono text-sm text-white placeholder-zinc-600 focus:outline-none"
+      />
+      <button
+        type="button"
+        onClick={go}
+        disabled={!valid}
+        className="rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:bg-zinc-800 disabled:text-zinc-500"
+      >
+        View
+      </button>
+    </div>
+  );
 }
 
 function TradeInner({ platformId }: { platformId: string }) {
@@ -133,11 +164,19 @@ function TradeInner({ platformId }: { platformId: string }) {
 
   return (
     <div className="mt-24 md:mt-0 md:pt-10 px-5 md:px-8 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16 w-full max-w-md mx-auto">
-      <div className="mb-6">
+      <div className="mb-5">
         <h1 className="text-2xl font-semibold text-white">Trade</h1>
         <p className="mt-1 text-sm text-zinc-400">
-          Swap tokens straight from your agent&apos;s wallet.
+          Paste a token address to see its chart and buy it — or quick-swap below.
         </p>
+      </div>
+
+      <CaSearch />
+
+      <div className="my-6 flex items-center gap-3 text-[11px] uppercase tracking-wide text-zinc-600">
+        <div className="h-px flex-1 bg-zinc-800" />
+        quick swap
+        <div className="h-px flex-1 bg-zinc-800" />
       </div>
 
       {isCustodial ? (

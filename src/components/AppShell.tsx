@@ -17,12 +17,14 @@ import {
   LogoutIcon,
   PlusIcon,
   SendIcon,
+  TradeIcon,
   WalletIcon,
 } from "./NavIcons";
 
 const NAV = [
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
   { href: "/send", label: "Send", icon: SendIcon, key: "s" },
+  { href: "/trade", label: "Trade", icon: TradeIcon, key: "t" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },
 ] as const;
