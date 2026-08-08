@@ -186,6 +186,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
     | { kind: "info"; message: string }
+    | { kind: "waitlist"; message: string }
     | { kind: "error"; message: string }
     | null
   >(null);
@@ -257,6 +258,9 @@ function SendScreen({ platformId }: { platformId: string }) {
           // Accepted but nothing moved (e.g. butler asked the sender to activate
           // first) — surface butler's real message, don't fake success.
           setResult({ kind: "info", message: r.message });
+        } else if (r.gated) {
+          // Not in the first-access cohort — a waitlist, not a failure.
+          setResult({ kind: "waitlist", message: r.message });
         } else {
           setResult({ kind: "error", message: r.message });
         }
@@ -539,6 +543,17 @@ function SendScreen({ platformId }: { platformId: string }) {
           {result?.kind === "info" && (
             <div className="mt-5 px-4 py-4 rounded-xl border border-zinc-700 bg-zinc-900/60 text-zinc-200 whitespace-pre-wrap break-words text-sm">
               <MessageText text={result.message} />
+            </div>
+          )}
+          {result?.kind === "waitlist" && (
+            <div className="mt-5 px-5 py-6 rounded-xl border border-indigo-800/50 bg-gradient-to-b from-indigo-950/40 to-zinc-950 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/15 text-2xl">
+                ✦
+              </div>
+              <div className="text-lg font-semibold text-white">You&apos;re on the list</div>
+              <p className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap break-words">
+                <MessageText text={result.message} />
+              </p>
             </div>
           )}
           {result?.kind === "error" && (

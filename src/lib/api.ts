@@ -146,6 +146,8 @@ export async function agentTrade(input: {
 export interface SendResult {
   /** Request succeeded (auth + validation passed and the send was attempted). */
   ok: boolean;
+  /** Sender isn't in the first-access cohort — render as a waitlist, not an error. */
+  gated: boolean;
   /** Funds moved on-chain now (recipient was a verified agent). */
   executed: boolean;
   /** On-chain tx signature when executed. */
@@ -182,6 +184,7 @@ export async function agentSend(input: {
   const data = (await res.json().catch(() => ({}))) as Partial<SendResult> & { error?: string };
   return {
     ok: !!data.ok,
+    gated: !!data.gated,
     executed: !!data.executed,
     signature: data.signature ?? null,
     inviteToken: data.inviteToken ?? null,
