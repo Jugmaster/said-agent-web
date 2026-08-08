@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@crossmint/client-sdk-react-ui": "^4.4.0",
     "@privy-io/react-auth": "^3.37.0",
     "@solana-program/memo": "^0.10.0",
     "@solana-program/system": "^0.10.0",
