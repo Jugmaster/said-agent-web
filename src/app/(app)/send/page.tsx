@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { chat } from "@/lib/api";
+import { chat, agentSend } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
@@ -186,6 +186,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
     | { kind: "info"; message: string }
+    | { kind: "waitlist"; message: string }
     | { kind: "error"; message: string }
     | null
   >(null);
@@ -217,35 +218,52 @@ function SendScreen({ platformId }: { platformId: string }) {
     setSending(true);
     setResult(null);
 
-    // Build a natural-language command that the butler's LLM router can
-    // unambiguously parse into the right tool call. Both interpolated values
-    // are strictly validated above (base58 / [a-z0-9_]) so no free text can
-    // ride along into the router prompt.
-    const cmd = addr
-      ? `send ${amount} ${asset} to ${addr}`
-      : `send ${amount} ${asset} to @${handleNorm} on ${platform}`;
-
     const recipient = addr ? addr : `@${handleNorm}`;
     try {
-      const res = await chat(platformId, cmd);
-      // Butler returns HTTP 200 even when it REFUSES the send (e.g. an
-      // unverified sender gets an "activate first" prompt). Only show the
-      // success card when there's actual evidence the send happened: a tx
-      // signature (executed) or an invite link (pending — funds reserved). A
-      // not-sent step, or the absence of both, means nothing moved — show
-      // butler's real message instead of a celebratory false success.
-      const step = res.context?.step;
-      const notSent = step
-        ? ["unknown", "awaiting_name", "provisioned", "registered", "registered_unverified"].includes(step)
-        : false;
-      const hasTx = /solscan|solana\.fm|explorer\.solana/i.test(res.message);
-      const hasInvite = /\/invite\/|[?&]start=invite_/i.test(res.message);
-      if (!notSent && (hasTx || hasInvite)) {
-        setResult({ kind: "ok", message: res.message, amount, asset, recipient });
-        // Funds just moved — refresh every balance surface, not just this one.
-        requestRefresh();
+      if (addr) {
+        // Raw-address fallback stays on the chat path — the typed /api/send is
+        // handle-only (it resolves SAID handles, not literal addresses). Same
+        // success-detection as before: only celebrate on real evidence funds
+        // moved. The address is base58-validated above, so no free text rides
+        // into the router prompt.
+        const res = await chat(platformId, `send ${amount} ${asset} to ${addr}`);
+        const step = res.context?.step;
+        const notSent = step
+          ? ["unknown", "awaiting_name", "provisioned", "registered", "registered_unverified"].includes(step)
+          : false;
+        const hasTx = /solscan|solana\.fm|explorer\.solana/i.test(res.message);
+        if (!notSent && hasTx) {
+          setResult({ kind: "ok", message: res.message, amount, asset, recipient });
+          requestRefresh();
+        } else {
+          setResult({ kind: "info", message: res.message });
+        }
       } else {
-        setResult({ kind: "info", message: res.message });
+        // Send-by-handle goes through the typed endpoint: no LLM in the money
+        // path, a structured result instead of scraping a reply. `executed`
+        // means funds moved now (verified recipient); `inviteToken` means they
+        // were reserved and settle when the recipient logs in and claims.
+        const r = await agentSend({
+          platformId,
+          handle: handleNorm,
+          platform,
+          asset,
+          amount: parseFloat(amount),
+        });
+        if (r.ok && (r.executed || r.inviteToken)) {
+          setResult({ kind: "ok", message: r.message, amount, asset, recipient });
+          // Funds moved (or were reserved) — refresh every balance surface.
+          requestRefresh();
+        } else if (r.ok) {
+          // Accepted but nothing moved (e.g. butler asked the sender to activate
+          // first) — surface butler's real message, don't fake success.
+          setResult({ kind: "info", message: r.message });
+        } else if (r.gated) {
+          // Not in the first-access cohort — a waitlist, not a failure.
+          setResult({ kind: "waitlist", message: r.message });
+        } else {
+          setResult({ kind: "error", message: r.message });
+        }
       }
     } catch (err) {
       setResult({
@@ -525,6 +543,17 @@ function SendScreen({ platformId }: { platformId: string }) {
           {result?.kind === "info" && (
             <div className="mt-5 px-4 py-4 rounded-xl border border-zinc-700 bg-zinc-900/60 text-zinc-200 whitespace-pre-wrap break-words text-sm">
               <MessageText text={result.message} />
+            </div>
+          )}
+          {result?.kind === "waitlist" && (
+            <div className="mt-5 px-5 py-6 rounded-xl border border-indigo-800/50 bg-gradient-to-b from-indigo-950/40 to-zinc-950 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/15 text-2xl">
+                ✦
+              </div>
+              <div className="text-lg font-semibold text-white">You&apos;re on the list</div>
+              <p className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap break-words">
+                <MessageText text={result.message} />
+              </p>
             </div>
           )}
           {result?.kind === "error" && (
