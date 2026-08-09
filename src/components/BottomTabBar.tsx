@@ -4,17 +4,17 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
-import { ActivityIcon, ChatIcon, SendIcon, TradeIcon, WalletIcon } from "./NavIcons";
+import { HomeIcon, ChatIcon, SendIcon, TradeIcon, WalletIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
-const APP_ROUTES = ["/chat", "/send", "/trade", "/portfolio", "/activity", "/fund"];
+const APP_ROUTES = ["/home", "/chat", "/send", "/trade", "/portfolio", "/activity", "/fund"];
 
 const TABS: { href: string; label: string; icon: ComponentType<{ className?: string }> }[] = [
+  { href: "/home", label: "Home", icon: HomeIcon },
   { href: "/chat", label: "Chat", icon: ChatIcon },
   { href: "/send", label: "Send", icon: SendIcon },
   { href: "/trade", label: "Trade", icon: TradeIcon },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon },
-  { href: "/activity", label: "Activity", icon: ActivityIcon },
 ];
 
 /**
