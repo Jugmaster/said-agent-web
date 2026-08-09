@@ -5,6 +5,7 @@ import Link from "next/link";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import { useAgent } from "@/hooks/useAgent";
+import { usePrivy } from "@privy-io/react-auth";
 import {
   getPortfolio,
   getActivity,
@@ -38,6 +39,16 @@ function Home({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
   const agentName = agent.status === "ready" ? agent.agentName : null;
+
+  // Greet the USER (the human), not their agent — from whatever Privy account
+  // they logged in with (X / Telegram / Google / email).
+  const { user } = usePrivy();
+  const userName =
+    user?.twitter?.username ??
+    user?.telegram?.username ??
+    (user?.google as { name?: string } | undefined)?.name?.split(" ")[0] ??
+    user?.email?.address?.split("@")[0] ??
+    null;
 
   const [portfolio, setPortfolio] = useState<FullPortfolio | null>(null);
   const [portfolioErr, setPortfolioErr] = useState(false);
@@ -77,7 +88,7 @@ function Home({ platformId }: { platformId: string }) {
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8">
-          <p className="text-sm text-zinc-500">{greeting()}{agentName ? `, ${agentName}` : ""}</p>
+          <p className="text-sm text-zinc-500">{greeting()}{userName ? `, ${userName}` : ""}</p>
           <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
