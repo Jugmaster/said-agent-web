@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getActivity, type ActivityResponse, type ActivityReceipt } from "@/lib/api";
+import { getActivity, getCashback, type ActivityResponse, type ActivityReceipt, type CashbackResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh } from "@/lib/refresh";
@@ -85,8 +85,13 @@ function ReceiptTable({ receipts }: { receipts: ActivityReceipt[] }) {
   );
 }
 
+function fmtUsd(v: number): string {
+  return `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
 function ActivityScreen({ platformId }: { platformId: string }) {
   const [data, setData] = useState<ActivityResponse | null>(null);
+  const [cb, setCb] = useState<CashbackResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -95,6 +100,9 @@ function ActivityScreen({ platformId }: { platformId: string }) {
       getActivity(platformId)
         .then((d) => !cancelled && setData(d))
         .catch((e) => !cancelled && setError(e instanceof Error ? e.message : "load failed"));
+      getCashback(platformId)
+        .then((c) => !cancelled && setCb(c))
+        .catch(() => {}); // cashback is additive — never block the page on it
     };
     load();
     const offRefresh = onRefresh(load);
@@ -124,7 +132,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
         {/* Stats */}
         <div className="mb-8 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <StatTile label="Transactions" value={data ? data.feeStats.txCount : "—"} />
-          <StatTile label="SAID fees paid" value={data ? data.feeStats.totalFee.toFixed(4) : "—"} />
+          <StatTile label="Cashback earned" value={cb ? fmtUsd(cb.earnedUsd) : "—"} />
           <StatTile label="Anchored" value={data ? anchored : "—"} />
           <StatTile label="Active DCA" value={data ? activeDca : "—"} />
         </div>
@@ -165,7 +173,8 @@ function ActivityScreen({ platformId }: { platformId: string }) {
           <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">Summary</h2>
           <dl className="space-y-2.5 text-sm">
             <Row label="Transactions" value={data ? String(data.feeStats.txCount) : "—"} />
-            <Row label="Fees paid" value={data ? data.feeStats.totalFee.toFixed(4) : "—"} />
+            <Row label="Cashback earned" value={cb ? fmtUsd(cb.earnedUsd) : "—"} />
+            <Row label="Cashback claimable" value={cb ? fmtUsd(cb.claimableUsd) : "—"} />
             <Row label="Anchored" value={data ? String(anchored) : "—"} />
             <Row label="Pending anchor" value={data ? String(pending) : "—"} />
           </dl>

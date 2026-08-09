@@ -183,6 +183,40 @@ export async function ping(): Promise<boolean> {
   }
 }
 
+export interface CashbackTotal {
+  currency: string;
+  total: number;
+}
+
+export interface CashbackResponse {
+  platformId: string;
+  /** Lifetime cashback accrued, by currency. */
+  earned: CashbackTotal[];
+  /** Accrued but not yet paid out, by currency. */
+  pending: CashbackTotal[];
+  /** Pending rows over the claim minimum — payable now. */
+  claimable: CashbackTotal[];
+  /** USD equivalents (USDC 1:1, SOL via live price; other currencies excluded). */
+  earnedUsd: number;
+  pendingUsd: number;
+  claimableUsd: number;
+  minClaim: { SOL: number; USDC: number };
+}
+
+/** Reputation cashback earned by this agent — the reward surface (we show users
+ * what they EARNED, not what they paid in fees). */
+export async function getCashback(platformId: string): Promise<CashbackResponse> {
+  const res = await fetch(
+    `${API_BASE}/api/cashback/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`cashback failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export async function getActivity(platformId: string): Promise<ActivityResponse> {
   const res = await fetch(
     `${API_BASE}/api/activity/${encodeURIComponent(platformId)}`,
