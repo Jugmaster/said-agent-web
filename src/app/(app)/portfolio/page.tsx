@@ -40,9 +40,7 @@ function useCopy() {
 
 function PortfolioScreen({ platformId }: { platformId: string }) {
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
-  const [main, setMain] = useState<FullPortfolio | null>(null); // SAID identity wallet
-  const [agentcash, setAgentcash] = useState<FullPortfolio | null>(null);
-  const [purch, setPurch] = useState<FullPortfolio | null>(null);
+  const [main, setMain] = useState<FullPortfolio | null>(null); // the identity wallet — the ONLY one users see
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [refreshing, setRefreshing] = useState(false);
@@ -56,8 +54,6 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       setBalance(b);
       await Promise.all([
         b.saidWallet ? getPortfolio(b.saidWallet).then(setMain).catch(() => {}) : Promise.resolve(),
-        b.agentcashWallet ? getPortfolio(b.agentcashWallet).then(setAgentcash).catch(() => {}) : Promise.resolve(),
-        b.purchWallet ? getPortfolio(b.purchWallet).then(setPurch).catch(() => {}) : Promise.resolve(),
         getActivity(platformId).then((a) => setReceipts(a.receipts.slice(0, 8))).catch(() => setReceipts([])),
       ]);
       setError(null);
@@ -77,7 +73,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
     return () => window.removeEventListener("focus", onFocus);
   }, [load]);
 
-  const total = walletUsdTotal(main) + walletUsdTotal(agentcash) + walletUsdTotal(purch);
+  const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
 
   return (
@@ -151,16 +147,6 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           </div>
         </section>
 
-        {/* Sub-wallets */}
-        <section>
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">Agent wallets</h2>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <SubWallet label="SAID identity" chain="Solana · Privy" address={balance?.saidWallet ?? null} value={walletUsdTotal(main)} onCopy={copy} copied={copied} primary />
-            <SubWallet label="AgentCash" chain="Base · API spend" address={balance?.agentcashWallet ?? null} value={walletUsdTotal(agentcash)} onCopy={copy} copied={copied} />
-            <SubWallet label="Purch" chain="Solana · Commerce" address={balance?.purchWallet ?? null} value={walletUsdTotal(purch)} onCopy={copy} copied={copied} />
-          </div>
-        </section>
-
         {/* Aside content inline on smaller screens */}
         <div className="mt-9 xl:hidden">
           <RecentActivity receipts={receipts} />
@@ -223,43 +209,6 @@ function HoldingRow({ symbol, balance, usd }: { symbol: string; balance: number;
         </div>
       </div>
       <div className="text-right text-sm font-medium text-zinc-200">{usd != null && usd > 0 ? fmtUsd(usd) : "—"}</div>
-    </div>
-  );
-}
-
-function SubWallet({
-  label,
-  chain,
-  address,
-  value,
-  onCopy,
-  copied,
-  primary,
-}: {
-  label: string;
-  chain: string;
-  address: string | null;
-  value: number;
-  onCopy: (a: string) => void;
-  copied: boolean;
-  primary?: boolean;
-}) {
-  return (
-    <div className={`rounded-2xl border p-4 ${primary ? "border-zinc-700 bg-zinc-900/60" : "border-zinc-800 bg-zinc-900/30"}`}>
-      <div className="flex items-center justify-between">
-        <span className="text-sm font-medium text-white">{label}</span>
-        <span className="text-[11px] text-zinc-500">{chain}</span>
-      </div>
-      {address ? (
-        <>
-          <button onClick={() => onCopy(address)} title={address} className="mt-2 font-mono text-xs text-zinc-500 transition hover:text-zinc-300">
-            {truncMiddle(address, 6, 6)} {copied ? "✓" : ""}
-          </button>
-          <div className="mt-3 text-lg font-semibold text-white">{value > 0 ? fmtUsd(value) : "—"}</div>
-        </>
-      ) : (
-        <p className="mt-2 text-xs italic text-zinc-600">not provisioned</p>
-      )}
     </div>
   );
 }
