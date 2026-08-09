@@ -14,6 +14,7 @@ import { requestRefresh } from "@/lib/refresh";
 import {
   ActivityIcon,
   ChatIcon,
+  HomeIcon,
   LogoutIcon,
   PlusIcon,
   SendIcon,
@@ -21,6 +22,7 @@ import {
 } from "./NavIcons";
 
 const NAV = [
+  { href: "/home", label: "Home", icon: HomeIcon, key: "h" },
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
   { href: "/send", label: "Send", icon: SendIcon, key: "s" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
