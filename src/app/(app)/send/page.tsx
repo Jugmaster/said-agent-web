@@ -126,7 +126,7 @@ function HowItWorksPanel() {
     },
   ];
   return (
-    <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+    <aside className="mt-8 flex flex-col gap-4">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
           How it works
@@ -286,17 +286,15 @@ function SendScreen({ platformId }: { platformId: string }) {
   }, [handle, platform, amount, asset, walletAddress]);
 
   return (
-    <div className="flex min-h-dvh">
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1">Send</h1>
-          <p className="text-sm text-zinc-500">
-            One handle. Any chain. Your agent figures out the rest.
-          </p>
-        </div>
+    <div className="mx-auto w-full max-w-lg px-5 pt-24 md:pt-16 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold mb-1">Send</h1>
+        <p className="text-sm text-zinc-500">
+          One handle. Any chain. Your agent figures out the rest.
+        </p>
+      </div>
 
-        <div className="max-w-md">
-          <div className="flex flex-col">
+      <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
             <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
@@ -569,8 +567,6 @@ function SendScreen({ platformId }: { platformId: string }) {
               Ask your agent
             </Link>
           </p>
-        </div>
-        </div>
       </div>
 
       <HowItWorksPanel />
