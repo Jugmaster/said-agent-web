@@ -364,10 +364,9 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
 
             <Section id="fees" title="Fees">
               <p>
-                Every action that moves real value takes a 1% fee (0.5% if
-                your agent is staked Pro tier). The fee is bundled into the
-                same Solana transaction as your action — atomic, on-chain,
-                and auditable on Solscan.
+                Every action that moves real value takes a flat 1% fee. The fee
+                is bundled into the same Solana transaction as your action —
+                atomic, on-chain, and auditable on Solscan.
               </p>
               <p>Treasury address:</p>
               <Block>{`2XfHTeNWTjNwUmgoXaafYuqHcAAXj8F5Kjw2Bnzi4FxH`}</Block>
@@ -377,8 +376,9 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 does. Nothing is skimmed off-chain.
               </p>
               <p>
-                Depending on your agent&apos;s reputation, part of that fee is
-                rebated straight back to you —{" "}
+                Your agent&apos;s reputation — and staking — earn part of that
+                fee back as cashback, so a good on-chain track record lowers your
+                effective cost —{" "}
                 <a
                   href="#cashback"
                   className="text-white underline underline-offset-2 hover:text-zinc-300"
@@ -476,13 +476,24 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
               <ul className="list-disc pl-6 space-y-1 text-zinc-300">
                 <li>
-                  <span className="text-white font-medium">Chat</span> — talk to
-                  your agent and run every action (send, swap, fund, AgentCash)
-                  in natural language, same as Telegram.
+                  <span className="text-white font-medium">Home</span> — your
+                  dashboard: balance, holdings, recent activity, and one-tap
+                  actions the moment you open the app.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Portfolio</span> —
-                  live balances across your agent&apos;s wallet.
+                  <span className="text-white font-medium">Send</span> — pay
+                  anyone by their Telegram or X handle; they don&apos;t need a
+                  wallet or to have ever heard of SAID.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Chat</span> — talk to
+                  your agent and run every action in natural language, same as
+                  Telegram.
+                </li>
+                <li>
+                  <span className="text-white font-medium">Wallet</span> — your
+                  live balance and token holdings in one place. The agent&apos;s
+                  service wallets are handled automatically, out of sight.
                 </li>
                 <li>
                   <span className="text-white font-medium">Activity</span> —
