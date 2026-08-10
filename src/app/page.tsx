@@ -17,7 +17,7 @@ export default function HomePage() {
   // `authenticated`) without trapping already-authed visitors: clicking the
   // logo or typing the URL while logged in keeps the home page browsable.
   useEffect(() => {
-    if (ready && authenticated && loginInitiated) router.replace("/chat");
+    if (ready && authenticated && loginInitiated) router.replace("/home");
   }, [ready, authenticated, loginInitiated, router]);
 
   return (
@@ -49,7 +49,7 @@ export default function HomePage() {
             {ready && authenticated ? (
               <>
                 <Link
-                  href="/chat"
+                  href="/home"
                   className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
                 >
                   Open app →

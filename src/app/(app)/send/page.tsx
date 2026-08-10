@@ -3,7 +3,8 @@
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { chat, agentSend } from "@/lib/api";
+import { chat, agentSend, getSends, type SendRecord } from "@/lib/api";
+import { timeAgo } from "@/lib/format";
 import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
@@ -126,7 +127,7 @@ function HowItWorksPanel() {
     },
   ];
   return (
-    <aside className="hidden lg:flex flex-col gap-4">
+    <div className="flex flex-col gap-4">
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
           How it works
@@ -154,7 +155,132 @@ function HowItWorksPanel() {
         </kbd>{" "}
         anywhere and just say it — “send 5 USDC to @maya”.
       </div>
-    </aside>
+    </div>
+  );
+}
+
+/** Right-of-form panel: recent recipients (one-tap re-send) + your send
+ * history with claim status — the "where's my money" trust surface. */
+function SendsPanel({
+  platformId,
+  refreshKey,
+  onPick,
+}: {
+  platformId: string;
+  refreshKey: number;
+  onPick: (handle: string, platform: Platform) => void;
+}) {
+  const [sends, setSends] = useState<SendRecord[] | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    getSends(platformId)
+      .then((r) => !cancelled && setSends(r.sends))
+      .catch(() => !cancelled && setSends([]));
+    return () => {
+      cancelled = true;
+    };
+  }, [platformId, refreshKey]);
+
+  // Unique recipients, most recent first, successful sends only.
+  const recents: SendRecord[] = [];
+  for (const s of sends ?? []) {
+    if (s.outcome !== "executed" && s.outcome !== "pending") continue;
+    if (recents.some((r) => r.recipientHandle === s.recipientHandle)) continue;
+    recents.push(s);
+    if (recents.length >= 6) break;
+  }
+
+  function statusLabel(s: SendRecord): { text: string; cls: string } {
+    if (s.outcome === "executed") return { text: "delivered", cls: "text-emerald-400" };
+    if (s.outcome === "pending") {
+      if (s.claimStatus === "claimed") return { text: "claimed", cls: "text-emerald-400" };
+      if (s.claimStatus === "expired") return { text: "expired", cls: "text-zinc-500" };
+      if (s.claimStatus === "cancelled") return { text: "cancelled", cls: "text-zinc-500" };
+      return { text: "awaiting claim", cls: "text-amber-400" };
+    }
+    return { text: s.outcome, cls: "text-red-400" };
+  }
+
+  return (
+    <div className="flex flex-col gap-8">
+      {/* Recent recipients */}
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+          Recent recipients
+        </h2>
+        {sends === null ? (
+          <div className="flex gap-2">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />
+            ))}
+          </div>
+        ) : recents.length === 0 ? (
+          <p className="text-xs italic text-zinc-600">
+            People you send to appear here for one-tap re-sends.
+          </p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {recents.map((s) => (
+              <button
+                key={s.recipientHandle}
+                type="button"
+                onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : "telegram")}
+                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
+              >
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-zinc-200">
+                  {s.recipientHandle.slice(0, 1).toUpperCase()}
+                </span>
+                <span className="text-sm text-zinc-200">@{s.recipientHandle}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Your sends */}
+      <section>
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+          Your sends
+        </h2>
+        {sends === null ? (
+          <div className="h-32 animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/40" />
+        ) : sends.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
+            No sends yet. Your first one shows up here — with live claim status
+            for recipients who aren&apos;t on SAID yet.
+          </div>
+        ) : (
+          <div className="overflow-hidden rounded-2xl border border-zinc-800">
+            <div className="divide-y divide-zinc-800/60">
+              {sends.slice(0, 10).map((s, i) => {
+                const st = statusLabel(s);
+                return (
+                  <div key={`${s.ts}-${i}`} className="flex items-center gap-3 bg-zinc-900/40 px-4 py-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-200">
+                      {s.recipientHandle.slice(0, 1).toUpperCase()}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-sm font-medium text-white">
+                        @{s.recipientHandle}
+                        <span className="ml-1.5 text-xs text-zinc-500">{s.platform === "x" ? "on X" : "on Telegram"}</span>
+                      </div>
+                      <div className={`text-xs ${st.cls}`}>{st.text}</div>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-sm font-medium text-zinc-200">
+                        {s.amount} {s.asset}
+                      </div>
+                      <div className="text-[11px] text-zinc-500">{timeAgo(new Date(s.ts).toISOString())}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+      </section>
+    </div>
   );
 }
 
@@ -182,6 +308,8 @@ function SendScreen({ platformId }: { platformId: string }) {
   );
   const [advancedOpen, setAdvancedOpen] = useState(() => !!params.get("address"));
   const [sending, setSending] = useState(false);
+  // Bumped after each successful send so the history panel refetches.
+  const [sendsNonce, setSendsNonce] = useState(0);
   const [confirming, setConfirming] = useState(false);
   const [result, setResult] = useState<
     | { kind: "ok"; message: string; amount: string; asset: Asset; recipient: string }
@@ -254,6 +382,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           setResult({ kind: "ok", message: r.message, amount, asset, recipient });
           // Funds moved (or were reserved) — refresh every balance surface.
           requestRefresh();
+          setSendsNonce((n) => n + 1);
         } else if (r.ok) {
           // Accepted but nothing moved (e.g. butler asked the sender to activate
           // first) — surface butler's real message, don't fake success.
@@ -286,15 +415,17 @@ function SendScreen({ platformId }: { platformId: string }) {
   }, [handle, platform, amount, asset, walletAddress]);
 
   return (
-    <div className="mt-24 md:mt-0 md:pt-10 px-5 md:px-8 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16 w-full max-w-md lg:max-w-4xl mx-auto">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold mb-1">Send</h1>
-        <p className="text-sm text-zinc-500">
-          One handle. Any chain. Your agent figures out the rest.
-        </p>
-      </div>
+    <div className="flex min-h-dvh">
+      {/* MAIN — form + send history fill the canvas like the sibling pages */}
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold mb-1">Send</h1>
+          <p className="text-sm text-zinc-500">
+            One handle. Any chain. Your agent figures out the rest.
+          </p>
+        </div>
 
-      <div className="lg:grid lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)] lg:gap-12 lg:items-start">
+        <div className="flex w-full flex-col">
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
@@ -397,7 +528,7 @@ function SendScreen({ platformId }: { platformId: string }) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0"
-              className="flex-1 px-4 py-3 bg-zinc-900/60 border border-zinc-800 rounded-xl text-base placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+              className="flex-1 min-w-0 px-4 py-3 bg-zinc-900/60 border border-zinc-800 rounded-xl text-2xl font-semibold placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
             />
             <div className="flex bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
               {(["USDC", "SOL"] as Asset[]).map((a) => (
@@ -568,10 +699,31 @@ function SendScreen({ platformId }: { platformId: string }) {
               Ask your agent
             </Link>
           </p>
+      </div>
+
+        <div className="mt-10">
+          <SendsPanel
+            platformId={platformId}
+            refreshKey={sendsNonce}
+            onPick={(h, p) => {
+              setHandle(h);
+              setPlatform(p);
+              setWalletAddress("");
+            }}
+          />
+        </div>
         </div>
 
-        <HowItWorksPanel />
+        {/* How-it-works inline on smaller screens (aside is xl-only) */}
+        <div className="mt-10 max-w-md xl:hidden">
+          <HowItWorksPanel />
+        </div>
       </div>
+
+      {/* RIGHT RAIL — matches the app's context-panel pattern */}
+      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+        <HowItWorksPanel />
+      </aside>
     </div>
   );
 }
