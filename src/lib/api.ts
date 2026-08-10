@@ -183,6 +183,34 @@ export async function ping(): Promise<boolean> {
   }
 }
 
+export interface SendRecord {
+  /** epoch ms */
+  ts: number;
+  recipientHandle: string;
+  platform: string | null;
+  asset: string;
+  amount: number;
+  /** executed | pending | declined | error */
+  outcome: string;
+  txSignature: string | null;
+  /** pending_sends status when the send is a held invite: pending | claimed | cancelled | expired */
+  claimStatus: string | null;
+}
+
+/** The sender's recent send-by-handle history — powers Send's recent
+ * recipients + "your sends" list. */
+export async function getSends(platformId: string): Promise<{ sends: SendRecord[] }> {
+  const res = await fetch(
+    `${API_BASE}/api/sends/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`sends failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export interface CashbackTotal {
   currency: string;
   total: number;
