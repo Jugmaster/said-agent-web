@@ -425,7 +425,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           </p>
         </div>
 
-        <div className="grid items-start gap-10 lg:grid-cols-[minmax(0,28rem)_minmax(0,1fr)]">
+        <div className="flex w-full flex-col">
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
@@ -701,15 +701,17 @@ function SendScreen({ platformId }: { platformId: string }) {
           </p>
       </div>
 
-        <SendsPanel
-          platformId={platformId}
-          refreshKey={sendsNonce}
-          onPick={(h, p) => {
-            setHandle(h);
-            setPlatform(p);
-            setWalletAddress("");
-          }}
-        />
+        <div className="mt-10">
+          <SendsPanel
+            platformId={platformId}
+            refreshKey={sendsNonce}
+            onPick={(h, p) => {
+              setHandle(h);
+              setPlatform(p);
+              setWalletAddress("");
+            }}
+          />
+        </div>
         </div>
 
         {/* How-it-works inline on smaller screens (aside is xl-only) */}

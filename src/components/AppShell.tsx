@@ -10,7 +10,8 @@ import FundModal from "./FundModal";
 import CommandPalette, { type PaletteAction } from "./CommandPalette";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
-import { requestRefresh } from "@/lib/refresh";
+import { requestRefresh, onRefresh } from "@/lib/refresh";
+import { getPortfolio } from "@/lib/api";
 import {
   ActivityIcon,
   ChatIcon,
@@ -66,6 +67,25 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   const bal = useSendableBalance(walletAddress, authed);
   const [funding, setFunding] = useState(false);
+  // Total portfolio value (all holdings, USD) for the sidebar headline —
+  // refreshed on the same bus that refreshes balances after money moves.
+  const [totalUsd, setTotalUsd] = useState<number | null>(null);
+  useEffect(() => {
+    if (!authed || !walletAddress) return;
+    let cancelled = false;
+    const load = () =>
+      void getPortfolio(walletAddress)
+        .then((p) => {
+          if (!cancelled) setTotalUsd(p.totalUsdValue);
+        })
+        .catch(() => {});
+    load();
+    const off = onRefresh(load);
+    return () => {
+      cancelled = true;
+      off();
+    };
+  }, [authed, walletAddress]);
   const [paletteOpen, setPaletteOpen] = useState(false);
   // Timestamp of the last bare "g" press for two-step nav chords.
   const gAt = useRef(0);
@@ -219,23 +239,27 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <div className="text-[11px] text-zinc-500 mb-1.5">Balance</div>
                 {bal.error ? (
                   <div className="text-xs text-yellow-600">unavailable</div>
-                ) : bal.loading ? (
+                ) : bal.loading && totalUsd == null ? (
                   <div className="text-xs text-zinc-600">loading…</div>
                 ) : (
-                  <div className="space-y-0.5 text-sm">
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-zinc-200 font-medium">
-                        {bal.sol.toFixed(4)}
-                      </span>
-                      <span className="text-xs text-zinc-500">SOL</span>
+                  <>
+                    {/* Headline = total portfolio value in USD (all holdings). */}
+                    <div className="text-xl font-semibold tabular-nums text-white">
+                      {totalUsd != null
+                        ? `$${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                        : "$—"}
                     </div>
-                    <div className="flex items-baseline justify-between">
-                      <span className="text-zinc-200 font-medium">
-                        {bal.usdc.toFixed(2)}
-                      </span>
-                      <span className="text-xs text-zinc-500">USDC</span>
+                    <div className="mt-1 space-y-0.5 text-xs text-zinc-500">
+                      <div className="flex items-baseline justify-between">
+                        <span>{bal.sol.toFixed(4)}</span>
+                        <span>SOL</span>
+                      </div>
+                      <div className="flex items-baseline justify-between">
+                        <span>{bal.usdc.toFixed(2)}</span>
+                        <span>USDC</span>
+                      </div>
                     </div>
-                  </div>
+                  </>
                 )}
                 <button
                   type="button"
