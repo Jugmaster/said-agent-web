@@ -21,10 +21,6 @@ export default function NotFound() {
               Agents
             </Link>
             <span className="text-zinc-700">·</span>
-            <Link href="/launches" className="hover:text-white transition">
-              Launches
-            </Link>
-            <span className="text-zinc-700">·</span>
             <Link href="/stats" className="hover:text-white transition">
               Stats
             </Link>

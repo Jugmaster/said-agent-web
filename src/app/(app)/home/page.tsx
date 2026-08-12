@@ -5,6 +5,7 @@ import Link from "next/link";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import { useAgent } from "@/hooks/useAgent";
+import { usePrivy } from "@privy-io/react-auth";
 import {
   getPortfolio,
   getActivity,
@@ -38,6 +39,16 @@ function Home({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
   const agentName = agent.status === "ready" ? agent.agentName : null;
+
+  // Greet the USER (the human), not their agent — from whatever Privy account
+  // they logged in with (X / Telegram / Google / email).
+  const { user } = usePrivy();
+  const userName =
+    user?.twitter?.username ??
+    user?.telegram?.username ??
+    (user?.google as { name?: string } | undefined)?.name?.split(" ")[0] ??
+    user?.email?.address?.split("@")[0] ??
+    null;
 
   const [portfolio, setPortfolio] = useState<FullPortfolio | null>(null);
   const [portfolioErr, setPortfolioErr] = useState(false);
@@ -77,7 +88,7 @@ function Home({ platformId }: { platformId: string }) {
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8">
-          <p className="text-sm text-zinc-500">{greeting()}{agentName ? `, ${agentName}` : ""}</p>
+          <p className="text-sm text-zinc-500">{greeting()}{userName ? `, ${userName}` : ""}</p>
           <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
@@ -106,8 +117,8 @@ function Home({ platformId }: { platformId: string }) {
         {/* Quick actions */}
         <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-4">
           <ActionCard href="/send" title="Send" sub="Pay anyone by handle" emoji="↗" />
-          <ActionCard href="/trade" title="Trade" sub="Swap any token" emoji="⇄" />
           <ActionCard href="/chat" title="Ask your agent" sub="It handles the rest" emoji="✦" />
+          <ActionCard href="/trade" title="Trade" sub="Swap any token" emoji="⇄" />
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
         </div>
 
@@ -133,13 +144,14 @@ function Home({ platformId }: { platformId: string }) {
               {holdings.map((t) => (
                 <HoldingCard key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} mint={t.mint} />
               ))}
-              {holdings.length === 0 && (
-                <Link
-                  href="/trade"
+              {holdings.length === 0 && (sol ?? 0) === 0 && (
+                <button
+                  type="button"
+                  onClick={() => setFunding(true)}
                   className="flex h-[74px] items-center justify-center rounded-2xl border border-dashed border-zinc-800 text-sm text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-300"
                 >
-                  + Buy your first token
-                </Link>
+                  + Add funds to get started
+                </button>
               )}
             </div>
           )}
@@ -188,7 +200,7 @@ function ActionCard({ href, title, sub, emoji }: { href: string; title: string; 
 }
 
 function HoldingCard({ symbol, balance, usd, mint }: { symbol: string; balance: number; usd: number | null; mint?: string }) {
-  const body = (
+  const card = (
     <div className="flex h-[74px] items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 transition hover:border-zinc-700">
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-200">
         {symbol.slice(0, 3).toUpperCase()}
@@ -202,13 +214,7 @@ function HoldingCard({ symbol, balance, usd, mint }: { symbol: string; balance: 
       <div className="text-right text-sm font-medium text-zinc-200">{usd != null ? fmtUsd(usd) : "—"}</div>
     </div>
   );
-  return mint ? (
-    <Link href={`/trade/${mint}`} className="block">
-      {body}
-    </Link>
-  ) : (
-    body
-  );
+  return mint ? <Link href={`/trade/${mint}`}>{card}</Link> : card;
 }
 
 function AgentIdentity({

@@ -112,37 +112,6 @@ export async function chat(
   return res.json();
 }
 
-export interface TradeResult {
-  ok: boolean;
-  signature: string | null;
-  message: string;
-}
-
-/**
- * Execute a swap FROM THE AGENT'S wallet via the butler (hosting-signed) — the
- * same path chat uses. The browser can't sign the agent's Privy wallet, so all
- * trades route through the box. `amount` is in UI units of the input mint.
- */
-export async function agentTrade(input: {
-  platformId: string;
-  inputMint: string;
-  outputMint: string;
-  amount: number;
-  inputDecimals?: number;
-}): Promise<TradeResult> {
-  const res = await fetch(`${API_BASE}/api/trade`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
-    body: JSON.stringify(input),
-  });
-  const data = (await res.json().catch(() => ({}))) as Partial<TradeResult> & { error?: string };
-  return {
-    ok: !!data.ok,
-    signature: data.signature ?? null,
-    message: data.message ?? data.error ?? `Trade failed (${res.status})`,
-  };
-}
-
 export interface SendResult {
   /** Request succeeded (auth + validation passed and the send was attempted). */
   ok: boolean;
@@ -193,6 +162,37 @@ export async function agentSend(input: {
   };
 }
 
+export interface TradeResult {
+  ok: boolean;
+  signature: string | null;
+  message: string;
+}
+
+/**
+ * Execute a swap FROM THE AGENT'S wallet via the butler (hosting-signed) — the
+ * same path chat uses. The browser can't sign the agent's Privy wallet, so all
+ * trades route through the box. `amount` is in UI units of the input mint.
+ */
+export async function agentTrade(input: {
+  platformId: string;
+  inputMint: string;
+  outputMint: string;
+  amount: number;
+  inputDecimals?: number;
+}): Promise<TradeResult> {
+  const res = await fetch(`${API_BASE}/api/trade`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as Partial<TradeResult> & { error?: string };
+  return {
+    ok: !!data.ok,
+    signature: data.signature ?? null,
+    message: data.message ?? data.error ?? `Trade failed (${res.status})`,
+  };
+}
+
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
   const res = await fetch(
     `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
@@ -212,6 +212,68 @@ export async function ping(): Promise<boolean> {
   } catch {
     return false;
   }
+}
+
+export interface SendRecord {
+  /** epoch ms */
+  ts: number;
+  recipientHandle: string;
+  platform: string | null;
+  asset: string;
+  amount: number;
+  /** executed | pending | declined | error */
+  outcome: string;
+  txSignature: string | null;
+  /** pending_sends status when the send is a held invite: pending | claimed | cancelled | expired */
+  claimStatus: string | null;
+}
+
+/** The sender's recent send-by-handle history — powers Send's recent
+ * recipients + "your sends" list. */
+export async function getSends(platformId: string): Promise<{ sends: SendRecord[] }> {
+  const res = await fetch(
+    `${API_BASE}/api/sends/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`sends failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+export interface CashbackTotal {
+  currency: string;
+  total: number;
+}
+
+export interface CashbackResponse {
+  platformId: string;
+  /** Lifetime cashback accrued, by currency. */
+  earned: CashbackTotal[];
+  /** Accrued but not yet paid out, by currency. */
+  pending: CashbackTotal[];
+  /** Pending rows over the claim minimum — payable now. */
+  claimable: CashbackTotal[];
+  /** USD equivalents (USDC 1:1, SOL via live price; other currencies excluded). */
+  earnedUsd: number;
+  pendingUsd: number;
+  claimableUsd: number;
+  minClaim: { SOL: number; USDC: number };
+}
+
+/** Reputation cashback earned by this agent — the reward surface (we show users
+ * what they EARNED, not what they paid in fees). */
+export async function getCashback(platformId: string): Promise<CashbackResponse> {
+  const res = await fetch(
+    `${API_BASE}/api/cashback/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`cashback failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
 }
 
 export async function getActivity(platformId: string): Promise<ActivityResponse> {

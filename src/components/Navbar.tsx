@@ -85,9 +85,6 @@ export default function Navbar() {
 
         {/* Public links (hidden on mobile) */}
         <div className="hidden md:flex items-center gap-1">
-          <Link href="/launches" className={NAV_LINK}>
-            Launches
-          </Link>
           <Link href="/agents" className={NAV_LINK}>
             Agents
           </Link>
