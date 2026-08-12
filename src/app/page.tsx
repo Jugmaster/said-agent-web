@@ -93,10 +93,6 @@ export default function HomePage() {
           </p>
 
           <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
-            <Link href="/launches" className="hover:text-white transition">
-              Launches
-            </Link>
-            <span className="text-zinc-700">·</span>
             <Link href="/agents" className="hover:text-white transition">
               Agents
             </Link>

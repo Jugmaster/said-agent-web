@@ -151,7 +151,6 @@ export default function HomeBelowFold() {
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link href="/agents" className="hover:text-white transition">Agents</Link>
-            <Link href="/launches" className="hover:text-white transition">Launches</Link>
             <Link href="/stats" className="hover:text-white transition">Stats</Link>
             <Link href="/docs" className="hover:text-white transition">Docs</Link>
             <a href="https://x.com/saidagent" target="_blank" rel="noreferrer" className="hover:text-white transition">X</a>
