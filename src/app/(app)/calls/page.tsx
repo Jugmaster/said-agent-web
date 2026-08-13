@@ -142,7 +142,7 @@ function CallsInner({ platformId }: { platformId: string }) {
     };
   }, [calls, load]);
 
-  const phoneValid = /^\+[1-9]\d{6,14}$/.test(phone.trim());
+  const phoneValid = /^\+1\d{10}$/.test(phone.trim());
   const taskValid = task.trim().length >= 5 && task.trim().length <= 500;
   const canCall = phoneValid && taskValid && !placing;
 
@@ -172,7 +172,7 @@ function CallsInner({ platformId }: { platformId: string }) {
         <p className="text-sm text-zinc-400 mt-1">
           Your agent makes the call — tell it who to ring and what to say. You
           get the summary, full transcript, and recording here. {CALL_COST} per
-          call, paid from your balance.
+          call, paid from your balance. US &amp; Canada numbers for now.
         </p>
       </div>
 
@@ -191,7 +191,8 @@ function CallsInner({ platformId }: { platformId: string }) {
           />
           {phone.trim() && !phoneValid && (
             <p className="text-xs text-zinc-500 mt-1.5">
-              International format, e.g. +447700900123 or +14155551234.
+              US &amp; Canada numbers only for now, e.g. +14155551234. More
+              countries soon.
             </p>
           )}
         </div>
