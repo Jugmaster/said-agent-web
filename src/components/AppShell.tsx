@@ -17,6 +17,7 @@ import {
   ChatIcon,
   HomeIcon,
   LogoutIcon,
+  PhoneIcon,
   PlusIcon,
   SendIcon,
   WalletIcon,
@@ -27,6 +28,7 @@ const NAV = [
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
   { href: "/send", label: "Send", icon: SendIcon, key: "s" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
+  { href: "/calls", label: "Calls", icon: PhoneIcon, key: "l" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },
 ] as const;
 

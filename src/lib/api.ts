@@ -173,6 +173,59 @@ export async function agentSend(input: {
   };
 }
 
+export interface CommsCallRecord {
+  id: number;
+  kind: string;
+  to: string;
+  task: string;
+  /** routing | in_progress | completed | failed */
+  status: string;
+  summary: string | null;
+  transcript: string | null;
+  recordingUrl: string | null;
+  priceUsd: number | null;
+  error: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Have the agent place a real phone call ($0.54 from the user's balance,
+ * routed automatically). Returns immediately — poll getComms for progress. */
+export async function commsCall(input: {
+  platformId: string;
+  phoneNumber: string;
+  task: string;
+}): Promise<{ ok: boolean; id?: number; status?: string; costUsd?: number; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/comms/call`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean; id?: number; status?: string; costUsd?: number; error?: string;
+  };
+  return {
+    ok: !!data.ok,
+    id: data.id,
+    status: data.status,
+    costUsd: data.costUsd,
+    message: data.error ?? (res.ok ? undefined : `Call failed (${res.status})`),
+  };
+}
+
+/** Call history + live progress (server refreshes in-flight calls). */
+export async function getComms(platformId: string): Promise<{ calls: CommsCallRecord[] }> {
+  const res = await apiFetch(
+    `${API_BASE}/api/comms/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`comms failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
   const res = await apiFetch(
     `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
