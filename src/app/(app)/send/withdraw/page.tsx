@@ -98,12 +98,15 @@ export default function WithdrawPage() {
       : null;
 
   const amountNum = parseFloat(amount);
+  // maxSol unknown (balance read failed) blocks submit — signing a tx against
+  // an unknown balance just burns the user's time on a doomed broadcast.
   const canSend =
     !!wallet &&
     isValidSolanaAddress(dest.trim()) &&
     Number.isFinite(amountNum) &&
     amountNum > 0 &&
-    (maxSol == null || amountNum <= maxSol + 1e-12) &&
+    maxSol != null &&
+    amountNum <= maxSol + 1e-12 &&
     !busy;
 
   async function handleSend() {

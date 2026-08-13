@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import type { Metadata } from "next";
 import { getInvite, type InviteResponse } from "@/lib/api";
 import InviteWebClaim from "./InviteWebClaim";
@@ -8,13 +9,28 @@ interface PageProps {
   params: Promise<{ token: string }>;
 }
 
-async function fetchInvite(token: string): Promise<InviteResponse | null> {
-  return getInvite(token, { cache: "no-store" });
-}
+// React cache(): generateMetadata + the page body both need the invite —
+// dedupe to ONE butler call per request. "unavailable" = transport/5xx (the
+// invite may well exist; never render not-found for it), null = real 404.
+const fetchInvite = cache(
+  async (token: string): Promise<InviteResponse | null | "unavailable"> => {
+    try {
+      return await getInvite(token, { cache: "no-store" });
+    } catch {
+      return "unavailable";
+    }
+  },
+);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { token } = await params;
   const invite = await fetchInvite(token);
+  if (invite === "unavailable") {
+    return {
+      title: "You've been sent crypto · SAID Agent",
+      description: "Open the link to claim — sign in with the account it was sent to.",
+    };
+  }
   if (!invite) {
     return {
       title: "Invite not found · SAID Agent",
@@ -56,6 +72,27 @@ function platformLabel(platform: "telegram" | "x"): string {
 export default async function InvitePage({ params }: PageProps) {
   const { token } = await params;
   const invite = await fetchInvite(token);
+
+  if (invite === "unavailable") {
+    // Butler blip ≠ dead invite. A recipient clicking "someone sent you money"
+    // must never see a 404 for a transient failure — that reads as a scam.
+    return (
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto flex flex-col items-center justify-center text-center">
+        <p className="text-3xl mb-4">⏳</p>
+        <h1 className="text-xl font-bold mb-2">One moment…</h1>
+        <p className="text-sm text-zinc-400 mb-6">
+          We couldn&apos;t load this invite right now — your funds are safe and
+          the link is still good. Refresh in a few seconds.
+        </p>
+        <a
+          href=""
+          className="px-5 py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200"
+        >
+          Retry
+        </a>
+      </main>
+    );
+  }
 
   if (!invite) notFound();
 
@@ -217,8 +254,8 @@ export default async function InvitePage({ params }: PageProps) {
 
       <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
-          Funds stay in {senderName}&apos;s wallet until you claim. No custody, no
-          escrow — just a name → wallet route through SAID Protocol.
+          Funds stay in {senderName}&apos;s wallet until you claim — no escrow,
+          the money isn&apos;t parked anywhere. A name → wallet route through SAID Protocol.
         </p>
       </footer>
     </main>

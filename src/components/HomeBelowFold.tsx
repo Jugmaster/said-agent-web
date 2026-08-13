@@ -136,7 +136,7 @@ export default function HomeBelowFold() {
             </button>
           </div>
           <p className="text-[11px] text-zinc-600 mt-5">
-            Non-custodial · keys secured by Privy · no seed phrase
+            Agent-managed wallet · keys secured by Privy · no seed phrase
           </p>
         </div>
       </section>

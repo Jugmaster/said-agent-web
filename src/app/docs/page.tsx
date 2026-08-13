@@ -213,8 +213,8 @@ send 25 JUP to @callum on x`}</Block>
               <p>
                 For <Code>@username on x</Code>, the recipient gets an invite
                 link you share with them. Funds stay in your wallet until they
-                claim them — there&apos;s no escrow, no custody, no risk of
-                stuck money. Cancel an unclaimed invite any time:
+                claim them — there&apos;s no escrow, the money isn&apos;t
+                parked anywhere. Cancel an unclaimed invite any time:
               </p>
               <Block>{`cancel invite to @joe`}</Block>
             </Section>

@@ -88,8 +88,8 @@ export default function HomePage() {
           </div>
 
           <p className="text-xs text-zinc-500">
-            Non-custodial · keys secured by Privy · no seed phrase · no SOL to
-            start
+            Agent-managed wallet · keys secured by Privy · no seed phrase · no
+            SOL to start
           </p>
 
           <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">

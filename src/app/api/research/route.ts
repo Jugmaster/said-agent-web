@@ -12,10 +12,9 @@
  * provisional. Read-only: no secrets, no funds, no writes.
  */
 
-const SOLANA_RPC =
-  process.env.SOLANA_RPC ??
-  process.env.NEXT_PUBLIC_SOLANA_RPC ??
-  "https://api.mainnet-beta.solana.com";
+// Server-only. No NEXT_PUBLIC_ fallback — if that var were ever set, the keyed
+// provider URL would ship in the client bundle for no benefit here.
+const SOLANA_RPC = process.env.SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
 
 // Optional shared secret. When RESEARCH_API_KEY is set, callers must send it
 // as `x-api-key` (configure the same value on the IDLE seller side). Unset →
@@ -28,7 +27,9 @@ const API_KEY = process.env.RESEARCH_API_KEY;
 const MAX_BODY_BYTES = 4096;
 const WINDOW_MS = 60_000;
 const PER_IP_LIMIT = 10;
-const GLOBAL_LIMIT = 60;
+// Global cap = spend ceiling only. Keep it well above PER_IP so one attacker
+// exhausting their own bucket can't lock out every legitimate caller.
+const GLOBAL_LIMIT = 300;
 const ipHits = new Map<string, { count: number; resetAt: number }>();
 let globalHits = { count: 0, resetAt: 0 };
 
@@ -147,8 +148,12 @@ export async function POST(request: Request) {
   if (API_KEY && request.headers.get("x-api-key") !== API_KEY) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
+  // Trusted IP: platform-set x-real-ip, else the LAST x-forwarded-for entry —
+  // proxies append the true client, the FIRST entry can be attacker-supplied.
+  const xff = request.headers.get("x-forwarded-for");
   const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+    request.headers.get("x-real-ip")?.trim() ??
+    (xff ? xff.split(",").pop()!.trim() : "unknown");
   if (rateLimited(ip)) {
     return Response.json({ error: "rate limited" }, { status: 429 });
   }

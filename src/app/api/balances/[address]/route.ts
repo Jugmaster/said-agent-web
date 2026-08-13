@@ -9,10 +9,11 @@
  * /api/research), and the browser only ever calls same-origin.
  */
 
-const SOLANA_RPC =
-  process.env.SOLANA_RPC ??
-  process.env.NEXT_PUBLIC_SOLANA_RPC ??
-  "https://api.mainnet-beta.solana.com";
+import { clientIp, rateLimited } from "@/lib/server-ratelimit";
+
+// Server-only. No NEXT_PUBLIC_ fallback — if that var were ever set, the keyed
+// provider URL would ship in the client bundle for no benefit here.
+const SOLANA_RPC = process.env.SOLANA_RPC ?? "https://api.mainnet-beta.solana.com";
 
 const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
 const B58 = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
@@ -31,12 +32,17 @@ async function rpc<T = unknown>(method: string, params: unknown[]): Promise<T> {
 }
 
 export async function GET(
-  _request: Request,
+  request: Request,
   { params }: { params: Promise<{ address: string }> },
 ) {
   const { address } = await params;
   if (!B58.test(address)) {
     return Response.json({ error: "invalid address" }, { status: 400 });
+  }
+  // Two RPC calls per request against a possibly-metered provider — cap it.
+  // Legit use is a per-user fallback poll, so 30/min per IP is generous.
+  if (rateLimited(`bal:${clientIp(request)}`, 30)) {
+    return Response.json({ error: "rate limited" }, { status: 429 });
   }
   try {
     const [sol, tokens] = await Promise.all([

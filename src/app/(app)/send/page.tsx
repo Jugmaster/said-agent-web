@@ -341,7 +341,9 @@ function SendScreen({ platformId }: { platformId: string }) {
     (handle.trim().length > 0 || addr.length > 0);
 
   async function submit(): Promise<void> {
-    if (!canSubmit) return;
+    // sending re-check: a mobile double-tap can fire two clicks before React
+    // re-renders the disabled state — never let two /api/send calls race.
+    if (!canSubmit || sending) return;
     setConfirming(false);
     setSending(true);
     setResult(null);
@@ -636,9 +638,10 @@ function SendScreen({ platformId }: { platformId: string }) {
                 <button
                   type="button"
                   onClick={() => void submit()}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition"
+                  disabled={sending}
+                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
                 >
-                  Confirm send
+                  {sending ? "Sending…" : "Confirm send"}
                 </button>
               </div>
             </div>
