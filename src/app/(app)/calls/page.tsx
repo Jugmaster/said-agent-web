@@ -10,7 +10,7 @@ import { timeAgo } from "@/lib/format";
 // the $0.54 comes "from your balance" — routing between wallets is server-side
 // plumbing the user never sees.
 
-const CALL_COST = "$0.54";
+const CALL_COST = "$0.65";
 
 export default function CallsPage() {
   return <AuthGate>{(platformId) => <CallsInner platformId={platformId} />}</AuthGate>;
@@ -308,7 +308,7 @@ function CallsInner({ platformId }: { platformId: string }) {
             disabled={!emailValid}
             className="w-full py-3 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200 disabled:opacity-40"
           >
-            {placing ? "Sending…" : "Send email · $0.02"}
+            {placing ? "Sending…" : "Send email · $0.03"}
           </button>
           {error && <p className="text-sm text-red-400">{error}</p>}
         </div>
