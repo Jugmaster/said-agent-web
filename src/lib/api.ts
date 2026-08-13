@@ -213,6 +213,26 @@ export async function commsCall(input: {
   };
 }
 
+/** Have the agent send an email ($0.02, only charged on success). */
+export async function commsEmail(input: {
+  platformId: string;
+  to: string;
+  subject: string;
+  body: string;
+}): Promise<{ ok: boolean; id?: number; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/comms/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; id?: number; error?: string };
+  return {
+    ok: !!data.ok,
+    id: data.id,
+    message: data.error ?? (res.ok ? undefined : `Email failed (${res.status})`),
+  };
+}
+
 /** Call history + live progress (server refreshes in-flight calls). */
 export async function getComms(platformId: string): Promise<{ calls: CommsCallRecord[] }> {
   const res = await apiFetch(

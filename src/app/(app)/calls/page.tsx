@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import AuthGate from "@/components/AuthGate";
-import { commsCall, getComms, type CommsCallRecord } from "@/lib/api";
+import { commsCall, commsEmail, getComms, type CommsCallRecord } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 
 // Your agent makes real phone calls: give it a number and a task, it speaks,
@@ -49,7 +49,7 @@ function CallCard({ call }: { call: CommsCallRecord }) {
               onClick={() => setOpen(!open)}
               className="text-xs text-zinc-300 underline mt-1"
             >
-              {open ? "Hide" : "Transcript"}
+              {open ? "Hide" : call.kind === "email" ? "Message" : "Transcript"}
             </button>
           )}
         </div>
@@ -67,7 +67,7 @@ function CallCard({ call }: { call: CommsCallRecord }) {
           )}
           {call.transcript && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Transcript</p>
+              <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">{call.kind === "email" ? "Message" : "Transcript"}</p>
               <pre className="text-xs text-zinc-400 whitespace-pre-wrap font-sans max-h-72 overflow-y-auto">
                 {formatTranscript(call.transcript)}
               </pre>
@@ -103,10 +103,14 @@ function formatTranscript(raw: string): string {
 
 function CallsInner({ platformId }: { platformId: string }) {
   const [calls, setCalls] = useState<CommsCallRecord[] | null>(null);
+  const [tab, setTab] = useState<"call" | "email" | "text">("call");
   const [phone, setPhone] = useState("");
   const [task, setTask] = useState("");
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const load = useCallback(async () => {
@@ -165,17 +169,62 @@ function CallsInner({ platformId }: { platformId: string }) {
     }
   }
 
+  const emailValid =
+    /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailTo.trim()) &&
+    emailSubject.trim().length >= 1 &&
+    emailBody.trim().length >= 1 &&
+    !placing;
+
+  async function sendEmail() {
+    if (!emailValid) return;
+    setPlacing(true);
+    setError(null);
+    try {
+      const r = await commsEmail({
+        platformId,
+        to: emailTo.trim(),
+        subject: emailSubject.trim(),
+        body: emailBody.trim(),
+      });
+      if (!r.ok) setError(r.message ?? "Couldn't send the email.");
+      else {
+        setEmailSubject("");
+        setEmailBody("");
+      }
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Couldn't send the email.");
+    } finally {
+      setPlacing(false);
+    }
+  }
+
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Calls</h1>
+        <h1 className="text-2xl font-bold">Comms</h1>
         <p className="text-sm text-zinc-400 mt-1">
-          Your agent makes the call — tell it who to ring and what to say. You
-          get the summary, full transcript, and recording here. {CALL_COST} per
-          call, paid from your balance. US &amp; Canada numbers for now.
+          Your agent calls, emails, and (soon) texts on your behalf — paid from
+          your balance, only when it works. Transcripts and recordings land
+          here.
         </p>
       </div>
 
+      <div className="flex gap-1 mb-5 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
+        {(["call", "email", "text"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition ${
+              tab === t ? "bg-zinc-100 text-zinc-900" : "text-zinc-400 hover:text-zinc-200"
+            }`}
+          >
+            {t}
+          </button>
+        ))}
+      </div>
+
+      {tab === "call" && (
       <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 mb-6">
         <div>
           <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">
@@ -218,18 +267,81 @@ function CallsInner({ platformId }: { platformId: string }) {
         </button>
         {error && <p className="text-sm text-red-400">{error}</p>}
       </div>
+      )}
+
+      {tab === "email" && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 mb-6">
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">To</label>
+            <input
+              value={emailTo}
+              onChange={(e) => setEmailTo(e.target.value)}
+              placeholder="alice@example.com"
+              inputMode="email"
+              spellCheck={false}
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">Subject</label>
+            <input
+              value={emailSubject}
+              onChange={(e) => setEmailSubject(e.target.value)}
+              maxLength={200}
+              placeholder="Quick question"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm"
+            />
+          </div>
+          <div>
+            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">Message</label>
+            <textarea
+              value={emailBody}
+              onChange={(e) => setEmailBody(e.target.value)}
+              rows={5}
+              maxLength={5000}
+              placeholder="Write the email your agent should send…"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm resize-none"
+            />
+          </div>
+          <button
+            onClick={() => void sendEmail()}
+            disabled={!emailValid}
+            className="w-full py-3 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200 disabled:opacity-40"
+          >
+            {placing ? "Sending…" : "Send email · $0.02"}
+          </button>
+          {error && <p className="text-sm text-red-400">{error}</p>}
+        </div>
+      )}
+
+      {tab === "text" && (
+        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6 text-center">
+          <p className="text-sm text-zinc-300 font-medium mb-1">Texts are coming soon.</p>
+          <p className="text-xs text-zinc-500">
+            SMS from your agent is on the way — calls and email work today.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-2">
         {calls === null ? (
           <div className="flex justify-center py-8">
             <div className="w-6 h-6 rounded-full border-2 border-zinc-700 border-t-zinc-300 animate-spin" />
           </div>
-        ) : calls.length === 0 ? (
-          <p className="text-sm text-zinc-500 text-center py-6">
-            No calls yet. Your agent&apos;s first one is a tap away.
-          </p>
         ) : (
-          calls.map((c) => <CallCard key={c.id} call={c} />)
+          (() => {
+            const kind = tab === "text" ? "sms" : tab;
+            const filtered = calls.filter((c) => c.kind === kind);
+            return filtered.length === 0 ? (
+              <p className="text-sm text-zinc-500 text-center py-6">
+                {tab === "call" && "No calls yet. Your agent's first one is a tap away."}
+                {tab === "email" && "No emails yet."}
+                {tab === "text" && ""}
+              </p>
+            ) : (
+              filtered.map((c) => <CallCard key={c.id} call={c} />)
+            );
+          })()
         )}
       </div>
     </div>
