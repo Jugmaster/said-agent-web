@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import { useAgent } from "@/hooks/useAgent";
@@ -17,7 +18,36 @@ import {
 import { timeAgo, actionLabel, truncMiddle } from "@/lib/format";
 
 export default function HomePage() {
-  return <AuthGate>{(platformId) => <Home platformId={platformId} />}</AuthGate>;
+  return (
+    <AuthGate>
+      {(platformId) => (
+        <>
+          {/* Agent-first mobile: the dashboard is a DESKTOP surface. On a phone
+              the agent is home, so anyone landing here (old link, back button,
+              installed shortcut) is handed straight to it instead of getting a
+              second, competing home screen. */}
+          <MobileHandoff />
+          <div className="hidden md:block">
+            <Home platformId={platformId} />
+          </div>
+        </>
+      )}
+    </AuthGate>
+  );
+}
+
+function MobileHandoff() {
+  const router = useRouter();
+  useEffect(() => {
+    if (window.matchMedia("(max-width: 767px)").matches) {
+      router.replace("/chat");
+    }
+  }, [router]);
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center md:hidden">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-700 border-t-zinc-300" />
+    </div>
+  );
 }
 
 function fmtUsd(v: number | null | undefined): string {

@@ -4,7 +4,7 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
-import { HomeIcon, ChatIcon, SendIcon, WalletIcon, ActivityIcon } from "./NavIcons";
+import { ChatIcon, WalletIcon, ActivityIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
 // NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
@@ -12,10 +12,13 @@ import { HomeIcon, ChatIcon, SendIcon, WalletIcon, ActivityIcon } from "./NavIco
 // tab of its own — six tabs would drop each below a comfortable width.
 const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls"];
 
+// Agent-first: on a phone the product IS the agent, so Agent is home and the
+// other two are the places you go to look at something. Everything else (send,
+// comms, funding) is reached by asking, or from the rail above the composer.
+// Five equal tabs read as five equal choices, which is why the old shape had
+// no flow.
 const TABS: { href: string; label: string; icon: ComponentType<{ className?: string }> }[] = [
-  { href: "/home", label: "Home", icon: HomeIcon },
-  { href: "/chat", label: "Chat", icon: ChatIcon },
-  { href: "/send", label: "Send", icon: SendIcon },
+  { href: "/chat", label: "Agent", icon: ChatIcon },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon },
   { href: "/activity", label: "Activity", icon: ActivityIcon },
 ];

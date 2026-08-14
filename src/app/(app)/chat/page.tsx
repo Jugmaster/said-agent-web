@@ -15,6 +15,8 @@ import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh, requestRefresh } from "@/lib/refresh";
+import { useAgent } from "@/hooks/useAgent";
+import { getPortfolio, type FullPortfolio } from "@/lib/api";
 
 interface UiMessage {
   id: string;
@@ -30,6 +32,13 @@ type AgentStep =
   | "registered_unverified"
   | "verified"
   | "returning_verified";
+
+// Short enough to read on a chip; phrased as things you'd actually ask.
+const MOBILE_PROMPTS = [
+  "What can you do?",
+  "Watch SOL under $150",
+  "Show my holdings",
+];
 
 const QUICK_ACTIONS = [
   "What can you do?",
@@ -140,6 +149,22 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
+
+  // Mobile-only: this screen is home, so it carries the balance. Same source
+  // as the desktop dashboard so the two can never disagree.
+  const agent = useAgent();
+  const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
+  const [portfolio, setPortfolio] = useState<FullPortfolio | null>(null);
+  useEffect(() => {
+    if (!walletAddress) return;
+    let cancelled = false;
+    const load = () =>
+      getPortfolio(walletAddress)
+        .then((p) => !cancelled && setPortfolio(p))
+        .catch(() => {});
+    void load();
+    return onRefresh(() => void load());
+  }, [walletAddress]);
 
   // Receive celebration: settle-on-login stashes a receipt in sessionStorage
   // (see useAgent). Read it once on landing, then clear so it shows a single time.
@@ -341,6 +366,25 @@ function ChatScreen({ platformId }: { platformId: string }) {
     <div className="flex h-[calc(100dvh-var(--navbar-h))] mt-[var(--navbar-h)] md:h-dvh md:mt-0 pb-[calc(var(--tabbar-h)+var(--kb,0px))] md:pb-0">
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="border-b border-zinc-800 px-4 py-3 md:px-6">
+          {/* Mobile: this screen is home, so the balance lives here. Desktop
+              keeps its sidebar total and skips this strip entirely. */}
+          <div className="mx-auto mb-3 w-full max-w-3xl md:hidden">
+            <Link href="/portfolio" className="block">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                Your balance
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight text-white">
+                  {portfolio?.totalUsdValue != null
+                    ? `$${portfolio.totalUsdValue.toFixed(2)}`
+                    : "···"}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  {portfolio ? `${portfolio.solBalance.toFixed(3)} SOL` : ""}
+                </span>
+              </div>
+            </Link>
+          </div>
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
             <div>
               <h1 className="text-base font-semibold">{agentName}</h1>
@@ -516,6 +560,34 @@ function ChatScreen({ platformId }: { platformId: string }) {
           }}
         >
           <div className="mx-auto w-full max-w-3xl">
+            {/* Mobile action rail: the desktop context rail is xl-only, so on a
+                phone there was nothing tappable at all. These are the jobs, not
+                navigation: two go to typed flows, the rest talk to the agent. */}
+            <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <Link
+                href="/send"
+                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
+              >
+                ↗ Send
+              </Link>
+              <Link
+                href="/calls"
+                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
+              >
+                ☏ Comms
+              </Link>
+              {MOBILE_PROMPTS.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => void send(q)}
+                  disabled={sending}
+                  className="shrink-0 rounded-full border border-zinc-800 bg-zinc-950 px-3.5 py-2 text-sm text-zinc-400 active:bg-zinc-900 disabled:opacity-50"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
             <div className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
