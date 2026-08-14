@@ -34,17 +34,18 @@ export default function OpengraphImage() {
           style={{
             display: "flex",
             flexDirection: "column",
-            fontSize: 74,
+            fontSize: 84,
             fontWeight: 800,
             lineHeight: 1.08,
             marginBottom: 30,
           }}
         >
-          <div>One conversation.</div>
-          <div>One identity. One balance.</div>
+          <div>Your money</div>
+          <div>got an agent.</div>
         </div>
         <div style={{ fontSize: 32, color: "#d4d4d8" }}>
-          Send by @handle · buy real things · swap tokens — from one chat.
+          Send by @handle · trade · price alerts that reach you · lower fees the
+          better its reputation
         </div>
       </div>
     ),

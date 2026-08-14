@@ -39,18 +39,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const senderName = invite.sender.displayName ?? "Someone";
   const ogTitle = `${senderName} sent you ${invite.amount} ${invite.asset} on SAID`;
+  // Describes the CURRENT flow: open the link, log in with the account it was
+  // sent to, and the money is already there. (The old copy sent people off to
+  // DM a bot, which is a dead end now and cost conversions on the one link
+  // every new user sees.)
+  const ogDescription =
+    "It's already waiting. Log in with the account it was sent to and it's yours.";
   return {
     title: ogTitle,
-    description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+    description: ogDescription,
     openGraph: {
       title: ogTitle,
-      description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+      description: ogDescription,
       type: "website",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: ogTitle,
-      description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+      description: ogDescription,
     },
   };
 }
