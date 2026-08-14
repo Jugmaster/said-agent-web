@@ -114,24 +114,14 @@ function Settings({ platformId }: { platformId: string }) {
 
       <Section title="Account">
         <Row label="Signed in as" value={loginLabel} />
-        <Row label="Add funds" href="/fund" />
-        <Row label="Full activity" href="/activity" />
-      </Section>
-
-      <Section title="Agent reach">
-        {/* Alerts deliver by Telegram push and, if you give the agent an
-            address, by email. Setting it is a sentence to the agent today,
-            so link to that rather than build a half-wired form. */}
-        <Row label="Comms & call history" href="/calls" />
+        {/* Alerts reach you by Telegram push and, if the agent has an address,
+            by email. Setting it is a sentence to the agent today, so link to
+            the composer rather than ship a half-wired form. */}
         <Row
           label="Email me price alerts"
           href="/chat?prompt=remember%20alert-email%20%3D%20your%40email.com"
         />
-      </Section>
-
-      <Section title="Learn">
-        <Row label="Docs" href="/docs" />
-        <Row label="Agent directory" href="/agents" />
+        <Row label="Calls & email history" href="/calls" />
       </Section>
 
       <Section title="Session">
