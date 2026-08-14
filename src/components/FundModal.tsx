@@ -16,6 +16,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useFundWallet } from "@privy-io/react-auth/solana";
+import { preferredCardProvider } from "@/lib/onramp";
 import { getOnChainBalances } from "@/lib/api";
 import { useModalA11y } from "@/hooks/useModalA11y";
 
@@ -101,7 +102,9 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
           // Jump straight to the card flow (MoonPay); user enters the amount in
           // MoonPay's own UI. Mirrors /fund-onramp's proven option shape.
           defaultFundingMethod: "card",
-          card: { preferredProvider: "moonpay" },
+          // Region-aware: MoonPay does not serve the UK, Coinbase Onramp does
+          // not serve Japan. The user can still switch inside Privy's modal.
+          card: { preferredProvider: preferredCardProvider() },
           asset: "native-currency",
         } as unknown as Parameters<typeof fundWallet>[0]["options"],
       });

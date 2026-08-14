@@ -10,7 +10,7 @@ import { ChatIcon, SendIcon, WalletIcon, SettingsIcon } from "./NavIcons";
 // NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
 // otherwise strands the user with no navigation), even though Comms has no
 // tab of its own — six tabs would drop each below a comfortable width.
-const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls", "/settings"];
+export const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls", "/settings"];
 
 // Agent-first: on a phone the product IS the agent, so Agent is home and the
 // other two are the places you go to look at something. Everything else (send,

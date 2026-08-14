@@ -23,6 +23,7 @@ import { useAgent } from "@/hooks/useAgent";
 // SolanaFundingPlugin (registered in providers.tsx) handle Solana destinations
 // natively.
 import { useFundWallet } from "@privy-io/react-auth/solana";
+import { preferredCardProvider } from "@/lib/onramp";
 
 // Telegram WebApp SDK types — use the same shape src/lib/identity.ts declares,
 // extended with the methods this page actually uses (close, expand).
@@ -143,7 +144,9 @@ export default function FundOnrampPage() {
         options: {
           // Jump straight to the card flow (MoonPay) — skip the method picker.
           defaultFundingMethod: "card",
-          card: { preferredProvider: "moonpay" },
+          // Region-aware: MoonPay does not serve the UK, Coinbase Onramp does
+          // not serve Japan. The user can still switch inside Privy's modal.
+          card: { preferredProvider: preferredCardProvider() },
           asset: "native-currency",
           ...(amount ? { amount } : {}),
         } as unknown as Parameters<typeof fundWallet>[0]["options"],
