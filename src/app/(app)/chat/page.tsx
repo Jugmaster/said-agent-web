@@ -363,9 +363,9 @@ function ChatScreen({ platformId }: { platformId: string }) {
     (step === "verified" || step === "returning_verified");
 
   return (
-    <div className="flex h-[calc(100dvh-var(--navbar-h))] mt-[var(--navbar-h)] md:h-dvh md:mt-0 pb-[calc(var(--tabbar-h)+var(--kb,0px))] md:pb-0">
+    <div className="flex h-dvh md:h-dvh pb-[calc(var(--tabbar-h)+var(--kb,0px))] md:pb-0">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-b border-zinc-800 px-4 py-3 md:px-6">
+        <header className="border-b border-zinc-800 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:px-6 md:pt-3">
           {/* Mobile: this screen is home, so the balance lives here. Desktop
               keeps its sidebar total and skips this strip entirely. */}
           <div className="mx-auto mb-3 w-full max-w-3xl md:hidden">

@@ -4,13 +4,13 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
-import { ChatIcon, WalletIcon, ActivityIcon } from "./NavIcons";
+import { ChatIcon, WalletIcon, ActivityIcon, SettingsIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
 // NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
 // otherwise strands the user with no navigation), even though Comms has no
 // tab of its own — six tabs would drop each below a comfortable width.
-const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls"];
+const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls", "/settings"];
 
 // Agent-first: on a phone the product IS the agent, so Agent is home and the
 // other two are the places you go to look at something. Everything else (send,
@@ -21,6 +21,9 @@ const TABS: { href: string; label: string; icon: ComponentType<{ className?: str
   { href: "/chat", label: "Agent", icon: ChatIcon },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon },
   { href: "/activity", label: "Activity", icon: ActivityIcon },
+  // Settings carries what the removed top pill held: identity, account,
+  // sign out. Four tabs still clear 44px comfortably at 360px.
+  { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 
 /**

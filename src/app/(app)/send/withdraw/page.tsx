@@ -183,7 +183,7 @@ export default function WithdrawPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[calc(var(--navbar-h)+1.5rem)] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Withdraw</h1>
         <p className="text-sm text-zinc-400 mt-1">

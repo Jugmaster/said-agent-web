@@ -419,7 +419,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[calc(var(--navbar-h)+1.5rem)] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Send</h1>
           <p className="text-sm text-zinc-500">
