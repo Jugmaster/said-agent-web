@@ -20,12 +20,14 @@ export default async function InviteOpengraphImage({
 
   let headline = "You've been sent crypto";
   let amountLine: string | null = null;
+  let recipient: string | null = null;
   try {
     const invite = await getInvite(token, { cache: "no-store" });
     if (invite) {
       const sender = invite.sender.displayName ?? "Someone";
       headline = `${sender} sent you`;
       amountLine = `${invite.amount} ${invite.asset}`;
+      recipient = invite.recipient?.handle ? `@${invite.recipient.handle}` : null;
     }
   } catch {
     /* generic card */
@@ -39,41 +41,80 @@ export default async function InviteOpengraphImage({
           width: "100%",
           display: "flex",
           flexDirection: "column",
-          justifyContent: "center",
+          justifyContent: "space-between",
           background: "#09090b",
-          padding: 84,
+          padding: 72,
           color: "#fff",
           fontFamily: "sans-serif",
+          // Faint radial glow behind the amount so the card reads as an object
+          // rather than a text file when it lands in a feed.
+          backgroundImage:
+            "radial-gradient(900px 420px at 12% 42%, rgba(16,185,129,0.16), rgba(9,9,11,0) 70%)",
         }}
       >
-        <div
-          style={{
-            fontSize: 26,
-            color: "#a1a1aa",
-            letterSpacing: 4,
-            marginBottom: 34,
-          }}
-        >
-          SAID AGENT · ON SOLANA
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              width: 40,
+              height: 40,
+              borderRadius: 12,
+              background: "#fff",
+              color: "#09090b",
+              fontSize: 24,
+              fontWeight: 800,
+            }}
+          >
+            S
+          </div>
+          <div style={{ fontSize: 24, color: "#a1a1aa", letterSpacing: 3 }}>
+            SAID AGENT
+          </div>
         </div>
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            marginBottom: 34,
-          }}
-        >
-          <div style={{ fontSize: 52, fontWeight: 600, color: "#d4d4d8" }}>
+
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ fontSize: 44, fontWeight: 600, color: "#d4d4d8" }}>
             {headline}
           </div>
           {amountLine && (
-            <div style={{ fontSize: 116, fontWeight: 800, lineHeight: 1.1 }}>
-              {amountLine}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "baseline",
+                gap: 18,
+                marginTop: 4,
+              }}
+            >
+              <div style={{ fontSize: 132, fontWeight: 800, lineHeight: 1.05, color: "#fff" }}>
+                {amountLine}
+              </div>
+              {recipient && (
+                <div style={{ fontSize: 32, color: "#71717a" }}>to {recipient}</div>
+              )}
             </div>
           )}
         </div>
-        <div style={{ fontSize: 32, color: "#d4d4d8" }}>
-          It&apos;s already waiting. Log in with the account it was sent to.
+
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              background: "#10b981",
+              color: "#052e1f",
+              fontSize: 28,
+              fontWeight: 700,
+              padding: "14px 28px",
+              borderRadius: 999,
+            }}
+          >
+            Claim it
+          </div>
+          <div style={{ fontSize: 26, color: "#a1a1aa" }}>
+            It&apos;s already waiting. Log in with the account it was sent to.
+          </div>
         </div>
       </div>
     ),
