@@ -565,12 +565,6 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 navigation: two go to typed flows, the rest talk to the agent. */}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <Link
-                href="/send"
-                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
-              >
-                ↗ Send
-              </Link>
-              <Link
                 href="/calls"
                 className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
               >

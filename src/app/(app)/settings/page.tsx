@@ -115,6 +115,7 @@ function Settings({ platformId }: { platformId: string }) {
       <Section title="Account">
         <Row label="Signed in as" value={loginLabel} />
         <Row label="Add funds" href="/fund" />
+        <Row label="Full activity" href="/activity" />
       </Section>
 
       <Section title="Agent reach">

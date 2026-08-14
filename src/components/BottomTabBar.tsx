@@ -4,7 +4,7 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
-import { ChatIcon, WalletIcon, ActivityIcon, SettingsIcon } from "./NavIcons";
+import { ChatIcon, SendIcon, WalletIcon, SettingsIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
 // NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
@@ -19,10 +19,12 @@ const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund
 // no flow.
 const TABS: { href: string; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { href: "/chat", label: "Agent", icon: ChatIcon },
+  // Send is the headline feature and the growth loop, so it earns a permanent
+  // home rather than living behind a chip. Activity is NOT a tab: Wallet
+  // already renders recent activity with a "View all" link, so a tab would
+  // spend a quarter of the bar on a duplicate.
+  { href: "/send", label: "Send", icon: SendIcon },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon },
-  { href: "/activity", label: "Activity", icon: ActivityIcon },
-  // Settings carries what the removed top pill held: identity, account,
-  // sign out. Four tabs still clear 44px comfortably at 360px.
   { href: "/settings", label: "Settings", icon: SettingsIcon },
 ];
 

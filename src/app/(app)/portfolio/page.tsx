@@ -227,7 +227,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
     <section>
       <div className="mb-2 flex items-baseline justify-between">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">Recent activity</h2>
-        <Link href="/activity" className="text-[11px] text-zinc-500 transition hover:text-zinc-300">View all →</Link>
+        <Link href="/activity" className="-my-1 py-2 text-sm text-zinc-400 transition hover:text-zinc-200">View all →</Link>
       </div>
       {receipts === null ? (
         <p className="text-xs text-zinc-600">Loading…</p>
