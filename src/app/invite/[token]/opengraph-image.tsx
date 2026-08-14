@@ -46,10 +46,10 @@ export default async function InviteOpengraphImage({
           padding: 72,
           color: "#fff",
           fontFamily: "sans-serif",
-          // Faint radial glow behind the amount so the card reads as an object
-          // rather than a text file when it lands in a feed.
+          // Linear only: satori's radial-gradient support is unreliable and a
+          // 502 here means every shared invite loses its preview image.
           backgroundImage:
-            "radial-gradient(900px 420px at 12% 42%, rgba(16,185,129,0.16), rgba(9,9,11,0) 70%)",
+            "linear-gradient(135deg, #0d1a15 0%, #09090b 55%)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
@@ -91,7 +91,7 @@ export default async function InviteOpengraphImage({
                 {amountLine}
               </div>
               {recipient && (
-                <div style={{ fontSize: 32, color: "#71717a" }}>to {recipient}</div>
+                <div style={{ fontSize: 32, color: "#71717a" }}>{`to ${recipient}`}</div>
               )}
             </div>
           )}
@@ -113,7 +113,7 @@ export default async function InviteOpengraphImage({
             Claim it
           </div>
           <div style={{ fontSize: 26, color: "#a1a1aa" }}>
-            It&apos;s already waiting. Log in with the account it was sent to.
+            {"It's already waiting. Log in with the account it was sent to."}
           </div>
         </div>
       </div>
