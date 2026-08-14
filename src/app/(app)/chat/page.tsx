@@ -15,6 +15,7 @@ import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh, requestRefresh } from "@/lib/refresh";
+import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
 import { getPortfolio, type FullPortfolio } from "@/lib/api";
 
@@ -153,6 +154,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
   // Mobile-only: this screen is home, so it carries the balance. Same source
   // as the desktop dashboard so the two can never disagree.
   const agent = useAgent();
+  const { user: privyUser } = usePrivy();
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
   const [portfolio, setPortfolio] = useState<FullPortfolio | null>(null);
   useEffect(() => {
@@ -358,6 +360,15 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const isFresh =
     messages.length === 0 &&
     (step === "unknown" || step === "provisioned" || step === "awaiting_name");
+  // Their own handle, from whichever account they signed in with.
+  const userHandle =
+    privyUser?.twitter?.username
+      ? `@${privyUser.twitter.username}`
+      : privyUser?.telegram?.username
+        ? `@${privyUser.telegram.username}`
+        : null;
+  const isLive = step === "verified" || step === "returning_verified";
+
   const isReturning =
     messages.length === 0 &&
     (step === "verified" || step === "returning_verified");
@@ -388,7 +399,17 @@ function ChatScreen({ platformId }: { platformId: string }) {
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
             <div>
               <h1 className="text-base font-semibold">{agentName}</h1>
-              <p className="text-xs text-zinc-500 font-mono">{platformId}</p>
+              {/* Never the backend platform id: it means nothing to a user and
+                  reads like a leaked internal. Their own handle plus live
+                  status is the same line's worth of space, actually useful. */}
+              <p className="text-xs text-zinc-500">
+                {isLive ? (
+                  <span className="text-emerald-400">● Live on SAID</span>
+                ) : (
+                  <span>Setting up</span>
+                )}
+                {userHandle ? ` · ${userHandle}` : ""}
+              </p>
             </div>
             <div className="flex gap-2">
               {needsFunding && (
