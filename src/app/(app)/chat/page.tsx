@@ -533,12 +533,18 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   // Autogrow: without this max-h-32 never engages and a
                   // multi-sentence message scrolls inside one 24px line.
                   e.target.style.height = "auto";
-                  e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`;
+                  const next = Math.min(e.target.scrollHeight, 128);
+                  e.target.style.height = `${next}px`;
+                  // Only scroll once it has actually hit the cap. Left on auto
+                  // the browser paints a scrollbar the moment content meets the
+                  // box, which on mobile is a permanent grey stripe.
+                  e.target.style.overflowY =
+                    e.target.scrollHeight > 128 ? "auto" : "hidden";
                 }}
                 onKeyDown={onKeyDown}
                 placeholder="Message your agent…"
                 rows={1}
-                className="flex-1 resize-none rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
+                className="flex-1 resize-none overflow-y-hidden rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
                 disabled={sending}
               />
               <button
