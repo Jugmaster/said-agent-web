@@ -64,7 +64,7 @@ interface DotGridBackgroundProps {
 }
 
 export default function DotGridBackground({
-  spacing = 9,
+  spacing: spacingProp = 9,
   energy: energyProp = 0.7,
   breathe: breatheAmp = 0,
   breatheSpeed = 1.5,
@@ -78,6 +78,18 @@ export default function DotGridBackground({
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
+
+    // Respect the OS setting, and never burn a phone battery on decoration:
+    // at spacing 9 a 390x844 viewport is ~4,100 dots x 4 noise calls per
+    // frame. Doubling spacing on small screens quarters the dot count.
+    if (
+      typeof window !== 'undefined' &&
+      window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    ) {
+      return;
+    }
+    const isSmall = typeof window !== 'undefined' && window.innerWidth < 768;
+    const spacing = isSmall ? Math.max(spacingProp, 18) : spacingProp;
 
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
@@ -214,7 +226,7 @@ export default function DotGridBackground({
       if (resizeTimeout) clearTimeout(resizeTimeout);
       cancelAnimationFrame(raf);
     };
-  }, [spacing, energyProp, breatheAmp, breatheSpeed, drift, driftAmount, bg]);
+  }, [spacingProp, energyProp, breatheAmp, breatheSpeed, drift, driftAmount, bg]);
 
   return (
     <>

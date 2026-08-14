@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -188,12 +188,39 @@ function ChatScreen({ platformId }: { platformId: string }) {
       });
   }, [platformId]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+  // First settle (50 messages of history arriving after paint) must be
+  // instant: smooth-scrolling that many bubbles on a phone gets interrupted by
+  // layout and strands the user mid-conversation. Subsequent sends animate.
+  const didFirstScroll = useRef(false);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: didFirstScroll.current ? "smooth" : "auto",
     });
+    if (messages.length) didFirstScroll.current = true;
   }, [messages]);
+
+  // iOS Safari ignores interactiveWidget, so dvh does NOT shrink for the
+  // keyboard and the composer ends up behind it. visualViewport is the only
+  // reliable signal; publish the keyboard height as --kb for the padding below.
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!vv) return;
+    const sync = () => {
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty("--kb", `${kb}px`);
+    };
+    sync();
+    vv.addEventListener("resize", sync);
+    vv.addEventListener("scroll", sync);
+    return () => {
+      vv.removeEventListener("resize", sync);
+      vv.removeEventListener("scroll", sync);
+      document.documentElement.style.setProperty("--kb", "0px");
+    };
+  }, []);
 
   async function send(text?: string): Promise<void> {
     const message = (text ?? input).trim();
@@ -311,7 +338,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
     (step === "verified" || step === "returning_verified");
 
   return (
-    <div className="flex h-[calc(100dvh-80px)] mt-20 md:h-dvh md:mt-0 pb-[var(--tabbar-h)] md:pb-0">
+    <div className="flex h-[calc(100dvh-var(--navbar-h))] mt-[var(--navbar-h)] md:h-dvh md:mt-0 pb-[calc(var(--tabbar-h)+var(--kb,0px))] md:pb-0">
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="border-b border-zinc-800 px-4 py-3 md:px-6">
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
@@ -324,14 +351,14 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 <button
                   type="button"
                   onClick={() => void send("verify")}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold"
+                  className="text-sm px-3.5 py-2.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold"
                 >
                   Verify
                 </button>
               )}
               <Link
                 href="/portfolio"
-                className="md:hidden text-xs px-3 py-1.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition"
+                className="md:hidden text-sm px-3.5 py-2.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition"
               >
                 Wallet
               </Link>
@@ -401,7 +428,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <button
                 type="button"
                 onClick={() => void send("verify")}
-                className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold whitespace-nowrap"
+                className="text-sm px-3.5 py-2.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold whitespace-nowrap"
               >
                 Verify
               </button>
@@ -493,7 +520,13 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Autogrow: without this max-h-32 never engages and a
+                  // multi-sentence message scrolls inside one 24px line.
+                  e.target.style.height = "auto";
+                  e.target.style.height = `${Math.min(e.target.scrollHeight, 128)}px`;
+                }}
                 onKeyDown={onKeyDown}
                 placeholder="Message your agent…"
                 rows={1}

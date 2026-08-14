@@ -85,7 +85,7 @@ function Home({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN — fills the width (no narrow centered column) */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[calc(var(--navbar-h)+1.5rem)] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8">
           <p className="text-sm text-zinc-500">{greeting()}{userName ? `, ${userName}` : ""}</p>
@@ -115,10 +115,11 @@ function Home({ platformId }: { platformId: string }) {
         </div>
 
         {/* Quick actions */}
-        <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-4">
+        <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
           <ActionCard href="/send" title="Send" sub="Pay anyone by handle" emoji="↗" />
           <ActionCard href="/chat" title="Ask your agent" sub="It handles the rest" emoji="✦" />
           <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" emoji="▢" />
+          <ActionCard href="/calls" title="Comms" sub="Calls & email" emoji="☏" />
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
         </div>
 

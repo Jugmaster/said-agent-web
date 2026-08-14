@@ -105,10 +105,12 @@ export default function InstallNudge() {
 
   const pathname = usePathname();
   // Don't nag inside the app surfaces — it overlaps the chat composer / tab bar.
-  const onAppRoute = ["/chat", "/send", "/portfolio", "/activity", "/fund"].some(
+  // Never nag on the claim screen: it is the first thing a new user sees.
+  const onInvite = pathname.startsWith("/invite");
+  const onAppRoute = ["/chat", "/send", "/portfolio", "/activity", "/fund", "/calls"].some(
     (r) => pathname === r || pathname.startsWith(r + "/"),
   );
-  if (!visible || onAppRoute) return null;
+  if (!visible || onAppRoute || onInvite) return null;
 
   return (
     <div

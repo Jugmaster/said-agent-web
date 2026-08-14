@@ -133,7 +133,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       onClick={onClose}
     >
       <div
@@ -142,7 +142,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
         aria-modal="true"
         aria-label="Add funds"
         tabIndex={-1}
-        className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 focus:outline-none"
+        className="w-full max-w-sm max-h-[85dvh] overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {phase === "idle" && (

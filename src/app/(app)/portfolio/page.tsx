@@ -76,10 +76,39 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
 
+  // Rendered in BOTH the desktop aside and the mobile stack: it carries the
+  // wallet address and copy button, the only way to fund the agent by hand.
+  const identityCard = (
+    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <div className="flex items-center gap-3">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
+          {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your agent"}</div>
+          <div className="text-xs">
+            {balance?.verified ? <span className="text-emerald-400">● Verified</span> : balance?.registered ? <span className="text-amber-400">● Registered</span> : <span className="text-zinc-500">○ Unverified</span>}
+            {balance && balance.proTier > 0 && <span className="ml-2 text-amber-400">Pro</span>}
+          </div>
+        </div>
+      </div>
+      {balance?.saidWallet && (
+        <button onClick={() => void copy(balance.saidWallet!)} className="mt-3 w-full rounded-lg border border-zinc-800/70 bg-zinc-950/50 px-3 py-3 text-left font-mono text-sm text-zinc-400 hover:text-zinc-200">
+          {truncMiddle(balance.saidWallet, 6, 6)} {copied ? "✓" : "⧉"}
+        </button>
+      )}
+      {balance?.saidPda && (
+        <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="mt-3 block rounded-lg border border-zinc-800 py-3 text-center text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white">
+          Public profile →
+        </Link>
+      )}
+    </section>
+  );
+
   return (
     <div className="flex min-h-dvh">
       {/* MAIN */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[calc(var(--navbar-h)+1.5rem)] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -147,38 +176,18 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           </div>
         </section>
 
-        {/* Aside content inline on smaller screens */}
-        <div className="mt-9 xl:hidden">
+        {/* Aside content inline on smaller screens. The identity card carries
+            the wallet address + copy button, which is the only way to fund the
+            agent from a phone, so it must not stay desktop-only. */}
+        <div className="mt-9 space-y-6 xl:hidden">
+          {identityCard}
           <RecentActivity receipts={receipts} />
         </div>
       </div>
 
       {/* RIGHT PANEL */}
       <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
-        <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
-              {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your agent"}</div>
-              <div className="text-xs">
-                {balance?.verified ? <span className="text-emerald-400">● Verified</span> : balance?.registered ? <span className="text-amber-400">● Registered</span> : <span className="text-zinc-500">○ Unverified</span>}
-                {balance && balance.proTier > 0 && <span className="ml-2 text-amber-400">Pro</span>}
-              </div>
-            </div>
-          </div>
-          {balance?.saidWallet && (
-            <button onClick={() => void copy(balance.saidWallet!)} className="mt-3 w-full rounded-lg border border-zinc-800/70 bg-zinc-950/50 px-3 py-2 text-left font-mono text-xs text-zinc-500 hover:text-zinc-300">
-              {truncMiddle(balance.saidWallet, 6, 6)} {copied ? "✓" : ""}
-            </button>
-          )}
-          {balance?.saidPda && (
-            <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="mt-3 block rounded-lg border border-zinc-800 py-2 text-center text-xs font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white">
-              Public profile →
-            </Link>
-          )}
-        </section>
+{identityCard}
         <RecentActivity receipts={receipts} />
       </aside>
 

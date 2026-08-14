@@ -7,7 +7,10 @@ import { usePrivy } from "@privy-io/react-auth";
 import { HomeIcon, ChatIcon, SendIcon, WalletIcon, ActivityIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
-const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund"];
+// NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
+// otherwise strands the user with no navigation), even though Comms has no
+// tab of its own — six tabs would drop each below a comfortable width.
+const APP_ROUTES = ["/home", "/chat", "/send", "/portfolio", "/activity", "/fund", "/calls"];
 
 const TABS: { href: string; label: string; icon: ComponentType<{ className?: string }> }[] = [
   { href: "/home", label: "Home", icon: HomeIcon },

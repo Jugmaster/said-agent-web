@@ -76,7 +76,7 @@ function CallCard({ call }: { call: CommsCallRecord }) {
           {call.recordingUrl && (
             <div>
               <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Recording</p>
-              <audio controls src={call.recordingUrl} className="w-full h-9" />
+              <audio controls src={call.recordingUrl} className="w-full" />
             </div>
           )}
         </div>
@@ -200,7 +200,7 @@ function CallsInner({ platformId }: { platformId: string }) {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[calc(var(--navbar-h)+1.5rem)] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Comms</h1>
         <p className="text-sm text-zinc-400 mt-1">
@@ -215,7 +215,7 @@ function CallsInner({ platformId }: { platformId: string }) {
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-1.5 rounded-lg text-sm font-medium capitalize transition ${
+            className={`px-4 py-2.5 rounded-lg text-sm font-medium capitalize transition ${
               tab === t ? "bg-zinc-100 text-zinc-900" : "text-zinc-400 hover:text-zinc-200"
             }`}
           >
@@ -236,7 +236,7 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="+14155551234"
             inputMode="tel"
             spellCheck={false}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-sm"
+            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-base sm:text-sm"
           />
           {phone.trim() && !phoneValid && (
             <p className="text-xs text-zinc-500 mt-1.5">
@@ -255,7 +255,7 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="Call this restaurant and book a table for 2 tomorrow at 8pm under the name Callum."
             rows={3}
             maxLength={500}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm resize-none"
+            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm resize-none"
           />
         </div>
         <button
@@ -279,7 +279,7 @@ function CallsInner({ platformId }: { platformId: string }) {
               placeholder="alice@example.com"
               inputMode="email"
               spellCheck={false}
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
             />
           </div>
           <div>
@@ -289,7 +289,7 @@ function CallsInner({ platformId }: { platformId: string }) {
               onChange={(e) => setEmailSubject(e.target.value)}
               maxLength={200}
               placeholder="Quick question"
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
             />
           </div>
           <div>
@@ -300,7 +300,7 @@ function CallsInner({ platformId }: { platformId: string }) {
               rows={5}
               maxLength={5000}
               placeholder="Write the email your agent should send…"
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm resize-none"
+              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm resize-none"
             />
           </div>
           <button

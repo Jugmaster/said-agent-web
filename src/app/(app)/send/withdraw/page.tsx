@@ -183,7 +183,7 @@ export default function WithdrawPage() {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 py-8">
+    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[calc(var(--navbar-h)+1.5rem)] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Withdraw</h1>
         <p className="text-sm text-zinc-400 mt-1">
@@ -237,7 +237,7 @@ export default function WithdrawPage() {
                 onChange={(e) => setDest(e.target.value)}
                 placeholder="Solana address"
                 spellCheck={false}
-                className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-sm"
+                className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-base sm:text-sm"
               />
               {dest.trim() && !isValidSolanaAddress(dest.trim()) && (
                 <p className="text-xs text-red-400 mt-1.5">
@@ -256,7 +256,7 @@ export default function WithdrawPage() {
                   onChange={(e) => setAmount(e.target.value.replace(/^\./, "0."))}
                   placeholder="0.0"
                   inputMode="decimal"
-                  className="flex-1 px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-sm"
+                  className="flex-1 px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
                 />
                 <button
                   onClick={() => maxSol != null && setAmount(maxSol.toFixed(9).replace(/0+$/, "").replace(/\.$/, ""))}

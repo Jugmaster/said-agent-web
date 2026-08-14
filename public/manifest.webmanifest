@@ -2,7 +2,7 @@
   "name": "SAID Agent",
   "short_name": "SAID",
   "description": "Your AI butler on Solana",
-  "start_url": "/chat",
+  "start_url": "/home",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#0a0a0a",

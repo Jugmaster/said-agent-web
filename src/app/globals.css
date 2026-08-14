@@ -17,6 +17,10 @@ html {
   --text-secondary: #999;
   /* Mobile bottom tab bar height (incl. iOS home-indicator safe area). */
   --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
+  /* Fixed pill navbar height incl. the iOS notch inset. Pages must clear this
+     rather than hardcoding pt-24: with black-translucent + viewportFit cover,
+     the inset alone is 47-59px on a notched iPhone. */
+  --navbar-h: calc(3rem + max(1rem, env(safe-area-inset-top)));
 }
 
 html,
