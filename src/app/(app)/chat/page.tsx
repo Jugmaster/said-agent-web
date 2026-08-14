@@ -344,7 +344,15 @@ function ChatScreen({ platformId }: { platformId: string }) {
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
             <div>
               <h1 className="text-base font-semibold">{agentName}</h1>
-              <p className="text-xs text-zinc-500 font-mono">{platformId}</p>
+              {/* Never the backend platform id: it means nothing to a user and
+                  reads like a leaked internal. */}
+              <p className="text-xs text-zinc-500">
+                {step === "verified" || step === "returning_verified" ? (
+                  <span className="text-emerald-400">● Live on SAID</span>
+                ) : (
+                  <span>Setting up</span>
+                )}
+              </p>
             </div>
             <div className="flex gap-2">
               {needsFunding && (
