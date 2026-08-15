@@ -110,6 +110,7 @@ function Settings({ platformId }: { platformId: string }) {
           <div className="px-4 pb-2 text-xs text-emerald-400">Address copied</div>
         )}
         <Row label="Public profile" href={`/agents/${encodeURIComponent(platformId)}`} />
+        <Row label="Link an existing agent" href="/settings/link-agent" />
       </Section>
 
       <Section title="Account">
