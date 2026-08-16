@@ -326,9 +326,20 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </aside>
       )}
 
+      {/* Signed-in mobile: pages scroll INSIDE this container, never the body.
+          iOS Safari and Telegram's in-app browser detach position:fixed
+          elements while the body scrolls, so any page long enough to
+          body-scroll dragged the bottom tab bar with it (first seen on
+          Comms). Locking the body here fixes it for every surface at once.
+          Keyed by pathname so a scrolled page doesn't hand its scroll
+          position to the next route. Desktop keeps body scroll (md:h-auto);
+          signed-out keeps the plain flow so login/marketing are untouched. */}
       <div
+        key={pathname}
         className={`flex-1 flex flex-col min-w-0 ${
-          authed ? "md:pl-16 lg:pl-64" : ""
+          authed
+            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
+            : ""
         }`}
       >
         {children}

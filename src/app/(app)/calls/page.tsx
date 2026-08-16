@@ -200,11 +200,8 @@ function CallsInner({ platformId }: { platformId: string }) {
   }
 
   return (
-    // Mobile: the page scrolls INSIDE this container (chat's pattern), never
-    // the body. iOS Safari and Telegram's in-app browser detach fixed elements
-    // while the body scrolls, which made the bottom tab bar drift on this page
-    // — the one app surface long enough to body-scroll. Desktop unchanged.
-    <div className="h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible">
+    // Mobile scrolling happens in AppShell's internal container (body is
+    // locked so the fixed tab bar can't drift on iOS/Telegram webviews).
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Comms</h1>
@@ -349,7 +346,6 @@ function CallsInner({ platformId }: { platformId: string }) {
           })()
         )}
       </div>
-    </div>
     </div>
   );
 }
