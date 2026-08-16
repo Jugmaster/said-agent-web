@@ -75,7 +75,7 @@ function FundScreen({ platformId }: { platformId: string }) {
   }
 
   return (
-    <main className="px-4 pt-[calc(var(--navbar-h)+1.5rem)] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
+    <main className="px-4 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
       <header className="flex items-center justify-between mb-6">
         <h1 className="text-xl font-semibold">Fund your agent</h1>
         <Link

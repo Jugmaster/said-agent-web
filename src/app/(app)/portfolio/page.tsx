@@ -108,7 +108,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[calc(var(--navbar-h)+1.5rem)] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -227,7 +227,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
     <section>
       <div className="mb-2 flex items-baseline justify-between">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">Recent activity</h2>
-        <Link href="/activity" className="text-[11px] text-zinc-500 transition hover:text-zinc-300">View all →</Link>
+        <Link href="/activity" className="-my-1 py-2 text-sm text-zinc-400 transition hover:text-zinc-200">View all →</Link>
       </div>
       {receipts === null ? (
         <p className="text-xs text-zinc-600">Loading…</p>

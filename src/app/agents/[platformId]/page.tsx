@@ -108,6 +108,9 @@ export default async function AgentProfilePage({ params }: PageProps) {
                   </span>
                 )}
               </div>
+              {/* Platform, not the raw backend id. The id is in the URL for
+                  anyone who needs it; rendering it as a subtitle just looks
+                  like a leaked internal. */}
               <p className="text-xs text-zinc-500 mt-1">
                 {platformId.startsWith("tw_")
                   ? "Agent on X"

@@ -684,3 +684,42 @@ export async function getPortfolio(walletAddress: string): Promise<FullPortfolio
   }
   return (await res.json()) as FullPortfolio;
 }
+
+export interface ReputationLink {
+  wallet: string | null;
+  tier: string | null;
+}
+
+/** Current linked reputation wallet for this agent, if any. */
+export async function getReputationLink(platformId: string): Promise<ReputationLink> {
+  const res = await apiFetch(
+    `${API_BASE}/api/reputation/link/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) return { wallet: null, tier: null };
+  return res.json();
+}
+
+/** Prove control of an externally-registered agent's wallet and adopt its tier. */
+export async function linkReputation(input: {
+  platformId: string;
+  wallet: string;
+  signature: string;
+  message: string;
+}): Promise<{ ok: boolean; tier?: string; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/reputation/link`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; tier?: string; error?: string };
+  return { ok: !!data.ok, tier: data.tier, message: data.error };
+}
+
+export async function unlinkReputation(platformId: string): Promise<boolean> {
+  const res = await apiFetch(
+    `${API_BASE}/api/reputation/link/${encodeURIComponent(platformId)}`,
+    { method: "DELETE", headers: await authHeaders() },
+  );
+  return res.ok;
+}
