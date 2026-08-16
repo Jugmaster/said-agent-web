@@ -89,6 +89,10 @@ function LinkAgent({ platformId }: { platformId: string }) {
   }
 
   return (
+    // Internal scroll on mobile (chat's pattern) — body scrolling detaches the
+    // fixed tab bar on iOS/Telegram webviews, and this page outgrows one
+    // screen once the signing challenge is open. Desktop unchanged.
+    <div className="h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible">
     <div className="mx-auto max-w-2xl px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-6 md:pt-10 md:pb-12">
       <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-300">
         ← Settings
@@ -199,6 +203,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
           {error && <p className="text-sm text-red-400">{error}</p>}
         </div>
       )}
+    </div>
     </div>
   );
 }
