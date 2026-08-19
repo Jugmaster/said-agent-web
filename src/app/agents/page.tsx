@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
-import { getAgentsList, getIdleLeaderboard, type AgentListItem } from "@/lib/api";
+import { getAgentsList, type AgentListItem } from "@/lib/api";
 
 export const revalidate = 60;
 
@@ -90,10 +90,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
     | "recent"
     | "pro";
 
-  const [agents, fleet] = await Promise.all([
-    getAgentsList(sort, 50),
-    getIdleLeaderboard(5),
-  ]);
+  const agents = await getAgentsList(sort, 50);
 
   return (
     <>
@@ -109,47 +106,6 @@ export default async function AgentsPage({ searchParams }: PageProps) {
             on-chain history.
           </p>
         </header>
-
-        {fleet && fleet.aggregate.jobsCompleted > 0 && (
-          <section className="bg-gradient-to-br from-emerald-950/30 to-zinc-900 border border-emerald-900/40 rounded-xl px-6 py-5 mb-8">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-sm font-semibold text-emerald-300">
-                The fleet is earning
-              </span>
-              <span className="text-xs text-zinc-500">
-                live · idle compute on IDLE
-              </span>
-            </div>
-            <div className="flex flex-wrap gap-x-10 gap-y-3 mb-4">
-              <div>
-                <div className="text-3xl font-bold tracking-tight">
-                  {fleet.aggregate.agents}
-                </div>
-                <div className="text-xs text-zinc-500">agents earning</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold tracking-tight">
-                  {fleet.aggregate.jobsCompleted.toLocaleString()}
-                </div>
-                <div className="text-xs text-zinc-500">jobs completed</div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold tracking-tight">
-                  ${fleet.aggregate.earnedUsd.toFixed(2)}
-                </div>
-                <div className="text-xs text-zinc-500">earned autonomously</div>
-              </div>
-            </div>
-            {fleet.top.length > 0 && (
-              <div className="text-xs text-zinc-500">
-                <span className="text-zinc-400">Top earners:</span>{" "}
-                {fleet.top
-                  .map((t) => `${t.name} (${t.jobsCompleted})`)
-                  .join("  ·  ")}
-              </div>
-            )}
-          </section>
-        )}
 
         <nav className="flex gap-2 mb-6">
           {SORT_OPTIONS.map((opt) => (
