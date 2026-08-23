@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -15,6 +15,9 @@ import AuthGate from "@/components/AuthGate";
 import MessageText from "@/components/MessageText";
 import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh, requestRefresh } from "@/lib/refresh";
+import { usePrivy } from "@privy-io/react-auth";
+import { useAgent } from "@/hooks/useAgent";
+import { getPortfolio, type FullPortfolio } from "@/lib/api";
 
 interface UiMessage {
   id: string;
@@ -30,6 +33,13 @@ type AgentStep =
   | "registered_unverified"
   | "verified"
   | "returning_verified";
+
+// Short enough to read on a chip; phrased as things you'd actually ask.
+const MOBILE_PROMPTS = [
+  "What can you do?",
+  "Watch SOL under $150",
+  "Show my holdings",
+];
 
 const QUICK_ACTIONS = [
   "What can you do?",
@@ -141,6 +151,23 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
 
+  // Mobile-only: this screen is home, so it carries the balance. Same source
+  // as the desktop dashboard so the two can never disagree.
+  const agent = useAgent();
+  const { user: privyUser } = usePrivy();
+  const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
+  const [portfolio, setPortfolio] = useState<FullPortfolio | null>(null);
+  useEffect(() => {
+    if (!walletAddress) return;
+    let cancelled = false;
+    const load = () =>
+      getPortfolio(walletAddress)
+        .then((p) => !cancelled && setPortfolio(p))
+        .catch(() => {});
+    void load();
+    return onRefresh(() => void load());
+  }, [walletAddress]);
+
   // Receive celebration: settle-on-login stashes a receipt in sessionStorage
   // (see useAgent). Read it once on landing, then clear so it shows a single time.
   useEffect(() => {
@@ -188,12 +215,39 @@ function ChatScreen({ platformId }: { platformId: string }) {
       });
   }, [platformId]);
 
-  useEffect(() => {
-    scrollRef.current?.scrollTo({
-      top: scrollRef.current.scrollHeight,
-      behavior: "smooth",
+  // First settle (50 messages of history arriving after paint) must be
+  // instant: smooth-scrolling that many bubbles on a phone gets interrupted by
+  // layout and strands the user mid-conversation. Subsequent sends animate.
+  const didFirstScroll = useRef(false);
+  useLayoutEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollTo({
+      top: el.scrollHeight,
+      behavior: didFirstScroll.current ? "smooth" : "auto",
     });
+    if (messages.length) didFirstScroll.current = true;
   }, [messages]);
+
+  // iOS Safari ignores interactiveWidget, so dvh does NOT shrink for the
+  // keyboard and the composer ends up behind it. visualViewport is the only
+  // reliable signal; publish the keyboard height as --kb for the padding below.
+  useEffect(() => {
+    const vv = typeof window !== "undefined" ? window.visualViewport : null;
+    if (!vv) return;
+    const sync = () => {
+      const kb = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
+      document.documentElement.style.setProperty("--kb", `${kb}px`);
+    };
+    sync();
+    vv.addEventListener("resize", sync);
+    vv.addEventListener("scroll", sync);
+    return () => {
+      vv.removeEventListener("resize", sync);
+      vv.removeEventListener("scroll", sync);
+      document.documentElement.style.setProperty("--kb", "0px");
+    };
+  }, []);
 
   async function send(text?: string): Promise<void> {
     const message = (text ?? input).trim();
@@ -306,32 +360,70 @@ function ChatScreen({ platformId }: { platformId: string }) {
   const isFresh =
     messages.length === 0 &&
     (step === "unknown" || step === "provisioned" || step === "awaiting_name");
+  // Their own handle, from whichever account they signed in with.
+  const userHandle =
+    privyUser?.twitter?.username
+      ? `@${privyUser.twitter.username}`
+      : privyUser?.telegram?.username
+        ? `@${privyUser.telegram.username}`
+        : null;
+  const isLive = step === "verified" || step === "returning_verified";
+
   const isReturning =
     messages.length === 0 &&
     (step === "verified" || step === "returning_verified");
 
   return (
-    <div className="flex h-[calc(100dvh-80px)] mt-20 md:h-dvh md:mt-0 pb-[var(--tabbar-h)] md:pb-0">
+    <div className="flex h-dvh md:h-dvh pb-[calc(var(--tabbar-h)+var(--kb,0px))] md:pb-0">
       <div className="flex min-w-0 flex-1 flex-col">
-        <header className="border-b border-zinc-800 px-4 py-3 md:px-6">
+        <header className="border-b border-zinc-800 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3 md:px-6 md:pt-3">
+          {/* Mobile: this screen is home, so the balance lives here. Desktop
+              keeps its sidebar total and skips this strip entirely. */}
+          <div className="mx-auto mb-3 w-full max-w-3xl md:hidden">
+            <Link href="/portfolio" className="block">
+              <div className="text-[11px] uppercase tracking-wide text-zinc-500">
+                Your balance
+              </div>
+              <div className="flex items-baseline gap-2">
+                <span className="text-3xl font-bold tracking-tight text-white">
+                  {portfolio?.totalUsdValue != null
+                    ? `$${portfolio.totalUsdValue.toFixed(2)}`
+                    : "···"}
+                </span>
+                <span className="text-xs text-zinc-500">
+                  {portfolio ? `${portfolio.solBalance.toFixed(3)} SOL` : ""}
+                </span>
+              </div>
+            </Link>
+          </div>
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
             <div>
               <h1 className="text-base font-semibold">{agentName}</h1>
-              <p className="text-xs text-zinc-500 font-mono">{platformId}</p>
+              {/* Never the backend platform id: it means nothing to a user and
+                  reads like a leaked internal. Their own handle plus live
+                  status is the same line's worth of space, actually useful. */}
+              <p className="text-xs text-zinc-500">
+                {isLive ? (
+                  <span className="text-emerald-400">● Live on SAID</span>
+                ) : (
+                  <span>Setting up</span>
+                )}
+                {userHandle ? ` · ${userHandle}` : ""}
+              </p>
             </div>
             <div className="flex gap-2">
               {needsFunding && (
                 <button
                   type="button"
                   onClick={() => void send("verify")}
-                  className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold"
+                  className="text-sm px-3.5 py-2.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold"
                 >
                   Verify
                 </button>
               )}
               <Link
                 href="/portfolio"
-                className="md:hidden text-xs px-3 py-1.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition"
+                className="md:hidden text-sm px-3.5 py-2.5 rounded-lg border border-zinc-700 hover:border-zinc-500 transition"
               >
                 Wallet
               </Link>
@@ -401,7 +493,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <button
                 type="button"
                 onClick={() => void send("verify")}
-                className="text-xs px-3 py-1.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold whitespace-nowrap"
+                className="text-sm px-3.5 py-2.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-black font-semibold whitespace-nowrap"
               >
                 Verify
               </button>
@@ -489,15 +581,49 @@ function ChatScreen({ platformId }: { platformId: string }) {
           }}
         >
           <div className="mx-auto w-full max-w-3xl">
+            {/* Mobile action rail: the desktop context rail is xl-only, so on a
+                phone there was nothing tappable at all. These are the jobs, not
+                navigation: two go to typed flows, the rest talk to the agent. */}
+            <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <Link
+                href="/calls"
+                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
+              >
+                ☏ Comms
+              </Link>
+              {MOBILE_PROMPTS.map((q) => (
+                <button
+                  key={q}
+                  type="button"
+                  onClick={() => void send(q)}
+                  disabled={sending}
+                  className="shrink-0 rounded-full border border-zinc-800 bg-zinc-950 px-3.5 py-2 text-sm text-zinc-400 active:bg-zinc-900 disabled:opacity-50"
+                >
+                  {q}
+                </button>
+              ))}
+            </div>
             <div className="flex items-end gap-2">
               <textarea
                 ref={inputRef}
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => {
+                  setInput(e.target.value);
+                  // Autogrow: without this max-h-32 never engages and a
+                  // multi-sentence message scrolls inside one 24px line.
+                  e.target.style.height = "auto";
+                  const next = Math.min(e.target.scrollHeight, 128);
+                  e.target.style.height = `${next}px`;
+                  // Only scroll once it has actually hit the cap. Left on auto
+                  // the browser paints a scrollbar the moment content meets the
+                  // box, which on mobile is a permanent grey stripe.
+                  e.target.style.overflowY =
+                    e.target.scrollHeight > 128 ? "auto" : "hidden";
+                }}
                 onKeyDown={onKeyDown}
                 placeholder="Message your agent…"
                 rows={1}
-                className="flex-1 resize-none rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
+                className="flex-1 resize-none overflow-y-hidden rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
                 disabled={sending}
               />
               <button

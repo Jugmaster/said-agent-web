@@ -17,11 +17,13 @@
 
 import { useEffect, useState } from "react";
 import { usePrivy, useLoginWithTelegram } from "@privy-io/react-auth";
+import { useAgent } from "@/hooks/useAgent";
 // Solana-specific fundWallet — the root useFundWallet is EVM-only and resolves
 // the chain to NaN for Solana addresses. The /solana variant + the
 // SolanaFundingPlugin (registered in providers.tsx) handle Solana destinations
 // natively.
 import { useFundWallet } from "@privy-io/react-auth/solana";
+import { preferredCardProvider } from "@/lib/onramp";
 
 // Telegram WebApp SDK types — use the same shape src/lib/identity.ts declares,
 // extended with the methods this page actually uses (close, expand).
@@ -39,6 +41,7 @@ export default function FundOnrampPage() {
   const { ready, authenticated, login, user, linkTelegram } = usePrivy();
   const { login: loginWithTelegram } = useLoginWithTelegram();
   const { fundWallet } = useFundWallet();
+  const agent = useAgent();
   const [wallet, setWallet] = useState<string | null>(null);
   const [amount, setAmount] = useState<string | null>(null);
   const [phase, setPhase] = useState<"loading" | "ready" | "funding" | "done" | "error">("loading");
@@ -50,7 +53,11 @@ export default function FundOnrampPage() {
   // Read URL params + initialize Telegram WebApp SDK
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const w = params.get("wallet");
+    const rawW = params.get("wallet");
+    // The wallet param comes from a URL anyone can craft — a link on our real
+    // domain must never route a card payment to an arbitrary address. Shape
+    // check here; hard ownership check against the session's own agent below.
+    const w = rawW && /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(rawW) ? rawW : null;
     const a = params.get("amount");
     setWallet(w);
     setAmount(a);
@@ -67,7 +74,7 @@ export default function FundOnrampPage() {
     }
 
     setPhase(w ? "ready" : "error");
-    if (!w) setErrorMsg("Missing wallet address in URL.");
+    if (!w) setErrorMsg("Missing or invalid wallet address in URL.");
   }, []);
 
   // Auto-auth: when we're inside Telegram and not yet authenticated, trigger
@@ -100,6 +107,23 @@ export default function FundOnrampPage() {
   async function start(): Promise<void> {
     if (!wallet) return;
 
+    // Ownership check: once the session's own agent resolves, the destination
+    // MUST be that agent's wallet. A crafted ?wallet= link on our domain must
+    // never route someone's card payment to a stranger's address.
+    if (authenticated) {
+      if (agent.status !== "ready") {
+        setErrorMsg("Still linking your agent — try again in a few seconds.");
+        return;
+      }
+      if (!agent.walletAddress || agent.walletAddress !== wallet) {
+        setPhase("error");
+        setErrorMsg(
+          "This funding link doesn't match your agent's wallet. Ask your agent for a fresh funding link (say \"fund\" in chat).",
+        );
+        return;
+      }
+    }
+
     // Run Privy's EMBEDDED onramp in place — no browser bounce. Privy mounts
     // the card/MoonPay flow in an in-app iframe (it ships its own MoonPay
     // merchant key), so the user funds without leaving the Telegram Mini App.
@@ -118,9 +142,13 @@ export default function FundOnrampPage() {
       await fundWallet({
         address: wallet,
         options: {
-          // Let Privy show the payment-method chooser + auto-route to the best
-          // ENABLED onramp (Stripe/MoonPay/Coinbase) for device + geo, which is
-          // what surfaces Apple Pay. No forced provider, no skipped picker.
+          // Show Privy's payment-method chooser. Do NOT set
+          // defaultFundingMethod: forcing the card flow SKIPS the picker and
+          // hides Apple Pay, which is the single highest-value funding path.
+          // preferredProvider is only an opening preference, not a lock, and it
+          // is what steers UK users to Coinbase (MoonPay does not serve the UK)
+          // and Japanese users to MoonPay (Coinbase Onramp does not serve JP).
+          card: { preferredProvider: preferredCardProvider() },
           asset: "native-currency",
           ...(amount ? { amount } : {}),
         } as unknown as Parameters<typeof fundWallet>[0]["options"],

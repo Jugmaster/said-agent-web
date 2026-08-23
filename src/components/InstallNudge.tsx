@@ -1,5 +1,7 @@
 "use client";
 
+import { APP_ROUTES } from "./BottomTabBar";
+
 /**
  * Install nudge — a small, dismissable chip at the bottom of the viewport
  * that surfaces "Install to home screen" to users who haven't installed yet.
@@ -105,10 +107,14 @@ export default function InstallNudge() {
 
   const pathname = usePathname();
   // Don't nag inside the app surfaces — it overlaps the chat composer / tab bar.
-  const onAppRoute = ["/chat", "/send", "/portfolio", "/activity", "/fund"].some(
+  // Never nag on the claim screen: it is the first thing a new user sees.
+  const onInvite = pathname.startsWith("/invite");
+  // Same list the tab bar uses. A private copy drifted once already and the
+  // nudge ended up rendering underneath the bar on a newly added surface.
+  const onAppRoute = APP_ROUTES.some(
     (r) => pathname === r || pathname.startsWith(r + "/"),
   );
-  if (!visible || onAppRoute) return null;
+  if (!visible || onAppRoute || onInvite) return null;
 
   return (
     <div
@@ -117,7 +123,7 @@ export default function InstallNudge() {
       style={{
         bottom: "max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))",
       }}
-      className="fixed left-1/2 -translate-x-1/2 z-40 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
+      className="fixed left-1/2 -translate-x-1/2 z-50 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-white flex-shrink-0 overflow-hidden">

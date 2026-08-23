@@ -14,6 +14,17 @@ const API_BASE =
  * Returns `{}` when no token is available — the API call still goes through; it's
  * up to butler to enforce auth on protected endpoints.
  */
+// Every butler call gets a default timeout — a slow or down butler must
+// surface as an error state, never as a page-wide infinite spinner. Callers
+// that pass their own signal keep it. 30s accommodates the slow LLM chat path.
+function apiFetch(
+  input: RequestInfo | URL,
+  init?: RequestInit,
+  timeoutMs = 30_000,
+): Promise<Response> {
+  return fetch(input, { ...init, signal: init?.signal ?? AbortSignal.timeout(timeoutMs) });
+}
+
 async function authHeaders(): Promise<Record<string, string>> {
   if (typeof window === "undefined") return {};
   try {
@@ -100,7 +111,7 @@ export async function chat(
   platformId: string,
   message: string
 ): Promise<ChatResponse> {
-  const res = await fetch(`${API_BASE}/api/chat`, {
+  const res = await apiFetch(`${API_BASE}/api/chat`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify({ platformId, message }),
@@ -145,7 +156,7 @@ export async function agentSend(input: {
   asset: "SOL" | "USDC";
   amount: number;
 }): Promise<SendResult> {
-  const res = await fetch(`${API_BASE}/api/send`, {
+  const res = await apiFetch(`${API_BASE}/api/send`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(input),
@@ -160,6 +171,79 @@ export async function agentSend(input: {
     resolvedPlatform: data.resolvedPlatform ?? null,
     message: data.message ?? data.error ?? `Send failed (${res.status})`,
   };
+}
+
+export interface CommsCallRecord {
+  id: number;
+  kind: string;
+  to: string;
+  task: string;
+  /** routing | in_progress | completed | failed */
+  status: string;
+  summary: string | null;
+  transcript: string | null;
+  recordingUrl: string | null;
+  priceUsd: number | null;
+  error: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+/** Have the agent place a real phone call ($0.54 from the user's balance,
+ * routed automatically). Returns immediately — poll getComms for progress. */
+export async function commsCall(input: {
+  platformId: string;
+  phoneNumber: string;
+  task: string;
+}): Promise<{ ok: boolean; id?: number; status?: string; costUsd?: number; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/comms/call`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as {
+    ok?: boolean; id?: number; status?: string; costUsd?: number; error?: string;
+  };
+  return {
+    ok: !!data.ok,
+    id: data.id,
+    status: data.status,
+    costUsd: data.costUsd,
+    message: data.error ?? (res.ok ? undefined : `Call failed (${res.status})`),
+  };
+}
+
+/** Have the agent send an email ($0.02, only charged on success). */
+export async function commsEmail(input: {
+  platformId: string;
+  to: string;
+  subject: string;
+  body: string;
+}): Promise<{ ok: boolean; id?: number; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/comms/email`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; id?: number; error?: string };
+  return {
+    ok: !!data.ok,
+    id: data.id,
+    message: data.error ?? (res.ok ? undefined : `Email failed (${res.status})`),
+  };
+}
+
+/** Call history + live progress (server refreshes in-flight calls). */
+export async function getComms(platformId: string): Promise<{ calls: CommsCallRecord[] }> {
+  const res = await apiFetch(
+    `${API_BASE}/api/comms/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`comms failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
 }
 
 export interface TradeResult {
@@ -194,7 +278,7 @@ export async function agentTrade(input: {
 }
 
 export async function getBalance(platformId: string): Promise<BalanceResponse> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/balance/${encodeURIComponent(platformId)}`,
     { headers: await authHeaders() }
   );
@@ -207,7 +291,7 @@ export async function getBalance(platformId: string): Promise<BalanceResponse> {
 
 export async function ping(): Promise<boolean> {
   try {
-    const res = await fetch(`${API_BASE}/api/health`);
+    const res = await apiFetch(`${API_BASE}/api/health`);
     return res.ok;
   } catch {
     return false;
@@ -231,7 +315,7 @@ export interface SendRecord {
 /** The sender's recent send-by-handle history — powers Send's recent
  * recipients + "your sends" list. */
 export async function getSends(platformId: string): Promise<{ sends: SendRecord[] }> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/sends/${encodeURIComponent(platformId)}`,
     { headers: await authHeaders() },
   );
@@ -265,7 +349,7 @@ export interface CashbackResponse {
 /** Reputation cashback earned by this agent — the reward surface (we show users
  * what they EARNED, not what they paid in fees). */
 export async function getCashback(platformId: string): Promise<CashbackResponse> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/cashback/${encodeURIComponent(platformId)}`,
     { headers: await authHeaders() },
   );
@@ -277,7 +361,7 @@ export async function getCashback(platformId: string): Promise<CashbackResponse>
 }
 
 export async function getActivity(platformId: string): Promise<ActivityResponse> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/activity/${encodeURIComponent(platformId)}`,
     { headers: await authHeaders() }
   );
@@ -310,7 +394,7 @@ export async function getConversations(
   platformId: string,
   limit: number = 50,
 ): Promise<ConversationsResponse> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/conversations/${encodeURIComponent(platformId)}?limit=${limit}`,
     { headers: await authHeaders() },
   );
@@ -325,7 +409,7 @@ export async function getAgentProfile(
   platformId: string,
   options?: { signal?: AbortSignal; cache?: RequestCache }
 ): Promise<AgentProfileResponse> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/agents/${encodeURIComponent(platformId)}`,
     {
       signal: options?.signal,
@@ -363,7 +447,7 @@ export async function claimAgent(input: {
    *  first claim. */
   walletAddress?: string;
 }): Promise<ClaimResponse> {
-  const res = await fetch(`${API_BASE}/api/claim`, {
+  const res = await apiFetch(`${API_BASE}/api/claim`, {
     method: "POST",
     headers: { "Content-Type": "application/json", ...(await authHeaders()) },
     body: JSON.stringify(input),
@@ -403,23 +487,22 @@ export async function getInvite(
   token: string,
   options?: { cache?: RequestCache; signal?: AbortSignal; revalidate?: number }
 ): Promise<InviteResponse | null> {
-  try {
-    const res = await fetch(`${API_BASE}/api/invites/${encodeURIComponent(token)}`, {
-      // Per-token, per-user — keep no-store so claim-state flips are seen instantly
-      cache: options?.cache ?? "no-store",
-      signal: options?.signal,
-      next: typeof options?.revalidate === "number" ? { revalidate: options.revalidate } : undefined,
-    });
-    if (res.status === 404) return null;
-    if (!res.ok) {
-      const text = await res.text();
-      throw new Error(`invite lookup failed (${res.status}): ${text.slice(0, 200)}`);
-    }
-    return res.json();
-  } catch (err) {
-    if (err instanceof Error && err.name === "AbortError") throw err;
-    return null;
+  // null means THE INVITE DOES NOT EXIST (real 404). Transport failures and
+  // 5xx THROW — the invite page is the highest-stakes page in the funnel
+  // ("someone sent you money"), and rendering not-found during a butler blip
+  // reads as the money being fake.
+  const res = await apiFetch(`${API_BASE}/api/invites/${encodeURIComponent(token)}`, {
+    // Per-token, per-user — keep no-store so claim-state flips are seen instantly
+    cache: options?.cache ?? "no-store",
+    signal: options?.signal ?? AbortSignal.timeout(8000),
+    next: typeof options?.revalidate === "number" ? { revalidate: options.revalidate } : undefined,
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`invite lookup failed (${res.status}): ${text.slice(0, 200)}`);
   }
+  return res.json();
 }
 
 export interface LaunchListItem {
@@ -452,7 +535,7 @@ export async function getLaunches(
   // Public, anonymous data — default revalidate=60s so crawlers + page hits
   // dedupe through Next's data cache instead of hitting butler every time.
   const revalidate = options?.revalidate ?? 60;
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/launches?limit=${encodeURIComponent(limit)}`,
     options?.cache
       ? { cache: options.cache }
@@ -496,7 +579,7 @@ export async function getStats(
   // than ~2/min per Next instance regardless of traffic.
   const revalidate = options?.revalidate ?? 30;
   try {
-    const res = await fetch(
+    const res = await apiFetch(
       `${API_BASE}/api/stats`,
       options?.cache
         ? { cache: options.cache }
@@ -517,7 +600,7 @@ export async function getAgentsList(
   // Public directory — 60s revalidate. Each (sort, limit) tuple is its own
   // cache key, which is fine: only 3 sorts × 1 default limit = 3 entries.
   const revalidate = options?.revalidate ?? 60;
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/agents?sort=${sort}&limit=${limit}`,
     options?.cache
       ? { cache: options.cache }
@@ -545,7 +628,7 @@ export async function getIdleLeaderboard(
 ): Promise<IdleLeaderboard | null> {
   const revalidate = options?.revalidate ?? 60;
   try {
-    const res = await fetch(`${API_BASE}/api/idle/leaderboard?limit=${limit}`, {
+    const res = await apiFetch(`${API_BASE}/api/idle/leaderboard?limit=${limit}`, {
       next: { revalidate },
     });
     if (!res.ok) return null;
@@ -570,7 +653,7 @@ export async function getOnChainBalances(
   // QuickNode → publicnode failover so this is reliable + doesn't leak
   // RPC keys to client bundles.
   try {
-    const res = await fetch(
+    const res = await apiFetch(
       `${API_BASE}/api/wallet-balances/${encodeURIComponent(walletAddress)}`,
       // Endpoint is auth-gated (protects our premium RPC). Without the bearer
       // token it 401s and we'd silently drop to the rate-limited public RPC
@@ -589,7 +672,7 @@ export async function getOnChainBalances(
   // the client bundle). A failed read must THROW, not read as a zero balance —
   // otherwise every surface confidently renders "0 SOL · 0 USDC" with no
   // error flag (and FundModal's deposit detection baselines at 0).
-  const res = await fetch(
+  const res = await apiFetch(
     `/api/balances/${encodeURIComponent(walletAddress)}`,
   );
   if (!res.ok) {
@@ -623,7 +706,7 @@ export interface FullPortfolio {
  * "empty" — `getOnChainBalances` only returns SOL + USDC (the sendable assets).
  */
 export async function getPortfolio(walletAddress: string): Promise<FullPortfolio> {
-  const res = await fetch(
+  const res = await apiFetch(
     `${API_BASE}/api/portfolio/${encodeURIComponent(walletAddress)}`,
     { headers: await authHeaders() },
   );
@@ -631,4 +714,43 @@ export async function getPortfolio(walletAddress: string): Promise<FullPortfolio
     throw new Error(`portfolio fetch failed (${res.status})`);
   }
   return (await res.json()) as FullPortfolio;
+}
+
+export interface ReputationLink {
+  wallet: string | null;
+  tier: string | null;
+}
+
+/** Current linked reputation wallet for this agent, if any. */
+export async function getReputationLink(platformId: string): Promise<ReputationLink> {
+  const res = await apiFetch(
+    `${API_BASE}/api/reputation/link/${encodeURIComponent(platformId)}`,
+    { headers: await authHeaders() },
+  );
+  if (!res.ok) return { wallet: null, tier: null };
+  return res.json();
+}
+
+/** Prove control of an externally-registered agent's wallet and adopt its tier. */
+export async function linkReputation(input: {
+  platformId: string;
+  wallet: string;
+  signature: string;
+  message: string;
+}): Promise<{ ok: boolean; tier?: string; message?: string }> {
+  const res = await apiFetch(`${API_BASE}/api/reputation/link`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const data = (await res.json().catch(() => ({}))) as { ok?: boolean; tier?: string; error?: string };
+  return { ok: !!data.ok, tier: data.tier, message: data.error };
+}
+
+export async function unlinkReputation(platformId: string): Promise<boolean> {
+  const res = await apiFetch(
+    `${API_BASE}/api/reputation/link/${encodeURIComponent(platformId)}`,
+    { method: "DELETE", headers: await authHeaders() },
+  );
+  return res.ok;
 }

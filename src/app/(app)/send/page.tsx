@@ -341,7 +341,9 @@ function SendScreen({ platformId }: { platformId: string }) {
     (handle.trim().length > 0 || addr.length > 0);
 
   async function submit(): Promise<void> {
-    if (!canSubmit) return;
+    // sending re-check: a mobile double-tap can fire two clicks before React
+    // re-renders the disabled state — never let two /api/send calls race.
+    if (!canSubmit || sending) return;
     setConfirming(false);
     setSending(true);
     setResult(null);
@@ -417,7 +419,7 @@ function SendScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-24 md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
+      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Send</h1>
           <p className="text-sm text-zinc-500">
@@ -462,7 +464,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             <button
               type="button"
               onClick={() => setPlatform("telegram")}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+              className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "telegram"
                   ? "border-white bg-white text-black"
                   : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
@@ -473,7 +475,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             <button
               type="button"
               onClick={() => setPlatform("x")}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold border transition ${
+              className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "x"
                   ? "border-white bg-white text-black"
                   : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
@@ -636,9 +638,10 @@ function SendScreen({ platformId }: { platformId: string }) {
                 <button
                   type="button"
                   onClick={() => void submit()}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition"
+                  disabled={sending}
+                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
                 >
-                  Confirm send
+                  {sending ? "Sending…" : "Confirm send"}
                 </button>
               </div>
             </div>

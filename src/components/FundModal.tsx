@@ -16,6 +16,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useFundWallet } from "@privy-io/react-auth/solana";
+import { preferredCardProvider } from "@/lib/onramp";
 import { getOnChainBalances } from "@/lib/api";
 import { useModalA11y } from "@/hooks/useModalA11y";
 
@@ -98,10 +99,13 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
       await fundWallet({
         address: walletAddress,
         options: {
-          // Let Privy show the payment-method chooser and auto-route to the best
-          // ENABLED onramp provider (Stripe/MoonPay/Coinbase) for the user's
-          // device + geo — that's what surfaces Apple Pay. Do NOT force a single
-          // provider or skip the picker (the old moonpay/card lock hid Apple Pay).
+          // Show Privy's payment-method chooser. Do NOT set
+          // defaultFundingMethod: forcing the card flow SKIPS the picker and
+          // hides Apple Pay, which is the single highest-value funding path.
+          // preferredProvider is only an opening preference, not a lock, and it
+          // is what steers UK users to Coinbase (MoonPay does not serve the UK)
+          // and Japanese users to MoonPay (Coinbase Onramp does not serve JP).
+          card: { preferredProvider: preferredCardProvider() },
           asset: "native-currency",
         } as unknown as Parameters<typeof fundWallet>[0]["options"],
       });
@@ -133,7 +137,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4"
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/70 backdrop-blur-sm p-4 pb-[max(1rem,env(safe-area-inset-bottom))]"
       onClick={onClose}
     >
       <div
@@ -142,7 +146,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
         aria-modal="true"
         aria-label="Add funds"
         tabIndex={-1}
-        className="w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl p-6 focus:outline-none"
+        className="w-full max-w-sm max-h-[85dvh] overflow-y-auto bg-zinc-900 border border-zinc-800 rounded-2xl p-6 focus:outline-none"
         onClick={(e) => e.stopPropagation()}
       >
         {phase === "idle" && (

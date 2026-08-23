@@ -17,6 +17,7 @@ import {
   ChatIcon,
   HomeIcon,
   LogoutIcon,
+  PhoneIcon,
   PlusIcon,
   SendIcon,
   TradeIcon,
@@ -29,6 +30,7 @@ const NAV = [
   { href: "/send", label: "Send", icon: SendIcon, key: "s" },
   { href: "/trade", label: "Trade", icon: TradeIcon, key: "t" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
+  { href: "/calls", label: "Comms", icon: PhoneIcon, key: "l" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },
 ] as const;
 
@@ -48,8 +50,8 @@ function isEditable(t: EventTarget | null): boolean {
  * fund), mounted once via the (app) route-group layout so it survives client
  * navigations.
  *
- * Mobile (<md) keeps the existing chrome untouched: floating pill Navbar on
- * top, BottomTabBar below. From md up the pill disappears and a fixed left
+ * Signed in there is no pill at any size: mobile gets the BottomTabBar plus
+ * each surface's own header, and from md up a fixed left
  * sidebar takes over — icon rail at md, full sidebar with labels, live
  * balance, and account footer at lg. Signed-out visitors get the plain
  * Navbar at every size so the login flow is unchanged.
@@ -168,10 +170,12 @@ export default function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <>
-      {/* Mobile keeps the pill navbar; desktop drops it once the sidebar owns nav. */}
-      <div className={authed ? "md:hidden" : ""}>
-        <Navbar />
-      </div>
+      {/* Signed in, the pill is dropped at EVERY size: the sidebar owns nav on
+          desktop, the tab bar + agent header own it on mobile, and the pill's
+          mobile dropdown only duplicated the tabs while eating the top ~96px
+          of the smallest screens. Signed-out visitors keep it so the login
+          flow is unchanged. */}
+      {!authed && <Navbar />}
 
       {authed && (
         <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-zinc-800/60 bg-zinc-950/70 backdrop-blur-md">
@@ -324,9 +328,20 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </aside>
       )}
 
+      {/* Signed-in mobile: pages scroll INSIDE this container, never the body.
+          iOS Safari and Telegram's in-app browser detach position:fixed
+          elements while the body scrolls, so any page long enough to
+          body-scroll dragged the bottom tab bar with it (first seen on
+          Comms). Locking the body here fixes it for every surface at once.
+          Keyed by pathname so a scrolled page doesn't hand its scroll
+          position to the next route. Desktop keeps body scroll (md:h-auto);
+          signed-out keeps the plain flow so login/marketing are untouched. */}
       <div
+        key={pathname}
         className={`flex-1 flex flex-col min-w-0 ${
-          authed ? "md:pl-16 lg:pl-64" : ""
+          authed
+            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
+            : ""
         }`}
       >
         {children}

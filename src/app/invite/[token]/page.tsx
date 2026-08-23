@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import type { Metadata } from "next";
 import { getInvite, type InviteResponse } from "@/lib/api";
 import InviteWebClaim from "./InviteWebClaim";
@@ -8,13 +9,28 @@ interface PageProps {
   params: Promise<{ token: string }>;
 }
 
-async function fetchInvite(token: string): Promise<InviteResponse | null> {
-  return getInvite(token, { cache: "no-store" });
-}
+// React cache(): generateMetadata + the page body both need the invite —
+// dedupe to ONE butler call per request. "unavailable" = transport/5xx (the
+// invite may well exist; never render not-found for it), null = real 404.
+const fetchInvite = cache(
+  async (token: string): Promise<InviteResponse | null | "unavailable"> => {
+    try {
+      return await getInvite(token, { cache: "no-store" });
+    } catch {
+      return "unavailable";
+    }
+  },
+);
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { token } = await params;
   const invite = await fetchInvite(token);
+  if (invite === "unavailable") {
+    return {
+      title: "You've been sent crypto · SAID Agent",
+      description: "Open the link to claim — sign in with the account it was sent to.",
+    };
+  }
   if (!invite) {
     return {
       title: "Invite not found · SAID Agent",
@@ -23,18 +39,24 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
   const senderName = invite.sender.displayName ?? "Someone";
   const ogTitle = `${senderName} sent you ${invite.amount} ${invite.asset} on SAID`;
+  // Describes the CURRENT flow: open the link, log in with the account it was
+  // sent to, and the money is already there. (The old copy sent people off to
+  // DM a bot, which is a dead end now and cost conversions on the one link
+  // every new user sees.)
+  const ogDescription =
+    "It's already waiting. Log in with the account it was sent to and it's yours.";
   return {
     title: ogTitle,
-    description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+    description: ogDescription,
     openGraph: {
       title: ogTitle,
-      description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+      description: ogDescription,
       type: "website",
     },
     twitter: {
-      card: "summary",
+      card: "summary_large_image",
       title: ogTitle,
-      description: `Claim by chatting with @saidinfrabot on Telegram or @saidagent on X.`,
+      description: ogDescription,
     },
   };
 }
@@ -57,6 +79,27 @@ export default async function InvitePage({ params }: PageProps) {
   const { token } = await params;
   const invite = await fetchInvite(token);
 
+  if (invite === "unavailable") {
+    // Butler blip ≠ dead invite. A recipient clicking "someone sent you money"
+    // must never see a 404 for a transient failure — that reads as a scam.
+    return (
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto flex flex-col items-center justify-center text-center">
+        <p className="text-3xl mb-4">⏳</p>
+        <h1 className="text-xl font-bold mb-2">One moment…</h1>
+        <p className="text-sm text-zinc-400 mb-6">
+          We couldn&apos;t load this invite right now — your funds are safe and
+          the link is still good. Refresh in a few seconds.
+        </p>
+        <a
+          href=""
+          className="px-5 py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200"
+        >
+          Retry
+        </a>
+      </main>
+    );
+  }
+
   if (!invite) notFound();
 
   const senderName = invite.sender.displayName ?? "Someone";
@@ -64,9 +107,9 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "claimed") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
             ← SAID Agent
           </Link>
         </header>
@@ -75,7 +118,7 @@ export default async function InvitePage({ params }: PageProps) {
           <p className="text-sm font-medium text-green-300 mb-1">
             Already claimed
           </p>
-          <p className="text-xs text-zinc-400 mb-3">
+          <p className="text-sm text-zinc-400 mb-3">
             {senderName} sent {invite.amount} {invite.asset} to {recipientLabel}.
             Claimed on {invite.claimedAt ? formatDate(invite.claimedAt) : "—"}.
           </p>
@@ -84,7 +127,7 @@ export default async function InvitePage({ params }: PageProps) {
               href={`https://solscan.io/tx/${invite.claimTx}`}
               target="_blank"
               rel="noreferrer"
-              className="text-xs text-zinc-400 hover:text-zinc-200 underline break-all block mb-4"
+              className="text-sm text-zinc-400 hover:text-zinc-200 underline break-all block mb-4"
             >
               View transaction
             </a>
@@ -102,16 +145,16 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "cancelled") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
             ← SAID Agent
           </Link>
         </header>
         <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
           <p className="text-3xl mb-2">↩</p>
           <p className="text-sm font-medium mb-1">Cancelled</p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             {senderName} cancelled this send. Funds returned to their wallet.
           </p>
           <Link
@@ -127,16 +170,16 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "expired") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
+      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
             ← SAID Agent
           </Link>
         </header>
         <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
           <p className="text-3xl mb-2">⏰</p>
           <p className="text-sm font-medium mb-1">Expired</p>
-          <p className="text-xs text-zinc-500">
+          <p className="text-sm text-zinc-500">
             This invite expired on {formatDate(invite.expiresAt)}. Funds returned to {senderName}.
           </p>
         </section>
@@ -149,9 +192,9 @@ export default async function InvitePage({ params }: PageProps) {
   const xDeepLink = `https://x.com/saidagent`;
 
   return (
-    <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
+    <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
       <header className="mb-6">
-        <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
+        <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
           ← SAID Agent
         </Link>
       </header>
@@ -170,7 +213,7 @@ export default async function InvitePage({ params }: PageProps) {
 
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5 mb-6">
         <h2 className="text-sm font-medium mb-3">Claim your crypto</h2>
-        <p className="text-xs text-zinc-500 mb-4">
+        <p className="text-sm text-zinc-500 mb-4">
           Sign in with the same {platformLabel(invite.recipient.platform)} account
           (@{invite.recipient.handle}) and your funds drop in automatically — no
           need to leave the web.
@@ -217,8 +260,8 @@ export default async function InvitePage({ params }: PageProps) {
 
       <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
-          Funds stay in {senderName}&apos;s wallet until you claim. No custody, no
-          escrow — just a name → wallet route through SAID Protocol.
+          Funds stay in {senderName}&apos;s wallet until you claim — no escrow,
+          the money isn&apos;t parked anywhere. A name → wallet route through SAID Protocol.
         </p>
       </footer>
     </main>

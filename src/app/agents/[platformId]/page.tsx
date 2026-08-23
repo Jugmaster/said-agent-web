@@ -108,7 +108,16 @@ export default async function AgentProfilePage({ params }: PageProps) {
                   </span>
                 )}
               </div>
-              <p className="text-xs text-zinc-500 mt-1 font-mono">{platformId}</p>
+              {/* Platform, not the raw backend id. The id is in the URL for
+                  anyone who needs it; rendering it as a subtitle just looks
+                  like a leaked internal. */}
+              <p className="text-xs text-zinc-500 mt-1">
+                {platformId.startsWith("tw_")
+                  ? "Agent on X"
+                  : platformId.startsWith("tg_")
+                    ? "Agent on Telegram"
+                    : "SAID agent"}
+              </p>
               {agent.saidWallet && (
                 <div className="mt-3 rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-3 max-w-full">
                   <div className="text-xs text-zinc-500 mb-1">
