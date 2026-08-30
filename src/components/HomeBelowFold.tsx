@@ -31,10 +31,10 @@ const IconBolt = () => (
 
 function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
-    <div className="flex-1 min-w-[150px] text-center px-4 py-7 rounded-2xl border border-zinc-800/60 bg-zinc-900/30">
+    <div className="flex-1 min-w-[150px] text-center px-4 py-7 rounded-2xl border border-[var(--line)] bg-[var(--card)]/30">
       <div className="text-3xl sm:text-4xl font-bold tracking-tight tabular-nums">{value}</div>
-      <div className="text-[11px] text-zinc-500 mt-2 uppercase tracking-wider">{label}</div>
-      {sub && <div className="text-[10px] text-zinc-600 mt-1">{sub}</div>}
+      <div className="text-[11px] text-[var(--faint)] mt-2 uppercase tracking-wider">{label}</div>
+      {sub && <div className="text-[10px] text-[var(--faint)] mt-1">{sub}</div>}
     </div>
   );
 }
@@ -79,8 +79,8 @@ export default function HomeBelowFold() {
       <section className="px-6">
         <div className="max-w-3xl mx-auto">
           <div className="flex items-center justify-center gap-2 mb-5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-[11px] text-zinc-500 uppercase tracking-widest">
+            <span className="w-1.5 h-1.5 rounded-full bg-[var(--good)] animate-pulse" />
+            <span className="text-[11px] text-[var(--faint)] uppercase tracking-widest">
               Live on Solana mainnet
             </span>
           </div>
@@ -96,16 +96,16 @@ export default function HomeBelowFold() {
       <section className="px-6 mt-24">
         <div className="max-w-3xl mx-auto text-center mb-10">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">What your agent can do</h2>
-          <p className="text-sm text-zinc-500 mt-2">One chat. One wallet. No seed phrases.</p>
+          <p className="text-sm text-[var(--faint)] mt-2">One chat. One wallet. No seed phrases.</p>
         </div>
         <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CAPABILITIES.map((c) => (
-            <div key={c.title} className="rounded-2xl border border-zinc-800/60 bg-zinc-900/30 px-5 py-5 text-left">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 flex items-center justify-center mb-3">
+            <div key={c.title} className="rounded-2xl border border-[var(--line)] bg-[var(--card)]/30 px-5 py-5 text-left">
+              <div className="w-10 h-10 rounded-xl bg-[rgba(122,167,217,.10)] border border-[rgba(122,167,217,.20)] text-[var(--info)] flex items-center justify-center mb-3">
                 {c.icon}
               </div>
               <div className="font-semibold mb-1">{c.title}</div>
-              <div className="text-sm text-zinc-400 leading-relaxed">{c.body}</div>
+              <div className="text-sm text-[var(--dim)] leading-relaxed">{c.body}</div>
             </div>
           ))}
         </div>
@@ -113,9 +113,9 @@ export default function HomeBelowFold() {
 
       {/* Closing CTA */}
       <section className="px-6 mt-24">
-        <div className="max-w-2xl mx-auto text-center rounded-3xl border border-zinc-800/60 bg-zinc-900/40 px-6 py-12">
+        <div className="max-w-2xl mx-auto text-center rounded-3xl border border-[var(--line)] bg-[var(--card)] px-6 py-12">
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Get your agent</h2>
-          <p className="text-sm text-zinc-400 mb-7 max-w-md mx-auto">
+          <p className="text-sm text-[var(--dim)] mb-7 max-w-md mx-auto">
             Free to start, sponsored onboarding, no SOL required. Activated in one message.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -123,39 +123,39 @@ export default function HomeBelowFold() {
               href="https://t.me/saidinfrabot"
               target="_blank"
               rel="noreferrer"
-              className="w-full sm:w-auto px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+              className="w-full sm:w-auto px-8 py-3 bg-[var(--ink)] text-[var(--bg)] rounded-lg font-semibold hover:opacity-85 transition"
             >
               Start in Telegram →
             </a>
             <button
               onClick={login}
               disabled={!ready}
-              className="w-full sm:w-auto px-8 py-3 border border-zinc-700 rounded-lg font-semibold text-zinc-200 hover:bg-zinc-800/50 disabled:opacity-50 transition"
+              className="w-full sm:w-auto px-8 py-3 border border-[var(--line)] rounded-lg font-semibold text-[var(--ink)] hover:bg-[rgba(128,128,128,.18)]/50 disabled:opacity-50 transition"
             >
               {ready ? "Open web app" : "Loading…"}
             </button>
           </div>
-          <p className="text-[11px] text-zinc-600 mt-5">
+          <p className="text-[11px] text-[var(--faint)] mt-5">
             Agent-managed wallet · keys secured by Privy · no seed phrase
           </p>
         </div>
       </section>
 
       {/* Footer */}
-      <footer className="px-6 mt-24 border-t border-zinc-900 pt-10">
-        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
+      <footer className="px-6 mt-24 border-t border-[var(--line)] pt-10">
+        <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-[var(--faint)]">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-zinc-300">SAID Agent</span>
-            <span className="text-zinc-700">·</span>
+            <span className="font-bold text-[var(--ink)]">SAID Agent</span>
+            <span className="text-[var(--faint)]">·</span>
             <span className="text-xs">on Solana</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
-            <Link href="/agents" className="hover:text-white transition">Agents</Link>
-            <Link href="/stats" className="hover:text-white transition">Stats</Link>
-            <Link href="/docs" className="hover:text-white transition">Docs</Link>
-            <a href="https://x.com/saidagent" target="_blank" rel="noreferrer" className="hover:text-white transition">X</a>
-            <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer" className="hover:text-white transition">Telegram</a>
-            <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer" className="hover:text-white transition">Protocol</a>
+            <Link href="/agents" className="hover:text-[var(--ink)] transition">Agents</Link>
+            <Link href="/stats" className="hover:text-[var(--ink)] transition">Stats</Link>
+            <Link href="/docs" className="hover:text-[var(--ink)] transition">Docs</Link>
+            <a href="https://x.com/saidagent" target="_blank" rel="noreferrer" className="hover:text-[var(--ink)] transition">X</a>
+            <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer" className="hover:text-[var(--ink)] transition">Telegram</a>
+            <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer" className="hover:text-[var(--ink)] transition">Protocol</a>
           </div>
         </div>
       </footer>

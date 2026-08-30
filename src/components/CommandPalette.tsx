@@ -86,7 +86,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
 
   const rowClass = (active: boolean) =>
     `flex w-full items-center gap-3 px-4 py-2.5 text-sm text-left transition ${
-      active ? "bg-zinc-800/80 text-white" : "text-zinc-300 hover:bg-zinc-800/40"
+      active ? "bg-[rgba(128,128,128,.18)]/80 text-[var(--ink)]" : "text-[var(--ink)] hover:bg-[rgba(128,128,128,.12)]"
     }`;
 
   return (
@@ -99,7 +99,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl shadow-black/60"
+        className="w-full max-w-lg overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--bg)]/95 shadow-2xl shadow-black/60"
         onClick={(e) => e.stopPropagation()}
       >
         <input
@@ -113,7 +113,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
           aria-expanded="true"
           aria-controls="cmdk-list"
           aria-activedescendant={rowCount > 0 ? `cmdk-opt-${highlight}` : undefined}
-          className="w-full bg-transparent px-4 py-3.5 text-base sm:text-sm text-white placeholder-zinc-600 focus:outline-none border-b border-zinc-800"
+          className="w-full bg-transparent px-4 py-3.5 text-base sm:text-sm text-[var(--ink)] placeholder-zinc-600 focus:outline-none border-b border-[var(--line)]"
         />
 
         <div ref={listRef} id="cmdk-list" role="listbox" className="max-h-80 overflow-y-auto py-1.5">
@@ -128,10 +128,10 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
               onMouseEnter={() => setHighlight(i)}
               className={rowClass(i === highlight)}
             >
-              {a.icon && <span className="text-zinc-500">{a.icon}</span>}
+              {a.icon && <span className="text-[var(--faint)]">{a.icon}</span>}
               <span className="flex-1">{a.label}</span>
               {a.hint && (
-                <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+                <span className="text-[10px] font-medium uppercase tracking-widest text-[var(--faint)]">
                   {a.hint}
                 </span>
               )}
@@ -148,25 +148,25 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
               onMouseEnter={() => setHighlight(matched.length)}
               className={rowClass(highlight === matched.length)}
             >
-              <span className="text-zinc-500">✦</span>
+              <span className="text-[var(--faint)]">✦</span>
               <span className="flex-1">
                 Ask your agent:{" "}
-                <span className="text-zinc-400">“{query.trim()}”</span>
+                <span className="text-[var(--dim)]">“{query.trim()}”</span>
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-600">
+              <span className="text-[10px] font-medium uppercase tracking-widest text-[var(--faint)]">
                 ↵
               </span>
             </button>
           )}
 
           {rowCount === 0 && (
-            <p className="px-4 py-6 text-center text-sm text-zinc-600">
+            <p className="px-4 py-6 text-center text-sm text-[var(--faint)]">
               Nothing matches.
             </p>
           )}
         </div>
 
-        <div className="flex items-center gap-4 border-t border-zinc-800 px-4 py-2 text-[11px] text-zinc-600">
+        <div className="flex items-center gap-4 border-t border-[var(--line)] px-4 py-2 text-[11px] text-[var(--faint)]">
           <span>↑↓ navigate</span>
           <span>↵ select</span>
           <span>esc close</span>

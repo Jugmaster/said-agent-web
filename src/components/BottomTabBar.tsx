@@ -45,7 +45,7 @@ export default function BottomTabBar() {
 
   return (
     <nav
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex border-t border-zinc-800 bg-zinc-950/90 backdrop-blur-md"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex border-t border-[var(--line)] bg-[var(--bg)] backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       {TABS.map(({ href, label, icon: Icon }) => {
@@ -55,7 +55,7 @@ export default function BottomTabBar() {
             key={href}
             href={href}
             className={`flex-1 flex flex-col items-center justify-center gap-1 h-14 text-[11px] font-medium transition ${
-              active ? "text-white" : "text-zinc-500 hover:text-zinc-300"
+              active ? "text-[var(--ink)]" : "text-[var(--faint)] hover:text-[var(--ink)]"
             }`}
           >
             <Icon />

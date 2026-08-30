@@ -8,13 +8,37 @@ html {
   text-size-adjust: 100%;
 }
 
+/* ─────────────────────────────────────────────────────────────────────────
+   SAID Agent design tokens.
+
+   Same token names and same palette as the protocol site, but inverted:
+   the app is dark by default and light is opt-in, where the marketing site
+   is light by default. One vocabulary, two defaults, so a component moved
+   between the two codebases keeps its meaning.
+
+   The legacy --background/--foreground/--bg-secondary/--border names are
+   kept as aliases: pages still on Tailwind zinc-* classes are being ported
+   surface by surface, and repointing the aliases here means the old and new
+   look agree on the base colours while that is in progress.
+   ───────────────────────────────────────────────────────────────────────── */
 :root {
-  /* Match DotGridBackground bg + vignette tint */
-  --background: #09090b;
-  --foreground: #ffffff;
-  --bg-secondary: #141414;
-  --border: #2a2a2a;
-  --text-secondary: #999;
+  --bg: #101010;
+  --card: #191917;
+  --ink: #f2f0ec;
+  --dim: #a3a09a;
+  --faint: #6b6963;
+  --line: rgba(255, 255, 255, 0.12);
+  --good: #3da35d;
+  --warn: #d9a514;
+  --info: #7aa7d9;
+
+  /* Legacy aliases — see note above. */
+  --background: var(--bg);
+  --foreground: var(--ink);
+  --bg-secondary: var(--card);
+  --border: var(--line);
+  --text-secondary: var(--dim);
+
   /* Mobile bottom tab bar height (incl. iOS home-indicator safe area). */
   --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
   /* Fixed pill navbar height incl. the iOS notch inset. Pages must clear this
@@ -23,11 +47,25 @@ html {
   --navbar-h: calc(3rem + max(1rem, env(safe-area-inset-top)));
 }
 
+html[data-theme="light"] {
+  --bg: #f6f4ef;
+  --card: #efece4;
+  --ink: #101010;
+  --dim: #5c5a54;
+  --faint: #a09d95;
+  --line: rgba(16, 16, 16, 0.12);
+}
+
 html,
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background: var(--bg);
+  color: var(--ink);
   font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+}
+
+::selection {
+  background: var(--ink);
+  color: var(--bg);
 }
 
 button,
@@ -43,12 +81,449 @@ a,
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--bg-secondary);
+  background: var(--card);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: var(--line);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: var(--faint);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────
+   Shared primitives, scoped to .sa (the signed-in app shell).
+
+   Scoped rather than global because the public marketing pages are still
+   Tailwind-only: a bare .card or .fill would reach into them. Surface-specific
+   CSS lives in its own page component; only what more than one surface uses
+   belongs here.
+   ───────────────────────────────────────────────────────────────────────── */
+.sa .mono,
+.sa .kickm,
+.sa .lbl {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+/* Type scale */
+.sa .kick {
+  font-size: 13px;
+  color: var(--faint);
+}
+.sa .kickm {
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+.sa .lbl {
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+.sa .h2 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--dim);
+}
+.sa .big {
+  margin-top: 6px;
+  font-size: clamp(36px, 4.2vw, 50px);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+.sa .subline {
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--dim);
+}
+.sa .subline i {
+  font-style: normal;
+  color: var(--faint);
+  margin: 0 8px;
+}
+
+/* Buttons */
+.sa .fill {
+  padding: 12px 26px;
+  border-radius: 99px;
+  border: none;
+  background: var(--ink);
+  color: var(--bg);
+  font-size: 14px;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+.sa .fill:hover {
+  opacity: 0.85;
+}
+.sa .fill:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.sa .ghost {
+  padding: 12px 22px;
+  border-radius: 99px;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--dim);
+  font-size: 14px;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sa .ghost:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.sa .more {
+  font-size: 11.5px;
+  color: var(--faint);
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+.sa .more:hover {
+  color: var(--dim);
+}
+.sa .outline {
+  margin-top: 10px;
+  display: block;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  padding: 11px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--dim);
+  background: none;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sa .outline:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+
+/* Layout */
+.sa .head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sa .sect {
+  margin-top: 34px;
+}
+
+/* Surfaces. The 1px gap over a --line background is what draws the hairline
+   grid between cells, so cells sit on var(--bg) and never collapse the gap. */
+.sa .card {
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  padding: 18px;
+  background: var(--card);
+}
+.sa .rowgrid {
+  margin-top: 14px;
+  display: grid;
+  gap: 1px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.sa .rrow {
+  display: grid;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+  font-size: 14.5px;
+}
+.sa .rrow .sub {
+  font-size: 12px;
+  color: var(--faint);
+  margin-top: 3px;
+}
+.sa .rrow .num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+/* Stat tiles */
+.sa .tiles {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.sa .tile {
+  border: none;
+  padding: 20px;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+}
+.sa .tile .l {
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  color: var(--faint);
+  text-transform: uppercase;
+}
+.sa .tile .v {
+  margin-top: 6px;
+  font-size: 26px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 760px) {
+  .sa .tiles {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Identity + address */
+.sa .av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.22);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  flex: none;
+}
+.sa .idrow {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+.sa .idrow .av {
+  width: 40px;
+  height: 40px;
+  font-size: 14px;
+}
+.sa .idrow b {
+  display: block;
+  font-size: 14px;
+}
+.sa .vchip {
+  font-size: 12px;
+  color: var(--good);
+}
+.sa .addr {
+  margin-top: 12px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg);
+  padding: 12px 13px;
+  font-family: ui-monospace, Menlo, monospace;
+  font-size: 13px;
+  color: var(--dim);
+  text-align: left;
+  word-break: break-all;
+  transition: color 0.2s;
+}
+.sa .addr:hover {
+  color: var(--ink);
+}
+
+/* Quick-action grid (home) */
+.sa .qa {
+  margin-top: 34px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.sa .qcard {
+  display: block;
+  border: none;
+  padding: 22px 20px;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+  text-align: left;
+  transition: background 0.3s;
+}
+.sa .qcard:hover {
+  background: var(--card);
+}
+.sa .qcard .ic {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: rgba(128, 128, 128, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+  font-size: 15px;
+}
+.sa .qcard b {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+.sa .qcard span:last-child {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--faint);
+}
+@media (max-width: 760px) {
+  .sa .qa {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Holdings grid (home + wallet) */
+.sa .grid3 {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+}
+.sa .hold {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  border: none;
+  padding: 18px 20px;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+  text-align: left;
+}
+.sa .tok {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(128, 128, 128, 0.18);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+  flex: none;
+}
+.sa .hold .m {
+  flex: 1;
+  min-width: 0;
+}
+.sa .hold .m b {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+.sa .hold .m span {
+  font-size: 12px;
+  color: var(--faint);
+  font-variant-numeric: tabular-nums;
+}
+.sa .hold .usd {
+  font-size: 14px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+@media (max-width: 980px) {
+  .sa .grid3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .sa .grid3 {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Compact list rows used in rails */
+.sa .qlist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+}
+.sa .actrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: none;
+  padding: 10px 14px;
+  font-size: 13.5px;
+}
+.sa .actrow .when {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--faint);
+}
+
+/* Two-column surface: content column + right rail.
+   Below 1280px the rail REFLOWS under the column rather than disappearing —
+   hiding it would take the fee disclosure, trust result and call history off
+   screen entirely. */
+.sa .surface {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+}
+.sa .col {
+  flex: 1;
+  min-width: 0;
+  padding: 40px clamp(20px, 3vw, 32px) 48px;
+}
+.sa .rail {
+  width: 320px;
+  flex: none;
+  border-left: 1px solid var(--line);
+  padding: 40px 20px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+@media (max-width: 1280px) {
+  .sa .surface {
+    flex-direction: column;
+  }
+  .sa .rail {
+    width: auto;
+    border-left: none;
+    border-top: 1px solid var(--line);
+    padding: 28px clamp(20px, 3vw, 32px) 48px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 24px;
+  }
+  .sa .rail > section {
+    flex: 1 1 260px;
+    min-width: 0;
+  }
+}
+/* Mobile: the bottom tab bar owns navigation, so surfaces need to clear it. */
+@media (max-width: 767px) {
+  .sa .col {
+    padding: 24px 20px calc(var(--tabbar-h) + 24px);
+  }
+  .sa .rail {
+    padding: 24px 20px calc(var(--tabbar-h) + 24px);
+  }
 }

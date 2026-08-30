@@ -55,23 +55,23 @@ function SendSuccessCard({
   const executed = !!txUrl;
 
   return (
-    <div className="mt-5 rounded-2xl border border-emerald-800/50 bg-gradient-to-b from-emerald-950/40 to-zinc-950 px-5 py-6 text-center">
-      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-300 text-2xl">
+    <div className="mt-5 rounded-2xl border border-[rgba(61,163,93,.35)] bg-gradient-to-b from-[rgba(61,163,93,.10)] to-[var(--bg)] px-5 py-6 text-center">
+      <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--good)]/15 text-[var(--good)] text-2xl">
         {executed ? "✓" : "↗"}
       </div>
-      <div className="text-lg font-semibold text-white">
+      <div className="text-lg font-semibold text-[var(--ink)]">
         {executed ? "Sent" : "On its way"} {amount} {asset}
       </div>
-      <div className="mt-0.5 text-sm text-zinc-400">
-        to <span className="text-zinc-200">{recipient}</span>
+      <div className="mt-0.5 text-sm text-[var(--dim)]">
+        to <span className="text-[var(--ink)]">{recipient}</span>
       </div>
 
       {executed ? (
-        <p className="mt-2 text-xs text-emerald-300/80">
+        <p className="mt-2 text-xs text-[var(--good)]">
           They’ll see it the moment they open SAID.
         </p>
       ) : (
-        <p className="mt-2 text-xs text-zinc-400">
+        <p className="mt-2 text-xs text-[var(--dim)]">
           They’ll get it the moment they open SAID — even if they’re not on it yet.
         </p>
       )}
@@ -82,7 +82,7 @@ function SendSuccessCard({
             href={txUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-medium text-emerald-300 underline underline-offset-2 hover:text-emerald-200"
+            className="text-xs font-medium text-[var(--good)] underline underline-offset-2 hover:text-[var(--good)]"
           >
             View on Solscan ↗
           </a>
@@ -92,7 +92,7 @@ function SendSuccessCard({
             href={inviteUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-medium text-zinc-400 underline underline-offset-2 hover:text-zinc-200"
+            className="text-xs font-medium text-[var(--dim)] underline underline-offset-2 hover:text-[var(--ink)]"
           >
             Share invite link ↗
           </a>
@@ -102,7 +102,7 @@ function SendSuccessCard({
       <button
         type="button"
         onClick={onSendAnother}
-        className="mt-5 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+        className="mt-5 w-full rounded-xl border border-[var(--line)] py-2.5 text-sm font-medium text-[var(--ink)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition"
       >
         Send another
       </button>
@@ -128,19 +128,19 @@ function HowItWorksPanel() {
   ];
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
+      <div className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
+        <h2 className="text-xs font-medium uppercase tracking-wider text-[var(--faint)] mb-4">
           How it works
         </h2>
         <ol className="space-y-4">
           {steps.map((s, i) => (
             <li key={s.title} className="flex gap-3">
-              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-zinc-700 text-[11px] font-semibold text-zinc-400">
+              <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-[var(--line)] text-[11px] font-semibold text-[var(--dim)]">
                 {i + 1}
               </span>
               <div>
-                <div className="text-sm font-medium text-zinc-200">{s.title}</div>
-                <p className="mt-0.5 text-xs leading-relaxed text-zinc-500">
+                <div className="text-sm font-medium text-[var(--ink)]">{s.title}</div>
+                <p className="mt-0.5 text-xs leading-relaxed text-[var(--faint)]">
                   {s.body}
                 </p>
               </div>
@@ -148,9 +148,9 @@ function HowItWorksPanel() {
           ))}
         </ol>
       </div>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 text-xs leading-relaxed text-zinc-500">
-        <span className="text-zinc-300">Prefer typing?</span> Press{" "}
-        <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-300">
+      <div className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5 text-xs leading-relaxed text-[var(--faint)]">
+        <span className="text-[var(--ink)]">Prefer typing?</span> Press{" "}
+        <kbd className="rounded border border-[var(--line)] bg-[rgba(128,128,128,.18)] px-1.5 py-0.5 text-[10px] text-[var(--ink)]">
           ⌘K
         </kbd>{" "}
         anywhere and just say it — “send 5 USDC to @maya”.
@@ -192,31 +192,31 @@ function SendsPanel({
   }
 
   function statusLabel(s: SendRecord): { text: string; cls: string } {
-    if (s.outcome === "executed") return { text: "delivered", cls: "text-emerald-400" };
+    if (s.outcome === "executed") return { text: "delivered", cls: "text-[var(--good)]" };
     if (s.outcome === "pending") {
-      if (s.claimStatus === "claimed") return { text: "claimed", cls: "text-emerald-400" };
-      if (s.claimStatus === "expired") return { text: "expired", cls: "text-zinc-500" };
-      if (s.claimStatus === "cancelled") return { text: "cancelled", cls: "text-zinc-500" };
-      return { text: "awaiting claim", cls: "text-amber-400" };
+      if (s.claimStatus === "claimed") return { text: "claimed", cls: "text-[var(--good)]" };
+      if (s.claimStatus === "expired") return { text: "expired", cls: "text-[var(--faint)]" };
+      if (s.claimStatus === "cancelled") return { text: "cancelled", cls: "text-[var(--faint)]" };
+      return { text: "awaiting claim", cls: "text-[var(--warn)]" };
     }
-    return { text: s.outcome, cls: "text-red-400" };
+    return { text: s.outcome, cls: "text-[#e06c5a]" };
   }
 
   return (
     <div className="flex flex-col gap-8">
       {/* Recent recipients */}
       <section>
-        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--faint)]">
           Recent recipients
         </h2>
         {sends === null ? (
           <div className="flex gap-2">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />
+              <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-[var(--line)] bg-[var(--card)]" />
             ))}
           </div>
         ) : recents.length === 0 ? (
-          <p className="text-xs italic text-zinc-600">
+          <p className="text-xs italic text-[var(--faint)]">
             People you send to appear here for one-tap re-sends.
           </p>
         ) : (
@@ -226,12 +226,12 @@ function SendsPanel({
                 key={s.recipientHandle}
                 type="button"
                 onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : "telegram")}
-                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
+                className="flex items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--card)] py-1.5 pl-1.5 pr-3.5 transition hover:border-[var(--dim)]"
               >
-                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-zinc-200">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-[rgba(128,128,128,.18)] text-[10px] font-semibold text-[var(--ink)]">
                   {s.recipientHandle.slice(0, 1).toUpperCase()}
                 </span>
-                <span className="text-sm text-zinc-200">@{s.recipientHandle}</span>
+                <span className="text-sm text-[var(--ink)]">@{s.recipientHandle}</span>
               </button>
             ))}
           </div>
@@ -240,38 +240,38 @@ function SendsPanel({
 
       {/* Your sends */}
       <section>
-        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
+        <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--faint)]">
           Your sends
         </h2>
         {sends === null ? (
-          <div className="h-32 animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/40" />
+          <div className="h-32 animate-pulse rounded-2xl border border-[var(--line)] bg-[var(--card)]" />
         ) : sends.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
+          <div className="rounded-2xl border border-dashed border-[var(--line)] px-4 py-10 text-center text-sm text-[var(--faint)]">
             No sends yet. Your first one shows up here — with live claim status
             for recipients who aren&apos;t on SAID yet.
           </div>
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-zinc-800">
-            <div className="divide-y divide-zinc-800/60">
+          <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
+            <div className="divide-y divide-[var(--line)]">
               {sends.slice(0, 10).map((s, i) => {
                 const st = statusLabel(s);
                 return (
-                  <div key={`${s.ts}-${i}`} className="flex items-center gap-3 bg-zinc-900/40 px-4 py-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-200">
+                  <div key={`${s.ts}-${i}`} className="flex items-center gap-3 bg-[var(--card)] px-4 py-3">
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(128,128,128,.18)] text-xs font-semibold text-[var(--ink)]">
                       {s.recipientHandle.slice(0, 1).toUpperCase()}
                     </span>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-sm font-medium text-white">
+                      <div className="truncate text-sm font-medium text-[var(--ink)]">
                         @{s.recipientHandle}
-                        <span className="ml-1.5 text-xs text-zinc-500">{s.platform === "x" ? "on X" : "on Telegram"}</span>
+                        <span className="ml-1.5 text-xs text-[var(--faint)]">{s.platform === "x" ? "on X" : "on Telegram"}</span>
                       </div>
                       <div className={`text-xs ${st.cls}`}>{st.text}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-sm font-medium text-zinc-200">
+                      <div className="text-sm font-medium text-[var(--ink)]">
                         {s.amount} {s.asset}
                       </div>
-                      <div className="text-[11px] text-zinc-500">{timeAgo(new Date(s.ts).toISOString())}</div>
+                      <div className="text-[11px] text-[var(--faint)]">{timeAgo(new Date(s.ts).toISOString())}</div>
                     </div>
                   </div>
                 );
@@ -422,7 +422,7 @@ function SendScreen({ platformId }: { platformId: string }) {
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Send</h1>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-[var(--faint)]">
             One handle. Any chain. Your agent figures out the rest.
           </p>
         </div>
@@ -431,18 +431,18 @@ function SendScreen({ platformId }: { platformId: string }) {
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
-            <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--card)] px-4 py-3">
               <div>
-                <div className="text-xs text-zinc-500 mb-0.5">Your balance</div>
+                <div className="text-xs text-[var(--faint)] mb-0.5">Your balance</div>
                 {bal.error ? (
-                  <span className="text-sm text-yellow-500">couldn’t load</span>
+                  <span className="text-sm text-[var(--warn)]">couldn’t load</span>
                 ) : bal.loading ? (
-                  <span className="text-sm text-zinc-500">loading…</span>
+                  <span className="text-sm text-[var(--faint)]">loading…</span>
                 ) : (
                   <div className="flex items-baseline gap-3 text-sm">
-                    <span className="text-zinc-200">{bal.sol.toFixed(4)} SOL</span>
-                    <span className="text-zinc-500">·</span>
-                    <span className="text-zinc-200">{bal.usdc.toFixed(2)} USDC</span>
+                    <span className="text-[var(--ink)]">{bal.sol.toFixed(4)} SOL</span>
+                    <span className="text-[var(--faint)]">·</span>
+                    <span className="text-[var(--ink)]">{bal.usdc.toFixed(2)} USDC</span>
                   </div>
                 )}
               </div>
@@ -450,7 +450,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                 type="button"
                 onClick={() => bal.refetch()}
                 disabled={bal.loading}
-                className="text-xs text-zinc-500 hover:text-zinc-300 disabled:opacity-40 transition"
+                className="text-xs text-[var(--faint)] hover:text-[var(--ink)] disabled:opacity-40 transition"
                 aria-label="Refresh balance"
               >
                 ↻
@@ -459,15 +459,15 @@ function SendScreen({ platformId }: { platformId: string }) {
           )}
 
           {/* Recipient — handle-first */}
-          <label className="block text-xs text-zinc-500 mb-2">RECIPIENT</label>
+          <label className="block text-xs text-[var(--faint)] mb-2">RECIPIENT</label>
           <div className="flex gap-2 mb-2">
             <button
               type="button"
               onClick={() => setPlatform("telegram")}
               className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "telegram"
-                  ? "border-white bg-white text-black"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                  ? "border-white bg-[var(--ink)] text-[var(--bg)]"
+                  : "border-[var(--line)] text-[var(--dim)] hover:border-[var(--ink)]"
               }`}
             >
               Telegram
@@ -477,15 +477,15 @@ function SendScreen({ platformId }: { platformId: string }) {
               onClick={() => setPlatform("x")}
               className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "x"
-                  ? "border-white bg-white text-black"
-                  : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+                  ? "border-white bg-[var(--ink)] text-[var(--bg)]"
+                  : "border-[var(--line)] text-[var(--dim)] hover:border-[var(--ink)]"
               }`}
             >
               X
             </button>
           </div>
           <div className="relative mb-1">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 select-none">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--faint)] select-none">
               @
             </span>
             <input
@@ -497,22 +497,22 @@ function SendScreen({ platformId }: { platformId: string }) {
               autoCorrect="off"
               spellCheck={false}
               inputMode="text"
-              className="w-full pl-9 pr-4 py-3 bg-zinc-900/60 border border-zinc-800 rounded-xl text-base placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+              className="w-full pl-9 pr-4 py-3 bg-[var(--card)] border border-[var(--line)] rounded-xl text-base placeholder-zinc-600 focus:outline-none focus:border-[var(--dim)]"
             />
           </div>
           {handleLooksLikeAddress && (
-            <p className="text-xs text-yellow-500 mb-3">
+            <p className="text-xs text-[var(--warn)] mb-3">
               Looks like a wallet address — use “advanced” below to send to a raw
               address instead.
             </p>
           )}
           {!handleLooksLikeAddress && handleInvalid && (
-            <p className="text-xs text-yellow-500 mb-3">
+            <p className="text-xs text-[var(--warn)] mb-3">
               Handles can only contain letters, numbers and underscores.
             </p>
           )}
           {!handleLooksLikeAddress && !handleInvalid && handle.trim() && (
-            <p className="text-xs text-zinc-500 mb-3">
+            <p className="text-xs text-[var(--faint)] mb-3">
               If they don’t have a SAID agent yet, your funds stay in your wallet
               and they get an invite link to claim them.
             </p>
@@ -520,7 +520,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           {!handle.trim() && <div className="mb-3" />}
 
           {/* Amount + asset */}
-          <label className="block text-xs text-zinc-500 mb-2">AMOUNT</label>
+          <label className="block text-xs text-[var(--faint)] mb-2">AMOUNT</label>
           <div className="flex gap-2 mb-1">
             <input
               type="number"
@@ -530,9 +530,9 @@ function SendScreen({ platformId }: { platformId: string }) {
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0"
-              className="flex-1 min-w-0 px-4 py-3 bg-zinc-900/60 border border-zinc-800 rounded-xl text-2xl font-semibold placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+              className="flex-1 min-w-0 px-4 py-3 bg-[var(--card)] border border-[var(--line)] rounded-xl text-2xl font-semibold placeholder-zinc-600 focus:outline-none focus:border-[var(--dim)]"
             />
-            <div className="flex bg-zinc-900/60 border border-zinc-800 rounded-xl overflow-hidden">
+            <div className="flex bg-[var(--card)] border border-[var(--line)] rounded-xl overflow-hidden">
               {(["USDC", "SOL"] as Asset[]).map((a) => (
                 <button
                   key={a}
@@ -540,8 +540,8 @@ function SendScreen({ platformId }: { platformId: string }) {
                   onClick={() => setAsset(a)}
                   className={`px-4 py-3 text-sm font-semibold transition ${
                     asset === a
-                      ? "bg-white text-black"
-                      : "text-zinc-400 hover:text-white"
+                      ? "bg-[var(--ink)] text-[var(--bg)]"
+                      : "text-[var(--dim)] hover:text-[var(--ink)]"
                   }`}
                 >
                   {a}
@@ -549,7 +549,7 @@ function SendScreen({ platformId }: { platformId: string }) {
               ))}
             </div>
           </div>
-          <div className="mb-6 flex justify-between text-xs text-zinc-500">
+          <div className="mb-6 flex justify-between text-xs text-[var(--faint)]">
             <span>
               {asset === "USDC"
                 ? "Sent on Solana, settles in seconds."
@@ -562,7 +562,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                   const max = maxSendable(asset, bal.sol, bal.usdc);
                   setAmount(asset === "SOL" ? max.toFixed(4) : max.toFixed(2));
                 }}
-                className="font-semibold text-zinc-400 hover:text-white transition"
+                className="font-semibold text-[var(--dim)] hover:text-[var(--ink)] transition"
               >
                 Max: {asset === "SOL"
                   ? `${maxSendable(asset, bal.sol, bal.usdc).toFixed(4)} SOL`
@@ -575,9 +575,9 @@ function SendScreen({ platformId }: { platformId: string }) {
           <details
             open={advancedOpen}
             onToggle={(e) => setAdvancedOpen((e.target as HTMLDetailsElement).open)}
-            className="mb-6 border border-zinc-800 rounded-xl px-4 py-3 bg-zinc-900/40"
+            className="mb-6 border border-[var(--line)] rounded-xl px-4 py-3 bg-[var(--card)]"
           >
-            <summary className="cursor-pointer text-xs text-zinc-500 select-none">
+            <summary className="cursor-pointer text-xs text-[var(--faint)] select-none">
               Send to a wallet address instead
             </summary>
             <div className="pt-3">
@@ -589,14 +589,14 @@ function SendScreen({ platformId }: { platformId: string }) {
                 autoCapitalize="none"
                 autoCorrect="off"
                 spellCheck={false}
-                className="w-full px-3 py-2 bg-zinc-950 border border-zinc-800 rounded-lg text-base sm:text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-zinc-600"
+                className="w-full px-3 py-2 bg-[var(--bg)] border border-[var(--line)] rounded-lg text-base sm:text-sm font-mono placeholder-zinc-600 focus:outline-none focus:border-[var(--dim)]"
               />
               {addrInvalid ? (
-                <p className="text-xs text-yellow-500 mt-2">
+                <p className="text-xs text-[var(--warn)] mt-2">
                   That doesn’t look like a valid Solana address.
                 </p>
               ) : (
-                <p className="text-xs text-zinc-500 mt-2">
+                <p className="text-xs text-[var(--faint)] mt-2">
                   Overrides the @handle above when filled.
                 </p>
               )}
@@ -606,7 +606,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           {/* Submit — two-step: review, then confirm. Money only moves on the
               explicit confirm click. */}
           {overBalance && (
-            <p className="mb-2 text-xs text-yellow-500">
+            <p className="mb-2 text-xs text-[var(--warn)]">
               That’s more than you can send — max{" "}
               {asset === "SOL"
                 ? `${maxSendable(asset, bal.sol, bal.usdc).toFixed(4)} SOL`
@@ -615,14 +615,14 @@ function SendScreen({ platformId }: { platformId: string }) {
             </p>
           )}
           {confirming && canSubmit ? (
-            <div className="rounded-xl border border-zinc-700 bg-zinc-900/60 p-4">
-              <p className="text-sm text-zinc-200 text-center">
+            <div className="rounded-xl border border-[var(--line)] bg-[var(--card)] p-4">
+              <p className="text-sm text-[var(--ink)] text-center">
                 Send{" "}
-                <span className="font-semibold text-white">
+                <span className="font-semibold text-[var(--ink)]">
                   {amount} {asset}
                 </span>{" "}
                 to{" "}
-                <span className="font-semibold text-white break-all">
+                <span className="font-semibold text-[var(--ink)] break-all">
                   {addr ? addr : `@${handleNorm} on ${platform === "x" ? "X" : "Telegram"}`}
                 </span>
                 ?
@@ -631,7 +631,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                 <button
                   type="button"
                   onClick={() => setConfirming(false)}
-                  className="flex-1 py-3 rounded-xl border border-zinc-700 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+                  className="flex-1 py-3 rounded-xl border border-[var(--line)] text-sm font-medium text-[var(--ink)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition"
                 >
                   Cancel
                 </button>
@@ -639,7 +639,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                   type="button"
                   onClick={() => void submit()}
                   disabled={sending}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85 transition disabled:opacity-50"
                 >
                   {sending ? "Sending…" : "Confirm send"}
                 </button>
@@ -649,7 +649,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             <button
               onClick={() => setConfirming(true)}
               disabled={!canSubmit}
-              className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="w-full py-3.5 bg-[var(--ink)] text-[var(--bg)] rounded-xl font-semibold hover:opacity-85 disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               {sending
                 ? "Sending…"
@@ -675,17 +675,17 @@ function SendScreen({ platformId }: { platformId: string }) {
             />
           )}
           {result?.kind === "info" && (
-            <div className="mt-5 px-4 py-4 rounded-xl border border-zinc-700 bg-zinc-900/60 text-zinc-200 whitespace-pre-wrap break-words text-sm">
+            <div className="mt-5 px-4 py-4 rounded-xl border border-[var(--line)] bg-[var(--card)] text-[var(--ink)] whitespace-pre-wrap break-words text-sm">
               <MessageText text={result.message} />
             </div>
           )}
           {result?.kind === "waitlist" && (
-            <div className="mt-5 px-5 py-6 rounded-xl border border-indigo-800/50 bg-gradient-to-b from-indigo-950/40 to-zinc-950 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/15 text-2xl">
+            <div className="mt-5 px-5 py-6 rounded-xl border border-[rgba(122,167,217,.30)] bg-gradient-to-b from-[rgba(122,167,217,.10)] to-[var(--bg)] text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[rgba(122,167,217,.15)] text-2xl">
                 ✦
               </div>
-              <div className="text-lg font-semibold text-white">You&apos;re on the list</div>
-              <p className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap break-words">
+              <div className="text-lg font-semibold text-[var(--ink)]">You&apos;re on the list</div>
+              <p className="mt-2 text-sm text-[var(--ink)] whitespace-pre-wrap break-words">
                 <MessageText text={result.message} />
               </p>
             </div>
@@ -696,9 +696,9 @@ function SendScreen({ platformId }: { platformId: string }) {
             </div>
           )}
 
-          <p className="mt-8 text-center text-xs text-zinc-600">
+          <p className="mt-8 text-center text-xs text-[var(--faint)]">
             Need something else?{" "}
-            <Link href="/chat" className="text-zinc-400 hover:text-white">
+            <Link href="/chat" className="text-[var(--dim)] hover:text-[var(--ink)]">
               Ask your agent
             </Link>
           </p>
@@ -724,7 +724,7 @@ function SendScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT RAIL — matches the app's context-panel pattern */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-[var(--line)] p-5 pt-10 xl:flex">
         <HowItWorksPanel />
       </aside>
     </div>

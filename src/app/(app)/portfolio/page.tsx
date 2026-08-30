@@ -79,26 +79,26 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
   const identityCard = (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <section className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
+        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[rgba(128,128,128,.22)] to-[rgba(128,128,128,.18)] text-sm font-semibold text-[var(--ink)]">
           {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your agent"}</div>
+          <div className="truncate text-sm font-semibold text-[var(--ink)]">{balance?.displayName ?? "Your agent"}</div>
           <div className="text-xs">
-            {balance?.verified ? <span className="text-emerald-400">● Verified</span> : balance?.registered ? <span className="text-amber-400">● Registered</span> : <span className="text-zinc-500">○ Unverified</span>}
-            {balance && balance.proTier > 0 && <span className="ml-2 text-amber-400">Pro</span>}
+            {balance?.verified ? <span className="text-[var(--good)]">● Verified</span> : balance?.registered ? <span className="text-[var(--warn)]">● Registered</span> : <span className="text-[var(--faint)]">○ Unverified</span>}
+            {balance && balance.proTier > 0 && <span className="ml-2 text-[var(--warn)]">Pro</span>}
           </div>
         </div>
       </div>
       {balance?.saidWallet && (
-        <button onClick={() => void copy(balance.saidWallet!)} className="mt-3 w-full rounded-lg border border-zinc-800/70 bg-zinc-950/50 px-3 py-3 text-left font-mono text-sm text-zinc-400 hover:text-zinc-200">
+        <button onClick={() => void copy(balance.saidWallet!)} className="mt-3 w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-3 text-left font-mono text-sm text-[var(--dim)] hover:text-[var(--ink)]">
           {truncMiddle(balance.saidWallet, 6, 6)} {copied ? "✓" : "⧉"}
         </button>
       )}
       {balance?.saidPda && (
-        <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="mt-3 block rounded-lg border border-zinc-800 py-3 text-center text-sm font-medium text-zinc-300 transition hover:border-zinc-600 hover:text-white">
+        <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="mt-3 block rounded-lg border border-[var(--line)] py-3 text-center text-sm font-medium text-[var(--ink)] transition hover:border-[var(--dim)] hover:text-[var(--ink)]">
           Public profile →
         </Link>
       )}
@@ -112,31 +112,31 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
         {/* Hero */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-sm text-zinc-500">
+            <div className="flex items-center gap-2 text-sm text-[var(--faint)]">
               <span>Total value</span>
               {balance?.verified ? (
-                <span className="text-emerald-400">· Verified</span>
+                <span className="text-[var(--good)]">· Verified</span>
               ) : balance?.registered ? (
-                <span className="text-amber-400">· Registered</span>
+                <span className="text-[var(--warn)]">· Registered</span>
               ) : null}
             </div>
-            <div className="mt-1 text-4xl font-semibold tracking-tight text-white md:text-5xl">
-              {main == null && !error ? <span className="text-zinc-700">$·····</span> : fmtUsd(total)}
+            <div className="mt-1 text-4xl font-semibold tracking-tight text-[var(--ink)] md:text-5xl">
+              {main == null && !error ? <span className="text-[var(--faint)]">$·····</span> : fmtUsd(total)}
             </div>
-            <div className="mt-1.5 text-sm text-zinc-400">
+            <div className="mt-1.5 text-sm text-[var(--dim)]">
               {main ? `${main.solBalance.toFixed(4)} SOL · ${holdings.length} token${holdings.length === 1 ? "" : "s"}` : "—"}
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <button onClick={() => void load()} disabled={refreshing} className="rounded-xl border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 transition hover:border-zinc-500 disabled:opacity-40">
+            <button onClick={() => void load()} disabled={refreshing} className="rounded-xl border border-[var(--line)] px-4 py-2.5 text-sm text-[var(--ink)] transition hover:border-[var(--ink)] disabled:opacity-40">
               {refreshing ? "Refreshing…" : "↻ Refresh"}
             </button>
             {balance?.saidWallet ? (
-              <button onClick={() => setFunding(true)} className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+              <button onClick={() => setFunding(true)} className="rounded-xl bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-[var(--bg)] transition hover:opacity-85">
                 Add funds
               </button>
             ) : (
-              <Link href="/fund" className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+              <Link href="/fund" className="rounded-xl bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-[var(--bg)] transition hover:opacity-85">
                 Set up agent
               </Link>
             )}
@@ -149,24 +149,24 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
         {/* Holdings */}
         <section className="mb-9">
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">Holdings</h2>
-          <div className="overflow-hidden rounded-2xl border border-zinc-800">
+          <h2 className="mb-3 text-sm font-medium text-[var(--ink)]">Holdings</h2>
+          <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
             {main == null && !error ? (
-              <div className="divide-y divide-zinc-800/60">
+              <div className="divide-y divide-[var(--line)]">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-16 animate-pulse bg-zinc-900/40" />
+                  <div key={i} className="h-16 animate-pulse bg-[var(--card)]" />
                 ))}
               </div>
             ) : (
-              <div className="divide-y divide-zinc-800/60">
+              <div className="divide-y divide-[var(--line)]">
                 <HoldingRow symbol="SOL" balance={main?.solBalance ?? 0} usd={main?.solUsdValue ?? null} />
                 {holdings.map((t) => (
                   <HoldingRow key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} />
                 ))}
                 {holdings.length === 0 && (main?.solBalance ?? 0) === 0 && (
-                  <div className="px-4 py-6 text-center text-sm text-zinc-500">
+                  <div className="px-4 py-6 text-center text-sm text-[var(--faint)]">
                     Nothing here yet.{" "}
-                    <button onClick={() => setFunding(true)} className="text-zinc-300 underline underline-offset-2 hover:text-white">
+                    <button onClick={() => setFunding(true)} className="text-[var(--ink)] underline underline-offset-2 hover:text-[var(--ink)]">
                       Add funds
                     </button>
                   </div>
@@ -186,7 +186,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT PANEL */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-[var(--line)] p-5 pt-10 xl:flex">
 {identityCard}
         <RecentActivity receipts={receipts} />
       </aside>
@@ -207,17 +207,17 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
 function HoldingRow({ symbol, balance, usd }: { symbol: string; balance: number; usd: number | null }) {
   return (
-    <div className="flex items-center gap-3 bg-zinc-900/40 px-4 py-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-200">
+    <div className="flex items-center gap-3 bg-[var(--card)] px-4 py-3">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(128,128,128,.18)] text-xs font-semibold text-[var(--ink)]">
         {symbol.slice(0, 3).toUpperCase()}
       </div>
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold text-white">{symbol}</div>
-        <div className="truncate text-xs text-zinc-500">
+        <div className="truncate text-sm font-semibold text-[var(--ink)]">{symbol}</div>
+        <div className="truncate text-xs text-[var(--faint)]">
           {balance.toLocaleString(undefined, { maximumFractionDigits: balance < 1 ? 6 : 4 })}
         </div>
       </div>
-      <div className="text-right text-sm font-medium text-zinc-200">{usd != null && usd > 0 ? fmtUsd(usd) : "—"}</div>
+      <div className="text-right text-sm font-medium text-[var(--ink)]">{usd != null && usd > 0 ? fmtUsd(usd) : "—"}</div>
     </div>
   );
 }
@@ -226,22 +226,22 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
   return (
     <section>
       <div className="mb-2 flex items-baseline justify-between">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">Recent activity</h2>
-        <Link href="/activity" className="-my-1 py-2 text-sm text-zinc-400 transition hover:text-zinc-200">View all →</Link>
+        <h2 className="text-xs font-medium uppercase tracking-wider text-[var(--faint)]">Recent activity</h2>
+        <Link href="/activity" className="-my-1 py-2 text-sm text-[var(--dim)] transition hover:text-[var(--ink)]">View all →</Link>
       </div>
       {receipts === null ? (
-        <p className="text-xs text-zinc-600">Loading…</p>
+        <p className="text-xs text-[var(--faint)]">Loading…</p>
       ) : receipts.length === 0 ? (
-        <p className="text-xs italic text-zinc-600">Nothing on-chain yet.</p>
+        <p className="text-xs italic text-[var(--faint)]">Nothing on-chain yet.</p>
       ) : (
         <div className="flex flex-col gap-1.5">
           {receipts.map((r) => {
             const label = actionLabel(r.type);
             return (
-              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2">
                 <span className="text-base leading-none">{label.emoji}</span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
-                <span className="text-[11px] text-zinc-500">{timeAgo(r.occurredAt)}</span>
+                <span className="text-[11px] text-[var(--faint)]">{timeAgo(r.occurredAt)}</span>
               </div>
             );
           })}

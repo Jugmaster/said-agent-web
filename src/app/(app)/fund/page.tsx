@@ -80,13 +80,13 @@ function FundScreen({ platformId }: { platformId: string }) {
         <h1 className="text-xl font-semibold">Fund your agent</h1>
         <Link
           href="/portfolio"
-          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
+          className="text-xs px-3 py-1 rounded-md border border-[var(--line)] hover:border-[var(--ink)]"
         >
           Back
         </Link>
       </header>
 
-      {loading && <p className="text-sm text-zinc-500">Loading…</p>}
+      {loading && <p className="text-sm text-[var(--faint)]">Loading…</p>}
 
       {error && (
         <div className="bg-red-950/30 border border-red-900 rounded-xl px-4 py-3 text-sm text-red-300">
@@ -100,12 +100,12 @@ function FundScreen({ platformId }: { platformId: string }) {
           <p className="text-sm font-medium text-green-300 mb-1">
             {balance.displayName ?? "Your agent"} is verified
           </p>
-          <p className="text-xs text-zinc-400 mb-4">
+          <p className="text-xs text-[var(--dim)] mb-4">
             On-chain identity active. Pro features unlocked.
           </p>
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85 transition"
           >
             Open chat →
           </Link>
@@ -114,8 +114,8 @@ function FundScreen({ platformId }: { platformId: string }) {
 
       {balance && !balance.verified && balance.saidWallet && (
         <>
-          <p className="text-sm text-zinc-400 mb-6">
-            Activation is <span className="text-zinc-100 font-medium">free and automatic</span> —
+          <p className="text-sm text-[var(--dim)] mb-6">
+            Activation is <span className="text-[var(--ink)] font-medium">free and automatic</span> —
             no deposit needed. Top up your agent&apos;s wallet here so it can
             swap, send, and buy: send SOL or USDC to the address below.
           </p>
@@ -123,30 +123,30 @@ function FundScreen({ platformId }: { platformId: string }) {
           {qrSvg && (
             <div className="flex justify-center mb-6">
               <div
-                className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4"
+                className="bg-[var(--card)] border border-[var(--line)] rounded-2xl p-4"
                 dangerouslySetInnerHTML={{ __html: qrSvg }}
               />
             </div>
           )}
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 mb-4">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3 mb-4">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-xs text-zinc-500">Wallet address</span>
+              <span className="text-xs text-[var(--faint)]">Wallet address</span>
               <button
                 onClick={copyAddress}
-                className="text-xs px-2 py-0.5 rounded bg-zinc-800 hover:bg-zinc-700"
+                className="text-xs px-2 py-0.5 rounded bg-[rgba(128,128,128,.18)] hover:bg-[rgba(128,128,128,.22)]"
               >
                 {copied ? "copied" : "copy"}
               </button>
             </div>
-            <code className="text-xs text-zinc-300 break-all block">
+            <code className="text-xs text-[var(--ink)] break-all block">
               {balance.saidWallet}
             </code>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-500">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3 text-xs text-[var(--faint)]">
             <p className="mb-2">
-              <span className="text-zinc-300">Tip:</span> Scan the QR with any
+              <span className="text-[var(--ink)]">Tip:</span> Scan the QR with any
               Solana wallet app (Phantom, Solflare, Backpack) to auto-fill the
               address.
             </p>
@@ -164,7 +164,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           agent gets provisioned on first message.
           <Link
             href="/chat"
-            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85 transition"
           >
             Open chat →
           </Link>

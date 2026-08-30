@@ -176,7 +176,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {!authed && <Navbar />}
 
       {authed && (
-        <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-zinc-800/60 bg-zinc-950/70 backdrop-blur-md">
+        <aside className="sa hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-[264px] flex-col border-r border-[var(--line)] bg-[var(--card)]">
           <Link
             href="/"
             className="flex h-16 items-center justify-center lg:justify-start gap-2.5 px-3 lg:px-5 shrink-0"
@@ -191,7 +191,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               className="h-[22px] w-auto"
               priority
             />
-            <span className="hidden lg:inline text-sm font-bold tracking-wide">
+            <span className="hidden lg:inline text-[15px] font-bold">
               SAID Agent
             </span>
           </Link>
@@ -204,15 +204,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
                   key={href}
                   href={href}
                   title={`${label} — press g then ${key}`}
-                  className={`group flex items-center justify-center lg:justify-start gap-3 rounded-lg px-2.5 lg:px-3 py-2.5 text-sm font-medium transition ${
+                  className={`group flex items-center justify-center lg:justify-start gap-3 rounded-full px-2.5 lg:px-[13px] py-2.5 text-sm font-medium transition ${
                     active
-                      ? "bg-zinc-800/70 text-white"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/40"
+                      ? "bg-[rgba(128,128,128,.18)] text-[var(--ink)]"
+                      : "text-[var(--dim)] hover:text-[var(--ink)] hover:bg-[rgba(128,128,128,.12)]"
                   }`}
                 >
                   <Icon className="w-5 h-5 shrink-0" />
                   <span className="hidden lg:inline flex-1">{label}</span>
-                  <span className="hidden lg:inline text-[10px] uppercase tracking-widest text-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <span className="hidden lg:inline font-mono text-[10px] uppercase tracking-[.14em] text-[var(--faint)] opacity-0 group-hover:opacity-100 transition-opacity">
                     g&thinsp;{key}
                   </span>
                 </Link>
@@ -222,13 +222,13 @@ export default function AppShell({ children }: { children: ReactNode }) {
             <button
               type="button"
               onClick={() => setPaletteOpen(true)}
-              className="hidden lg:flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-zinc-500 hover:text-white hover:bg-zinc-800/40 transition"
+              className="hidden lg:flex items-center gap-3 rounded-full px-[13px] py-2.5 text-sm text-[var(--faint)] hover:text-[var(--ink)] hover:bg-[rgba(128,128,128,.12)] transition"
             >
               <span className="w-5 h-5 flex items-center justify-center text-base leading-none">
                 ⌘
               </span>
               <span className="flex-1 text-left">Command</span>
-              <span className="text-[10px] uppercase tracking-widest text-zinc-700">
+              <span className="font-mono text-[10px] uppercase tracking-[.14em] text-[var(--faint)]">
                 ⌘k
               </span>
             </button>
@@ -239,21 +239,21 @@ export default function AppShell({ children }: { children: ReactNode }) {
           {/* Live balance + top-up. Full card at lg; a bare "+" on the icon rail. */}
           {walletAddress && (
             <>
-              <div className="hidden lg:block mx-3 mb-3 rounded-xl border border-zinc-800 bg-zinc-900/50 p-3">
-                <div className="text-[11px] text-zinc-500 mb-1.5">Balance</div>
+              <div className="hidden lg:block mx-3 mb-3 rounded-[20px] border border-[var(--line)] bg-[var(--bg)] p-4">
+                <div className="font-mono text-[10.5px] uppercase tracking-[.16em] text-[var(--faint)]">Balance</div>
                 {bal.error ? (
-                  <div className="text-xs text-yellow-600">unavailable</div>
+                  <div className="text-xs text-[var(--warn)]">unavailable</div>
                 ) : bal.loading && totalUsd == null ? (
-                  <div className="text-xs text-zinc-600">loading…</div>
+                  <div className="text-xs text-[var(--faint)]">loading…</div>
                 ) : (
                   <>
                     {/* Headline = total portfolio value in USD (all holdings). */}
-                    <div className="text-xl font-semibold tabular-nums text-white">
+                    <div className="mt-1.5 text-[22px] font-medium tracking-[-.02em] tabular-nums text-[var(--ink)]">
                       {totalUsd != null
                         ? `$${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
                         : "$—"}
                     </div>
-                    <div className="mt-1 space-y-0.5 text-xs text-zinc-500">
+                    <div className="mt-1 space-y-0.5 text-xs text-[var(--faint)]">
                       <div className="flex items-baseline justify-between">
                         <span>{bal.sol.toFixed(4)}</span>
                         <span>SOL</span>
@@ -268,7 +268,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setFunding(true)}
-                  className="mt-2.5 w-full rounded-lg bg-white text-black text-xs font-semibold py-2 hover:bg-zinc-200 transition"
+                  className="mt-3 w-full rounded-full bg-[var(--ink)] text-[var(--bg)] text-[12.5px] font-medium py-2.5 hover:opacity-85 transition"
                 >
                   Add funds
                 </button>
@@ -277,29 +277,29 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={() => setFunding(true)}
                 title="Add funds"
-                className="lg:hidden mx-auto mb-3 flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-600 transition"
+                className="lg:hidden mx-auto mb-3 flex h-9 w-9 items-center justify-center rounded-full border border-[var(--line)] text-[var(--dim)] hover:text-[var(--ink)] hover:border-[var(--ink)] transition"
               >
                 <PlusIcon className="w-4 h-4" />
               </button>
             </>
           )}
 
-          <div className="border-t border-zinc-800/60 px-2 lg:px-3 py-3">
+          <div className="border-t border-[var(--line)] px-2 lg:px-4 py-3.5">
             <div className="flex items-center justify-center lg:justify-start gap-2.5 px-0.5 lg:px-1">
               <span
                 title={agentName ?? undefined}
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[rgba(128,128,128,.22)] text-xs font-semibold"
               >
                 {(agentName?.[0] ?? "•").toUpperCase()}
               </span>
               <div className="hidden lg:block min-w-0 flex-1">
-                <div className="truncate text-sm text-zinc-200">
+                <div className="truncate text-[13px] text-[var(--ink)]">
                   {agentName ?? "Your agent"}
                 </div>
                 {platformId && (
                   <Link
                     href={`/agents/${encodeURIComponent(platformId)}`}
-                    className="text-[11px] text-zinc-500 hover:text-zinc-300 transition"
+                    className="text-[11px] text-[var(--faint)] hover:text-[var(--dim)] transition"
                   >
                     Public profile →
                   </Link>
@@ -309,7 +309,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 type="button"
                 onClick={agent.logout}
                 title="Log out"
-                className="hidden lg:flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800/60 transition"
+                className="hidden lg:flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[var(--faint)] hover:text-[#e06c5a] hover:bg-[rgba(128,128,128,.14)] transition"
               >
                 <LogoutIcon className="w-4 h-4" />
               </button>
@@ -318,7 +318,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
               type="button"
               onClick={agent.logout}
               title="Log out"
-              className="lg:hidden mx-auto mt-2 flex h-8 w-8 items-center justify-center rounded-lg text-zinc-500 hover:text-red-400 hover:bg-zinc-800/60 transition"
+              className="lg:hidden mx-auto mt-2 flex h-[30px] w-[30px] items-center justify-center rounded-[9px] text-[var(--faint)] hover:text-[#e06c5a] hover:bg-[rgba(128,128,128,.14)] transition"
             >
               <LogoutIcon className="w-4 h-4" />
             </button>
@@ -336,9 +336,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
           signed-out keeps the plain flow so login/marketing are untouched. */}
       <div
         key={pathname}
-        className={`flex-1 flex flex-col min-w-0 ${
+        className={`sa flex-1 flex flex-col min-w-0 ${
           authed
-            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
+            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-[264px]"
             : ""
         }`}
       >

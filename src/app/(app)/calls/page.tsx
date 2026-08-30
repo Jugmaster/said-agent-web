@@ -20,10 +20,10 @@ function StatusBadge({ status }: { status: string }) {
   const map: Record<string, { label: string; cls: string }> = {
     routing: { label: "Preparing…", cls: "bg-amber-500/10 text-amber-300 border-amber-800" },
     in_progress: { label: "Calling…", cls: "bg-sky-500/10 text-sky-300 border-sky-800" },
-    completed: { label: "Completed", cls: "bg-emerald-500/10 text-emerald-300 border-emerald-800" },
+    completed: { label: "Completed", cls: "bg-[var(--good)]/10 text-[var(--good)] border-[rgba(61,163,93,.35)]" },
     failed: { label: "Failed", cls: "bg-red-500/10 text-red-300 border-red-900" },
   };
-  const m = map[status] ?? { label: status, cls: "bg-zinc-800 text-zinc-300 border-zinc-700" };
+  const m = map[status] ?? { label: status, cls: "bg-[rgba(128,128,128,.18)] text-[var(--ink)] border-[var(--line)]" };
   return (
     <span className={`text-[11px] px-2 py-0.5 rounded-full border ${m.cls}`}>{m.label}</span>
   );
@@ -33,21 +33,21 @@ function CallCard({ call }: { call: CommsCallRecord }) {
   const [open, setOpen] = useState(false);
   const hasDetail = call.summary || call.transcript || call.recordingUrl;
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3">
+    <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
             <span className="font-mono text-sm">{call.to}</span>
             <StatusBadge status={call.status} />
           </div>
-          <p className="text-xs text-zinc-400 mt-1 truncate">{call.task}</p>
+          <p className="text-xs text-[var(--dim)] mt-1 truncate">{call.task}</p>
         </div>
         <div className="text-right shrink-0">
-          <p className="text-[11px] text-zinc-500">{timeAgo(call.createdAt.replace(" ", "T") + "Z")}</p>
+          <p className="text-[11px] text-[var(--faint)]">{timeAgo(call.createdAt.replace(" ", "T") + "Z")}</p>
           {hasDetail && (
             <button
               onClick={() => setOpen(!open)}
-              className="text-xs text-zinc-300 underline mt-1"
+              className="text-xs text-[var(--ink)] underline mt-1"
             >
               {open ? "Hide" : call.kind === "email" ? "Message" : "Transcript"}
             </button>
@@ -55,27 +55,27 @@ function CallCard({ call }: { call: CommsCallRecord }) {
         </div>
       </div>
       {call.status === "failed" && call.error && (
-        <p className="text-xs text-red-400 mt-2">{call.error}</p>
+        <p className="text-xs text-[#e06c5a] mt-2">{call.error}</p>
       )}
       {open && (
-        <div className="mt-3 pt-3 border-t border-zinc-800 space-y-3">
+        <div className="mt-3 pt-3 border-t border-[var(--line)] space-y-3">
           {call.summary && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Summary</p>
-              <p className="text-sm text-zinc-300">{call.summary}</p>
+              <p className="text-[11px] uppercase tracking-wide text-[var(--faint)] mb-1">Summary</p>
+              <p className="text-sm text-[var(--ink)]">{call.summary}</p>
             </div>
           )}
           {call.transcript && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">{call.kind === "email" ? "Message" : "Transcript"}</p>
-              <pre className="text-xs text-zinc-400 whitespace-pre-wrap font-sans max-h-72 overflow-y-auto">
+              <p className="text-[11px] uppercase tracking-wide text-[var(--faint)] mb-1">{call.kind === "email" ? "Message" : "Transcript"}</p>
+              <pre className="text-xs text-[var(--dim)] whitespace-pre-wrap font-sans max-h-72 overflow-y-auto">
                 {formatTranscript(call.transcript)}
               </pre>
             </div>
           )}
           {call.recordingUrl && (
             <div>
-              <p className="text-[11px] uppercase tracking-wide text-zinc-500 mb-1">Recording</p>
+              <p className="text-[11px] uppercase tracking-wide text-[var(--faint)] mb-1">Recording</p>
               <audio controls src={call.recordingUrl} className="w-full" />
             </div>
           )}
@@ -205,20 +205,20 @@ function CallsInner({ platformId }: { platformId: string }) {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Comms</h1>
-        <p className="text-sm text-zinc-400 mt-1">
+        <p className="text-sm text-[var(--dim)] mt-1">
           Your agent calls, emails, and (soon) texts on your behalf — paid from
           your balance, only when it works. Transcripts and recordings land
           here.
         </p>
       </div>
 
-      <div className="flex gap-1 mb-5 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
+      <div className="flex gap-1 mb-5 bg-[var(--card)] border border-[var(--line)] rounded-xl p-1 w-fit">
         {(["call", "email", "text"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
             className={`px-4 py-2.5 rounded-lg text-sm font-medium capitalize transition ${
-              tab === t ? "bg-zinc-100 text-zinc-900" : "text-zinc-400 hover:text-zinc-200"
+              tab === t ? "bg-[var(--ink)] text-[var(--bg)]" : "text-[var(--dim)] hover:text-[var(--ink)]"
             }`}
           >
             {t}
@@ -227,9 +227,9 @@ function CallsInner({ platformId }: { platformId: string }) {
       </div>
 
       {tab === "call" && (
-      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 mb-6">
+      <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4 mb-6">
         <div>
-          <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">
+          <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
             Phone number
           </label>
           <input
@@ -238,17 +238,17 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="+14155551234"
             inputMode="tel"
             spellCheck={false}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-base sm:text-sm"
+            className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none font-mono text-base sm:text-sm"
           />
           {phone.trim() && !phoneValid && (
-            <p className="text-xs text-zinc-500 mt-1.5">
+            <p className="text-xs text-[var(--faint)] mt-1.5">
               US &amp; Canada numbers only for now, e.g. +14155551234. More
               countries soon.
             </p>
           )}
         </div>
         <div>
-          <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">
+          <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
             What should your agent say?
           </label>
           <textarea
@@ -257,69 +257,69 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="Call this restaurant and book a table for 2 tomorrow at 8pm under the name Callum."
             rows={3}
             maxLength={500}
-            className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm resize-none"
+            className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm resize-none"
           />
         </div>
         <button
           onClick={() => void placeCall()}
           disabled={!canCall}
-          className="w-full py-3 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200 disabled:opacity-40"
+          className="w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85 disabled:opacity-40"
         >
           {placing ? "Placing call…" : `Call now · ${CALL_COST}`}
         </button>
-        {error && <p className="text-sm text-red-400">{error}</p>}
+        {error && <p className="text-sm text-[#e06c5a]">{error}</p>}
       </div>
       )}
 
       {tab === "email" && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4 mb-6">
+        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4 mb-6">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">To</label>
+            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">To</label>
             <input
               value={emailTo}
               onChange={(e) => setEmailTo(e.target.value)}
               placeholder="alice@example.com"
               inputMode="email"
               spellCheck={false}
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">Subject</label>
+            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">Subject</label>
             <input
               value={emailSubject}
               onChange={(e) => setEmailSubject(e.target.value)}
               maxLength={200}
               placeholder="Quick question"
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
+              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm"
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">Message</label>
+            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">Message</label>
             <textarea
               value={emailBody}
               onChange={(e) => setEmailBody(e.target.value)}
               rows={5}
               maxLength={5000}
               placeholder="Write the email your agent should send…"
-              className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm resize-none"
+              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm resize-none"
             />
           </div>
           <button
             onClick={() => void sendEmail()}
             disabled={!emailValid}
-            className="w-full py-3 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200 disabled:opacity-40"
+            className="w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85 disabled:opacity-40"
           >
             {placing ? "Sending…" : "Send email · $0.03"}
           </button>
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-[#e06c5a]">{error}</p>}
         </div>
       )}
 
       {tab === "text" && (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 mb-6 text-center">
-          <p className="text-sm text-zinc-300 font-medium mb-1">Texts are coming soon.</p>
-          <p className="text-xs text-zinc-500">
+        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-6 mb-6 text-center">
+          <p className="text-sm text-[var(--ink)] font-medium mb-1">Texts are coming soon.</p>
+          <p className="text-xs text-[var(--faint)]">
             SMS from your agent is on the way — calls and email work today.
           </p>
         </div>
@@ -328,14 +328,14 @@ function CallsInner({ platformId }: { platformId: string }) {
       <div className="space-y-2">
         {calls === null ? (
           <div className="flex justify-center py-8">
-            <div className="w-6 h-6 rounded-full border-2 border-zinc-700 border-t-zinc-300 animate-spin" />
+            <div className="w-6 h-6 rounded-full border-2 border-[var(--line)] border-t-zinc-300 animate-spin" />
           </div>
         ) : (
           (() => {
             const kind = tab === "text" ? "sms" : tab;
             const filtered = calls.filter((c) => c.kind === kind);
             return filtered.length === 0 ? (
-              <p className="text-sm text-zinc-500 text-center py-6">
+              <p className="text-sm text-[var(--faint)] text-center py-6">
                 {tab === "call" && "No calls yet. Your agent's first one is a tap away."}
                 {tab === "email" && "No emails yet."}
                 {tab === "text" && ""}

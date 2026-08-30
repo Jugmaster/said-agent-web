@@ -30,15 +30,15 @@ function Row({
 }) {
   const body = (
     <div className="flex items-center justify-between gap-3 px-4 py-3.5">
-      <span className={`text-sm ${danger ? "text-red-400" : "text-zinc-200"}`}>{label}</span>
-      <span className="flex items-center gap-2 text-sm text-zinc-500">
+      <span className={`text-sm ${danger ? "text-[#e06c5a]" : "text-[var(--ink)]"}`}>{label}</span>
+      <span className="flex items-center gap-2 text-sm text-[var(--faint)]">
         {value && <span className="truncate font-mono text-xs">{value}</span>}
-        {(href || onClick) && !danger && <span className="text-zinc-600">›</span>}
+        {(href || onClick) && !danger && <span className="text-[var(--faint)]">›</span>}
       </span>
     </div>
   );
   const cls =
-    "block w-full text-left border-b border-zinc-800/70 last:border-b-0 active:bg-zinc-800/40 transition";
+    "block w-full text-left border-b border-[var(--line)] last:border-b-0 active:bg-[rgba(128,128,128,.12)] transition";
   if (href) {
     return (
       <Link href={href} className={cls}>
@@ -59,10 +59,10 @@ function Row({
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="mb-6">
-      <h2 className="mb-2 px-1 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
+      <h2 className="mb-2 px-1 text-[11px] font-medium uppercase tracking-wider text-[var(--faint)]">
         {title}
       </h2>
-      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+      <div className="overflow-hidden rounded-2xl border border-[var(--line)] bg-[var(--card)]">
         {children}
       </div>
     </section>
@@ -107,7 +107,7 @@ function Settings({ platformId }: { platformId: string }) {
           onClick={copyAddress}
         />
         {copied && (
-          <div className="px-4 pb-2 text-xs text-emerald-400">Address copied</div>
+          <div className="px-4 pb-2 text-xs text-[var(--good)]">Address copied</div>
         )}
         <Row label="Public profile" href={`/agents/${encodeURIComponent(platformId)}`} />
         <Row label="Link an existing agent" href="/settings/link-agent" />
@@ -129,7 +129,7 @@ function Settings({ platformId }: { platformId: string }) {
         <Row label="Sign out" onClick={agent.logout} danger />
       </Section>
 
-      <p className="px-1 pb-2 text-center text-xs text-zinc-600">
+      <p className="px-1 pb-2 text-center text-xs text-[var(--faint)]">
         SAID Agent · your keys are secured by Privy
       </p>
     </div>
