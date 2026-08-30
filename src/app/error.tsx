@@ -19,10 +19,10 @@ export default function Error({
       <div className="text-center max-w-md">
         <div className="text-5xl mb-4">⚠️</div>
         <h1 className="text-xl font-semibold mb-2">Something went wrong</h1>
-        <p className="text-sm text-zinc-400 mb-8">
+        <p className="text-sm text-[var(--dim)] mb-8">
           Your agent and funds are fine — this page just hit an error.
           {error.digest && (
-            <span className="block mt-2 text-xs text-zinc-600">
+            <span className="block mt-2 text-xs text-[var(--faint)]">
               Reference: {error.digest}
             </span>
           )}
@@ -30,13 +30,13 @@ export default function Error({
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => unstable_retry()}
-            className="px-5 py-2.5 bg-white text-black rounded-lg text-sm font-semibold hover:bg-zinc-200 transition"
+            className="px-5 py-2.5 bg-[var(--ink)] text-[var(--bg)] rounded-lg text-sm font-semibold hover:opacity-85 transition"
           >
             Try again
           </button>
           <Link
             href="/"
-            className="px-5 py-2.5 rounded-lg border border-zinc-700 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+            className="px-5 py-2.5 rounded-lg border border-[var(--line)] text-sm font-medium text-[var(--ink)] hover:border-[var(--ink)] hover:text-[var(--ink)] transition"
           >
             Back home
           </Link>

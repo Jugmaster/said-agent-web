@@ -13,7 +13,7 @@ function shortAddr(a: string | null | undefined): string {
 }
 
 const NAV_LINK =
-  "px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition rounded-full hover:bg-zinc-800/50 whitespace-nowrap";
+  "px-3 py-1.5 text-sm text-[var(--dim)] hover:text-[var(--ink)] transition rounded-full hover:bg-[rgba(128,128,128,.18)]/50 whitespace-nowrap";
 
 export default function Navbar() {
   const { ready, authenticated, user, login } = usePrivy();
@@ -62,9 +62,9 @@ export default function Navbar() {
       <nav
         className="
           flex items-center gap-1 rounded-full
-          border border-zinc-800/60
+          border border-[var(--line)]
           transition-all duration-500 ease-in-out
-          px-3 py-2 bg-zinc-950/50 backdrop-blur-md
+          px-3 py-2 bg-[var(--bg)] backdrop-blur-md
           max-w-full
         "
       >
@@ -116,11 +116,11 @@ export default function Navbar() {
           </a>
 
           {!ready ? (
-            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800/60 animate-pulse" />
+            <div className="w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--line)] animate-pulse" />
           ) : !authenticated ? (
             <button
               onClick={login}
-              className="ml-1 px-4 py-1.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-zinc-200 transition whitespace-nowrap"
+              className="ml-1 px-4 py-1.5 bg-[var(--ink)] text-[var(--bg)] rounded-full text-sm font-semibold hover:opacity-85 transition whitespace-nowrap"
             >
               Log in
             </button>
@@ -128,12 +128,12 @@ export default function Navbar() {
             <div className="relative" ref={menuRef}>
               <button
                 onClick={() => setMenuOpen((o) => !o)}
-                className="ml-1 flex items-center gap-2 pl-1 pr-3 py-1 border border-zinc-800/60 hover:border-zinc-700 rounded-full text-sm transition"
+                className="ml-1 flex items-center gap-2 pl-1 pr-3 py-1 border border-[var(--line)] hover:border-[var(--line)] rounded-full text-sm transition"
               >
-                <span className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold">
+                <span className="w-6 h-6 rounded-full bg-[rgba(128,128,128,.18)] flex items-center justify-center text-xs font-semibold">
                   {(user?.email?.address?.[0] ?? user?.wallet?.address?.[0] ?? "•").toUpperCase()}
                 </span>
-                <span className="hidden sm:inline text-zinc-300">
+                <span className="hidden sm:inline text-[var(--ink)]">
                   {agent.status === "ready"
                     ? agent.agentName ?? shortAddr(agent.walletAddress)
                     : agent.status === "linking"
@@ -145,36 +145,36 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-12 w-64 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-zinc-800">
+                <div className="absolute right-0 top-12 w-64 bg-[var(--card)]/95 backdrop-blur-md border border-[var(--line)] rounded-2xl shadow-xl overflow-hidden z-50">
+                  <div className="px-4 py-3 border-b border-[var(--line)]">
                     <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs text-zinc-500">signed in with</span>
+                      <span className="text-xs text-[var(--faint)]">signed in with</span>
                       {signedIn.platform && (
-                        <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
+                        <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-[rgba(128,128,128,.18)] text-[var(--ink)]">
                           {signedIn.platform}
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-zinc-200 truncate">
+                    <div className="text-sm text-[var(--ink)] truncate">
                       {signedIn.handle}
                     </div>
                   </div>
                   {agent.status === "ready" && (
-                    <div className="px-4 py-3 border-b border-zinc-800">
-                      <div className="text-xs text-zinc-500">agent wallet</div>
-                      <code className="text-xs text-zinc-300 font-mono">
+                    <div className="px-4 py-3 border-b border-[var(--line)]">
+                      <div className="text-xs text-[var(--faint)]">agent wallet</div>
+                      <code className="text-xs text-[var(--ink)] font-mono">
                         {shortAddr(agent.walletAddress)}
                       </code>
                       {agent.walletAddress && (
                         <div className="mt-1.5 text-xs">
                           {bal.error ? (
-                            <span className="text-yellow-600">balance unavailable</span>
+                            <span className="text-[var(--warn)]">balance unavailable</span>
                           ) : bal.loading ? (
-                            <span className="text-zinc-600">loading…</span>
+                            <span className="text-[var(--faint)]">loading…</span>
                           ) : (
-                            <span className="text-zinc-400">
+                            <span className="text-[var(--dim)]">
                               {bal.sol.toFixed(4)} SOL
-                              <span className="text-zinc-600"> · </span>
+                              <span className="text-[var(--faint)]"> · </span>
                               {bal.usdc.toFixed(2)} USDC
                             </span>
                           )}
@@ -185,28 +185,28 @@ export default function Navbar() {
                   <Link
                     href="/chat"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
+                    className="block px-4 py-3 text-sm hover:bg-[rgba(128,128,128,.18)] transition"
                   >
                     Chat
                   </Link>
                   <Link
                     href="/send"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
+                    className="block px-4 py-3 text-sm hover:bg-[rgba(128,128,128,.18)] transition"
                   >
                     Send
                   </Link>
                   <Link
                     href="/portfolio"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
+                    className="block px-4 py-3 text-sm hover:bg-[rgba(128,128,128,.18)] transition"
                   >
                     Portfolio
                   </Link>
                   <Link
                     href="/activity"
                     onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
+                    className="block px-4 py-3 text-sm hover:bg-[rgba(128,128,128,.18)] transition"
                   >
                     Activity
                   </Link>
@@ -215,7 +215,7 @@ export default function Navbar() {
                       agent.logout();
                       setMenuOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-zinc-800 transition border-t border-zinc-800"
+                    className="block w-full text-left px-4 py-3 text-sm text-[#e06c5a] hover:bg-[rgba(128,128,128,.18)] transition border-t border-[var(--line)]"
                   >
                     Log out
                   </button>

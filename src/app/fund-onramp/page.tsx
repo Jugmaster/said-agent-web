@@ -183,19 +183,19 @@ export default function FundOnrampPage() {
 
   if (phase === "loading" || !ready) {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 flex items-center justify-center px-6">
-        <div className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-white animate-spin" />
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] flex items-center justify-center px-6">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--line)] border-t-white animate-spin" />
       </main>
     );
   }
 
   if (phase === "error") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-6 py-8 flex flex-col items-center justify-center">
         <p className="text-2xl mb-3">⚠️</p>
         <p className="text-sm text-red-300 mb-2">Couldn&apos;t open funding</p>
-        <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">{errorMsg}</p>
-        <button onClick={close} className="text-sm px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-500">
+        <p className="text-xs text-[var(--dim)] mb-6 max-w-xs text-center">{errorMsg}</p>
+        <button onClick={close} className="text-sm px-4 py-2 rounded-lg border border-[var(--line)] hover:border-[var(--ink)]">
           Close
         </button>
       </main>
@@ -204,17 +204,17 @@ export default function FundOnrampPage() {
 
   if (phase === "done") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-6 py-8 flex flex-col items-center justify-center">
         <p className="text-3xl mb-3">✅</p>
         <p className="text-sm font-medium mb-2">Payment window open</p>
-        <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">
+        <p className="text-xs text-[var(--dim)] mb-6 max-w-xs text-center">
           Complete your card payment in the window that just opened. SOL lands
           in your wallet ~30 seconds after payment confirms; I&apos;ll DM you
           when it does.
         </p>
         <button
           onClick={close}
-          className="px-6 py-3 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition"
+          className="px-6 py-3 bg-[var(--ink)] text-[var(--bg)] rounded-xl font-semibold hover:opacity-85 transition"
         >
           Done — back to chat
         </button>
@@ -224,28 +224,28 @@ export default function FundOnrampPage() {
 
   if (phase === "funding") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-white animate-spin mb-4" />
-        <p className="text-sm text-zinc-300">Opening payment...</p>
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-6 py-8 flex flex-col items-center justify-center">
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--line)] border-t-white animate-spin mb-4" />
+        <p className="text-sm text-[var(--ink)]">Opening payment...</p>
       </main>
     );
   }
 
   // ready state — show the confirm card
   return (
-    <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8">
+    <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-6 py-8">
       <div className="max-w-sm mx-auto">
         <div className="mb-8">
-          <p className="text-xs text-zinc-500 mb-1">Fund your agent</p>
+          <p className="text-xs text-[var(--faint)] mb-1">Fund your agent</p>
           <h1 className="text-3xl font-semibold">
             {amount ? `$${amount}` : "Pick amount"}
           </h1>
-          <p className="text-xs text-zinc-500 mt-2 break-all">
+          <p className="text-xs text-[var(--faint)] mt-2 break-all">
             → {wallet?.slice(0, 8)}…{wallet?.slice(-6)}
           </p>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-4 mb-6 text-xs text-zinc-400 leading-relaxed">
+        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-4 mb-6 text-xs text-[var(--dim)] leading-relaxed">
           You&apos;ll pay with card or Apple Pay via Privy&apos;s onramp partner.
           SOL lands in your butler wallet — your agent DMs you the moment it
           confirms (~30 seconds).
@@ -256,14 +256,14 @@ export default function FundOnrampPage() {
 
         <button
           onClick={() => void start()}
-          className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition mb-2"
+          className="w-full py-3.5 bg-[var(--ink)] text-[var(--bg)] rounded-xl font-semibold hover:opacity-85 transition mb-2"
         >
           Continue to payment →
         </button>
 
         <button
           onClick={close}
-          className="w-full py-3 text-sm text-zinc-500 hover:text-zinc-200 transition"
+          className="w-full py-3 text-sm text-[var(--faint)] hover:text-[var(--ink)] transition"
         >
           Cancel
         </button>

@@ -110,7 +110,7 @@ function renderInline(text: string, keyBase: string): ReactNode[] {
     out.push(
       <code
         key={`${keyBase}-c${n}`}
-        className="rounded bg-zinc-500/20 px-1 py-0.5 font-mono text-[0.9em] break-all"
+        className="rounded bg-[rgba(128,128,128,.35)]/20 px-1 py-0.5 font-mono text-[0.9em] break-all"
       >
         {m[1]}
       </code>,
@@ -135,7 +135,7 @@ export default function MessageText({ text }: { text: string }) {
     out.push(
       <pre
         key={`f${n}`}
-        className="my-1.5 overflow-x-auto rounded-lg bg-zinc-950/60 border border-zinc-700/60 px-3 py-2 font-mono text-xs whitespace-pre"
+        className="my-1.5 overflow-x-auto rounded-lg bg-[var(--bg)]/60 border border-[var(--line)]/60 px-3 py-2 font-mono text-xs whitespace-pre"
       >
         {m[1].replace(/\n$/, "")}
       </pre>,

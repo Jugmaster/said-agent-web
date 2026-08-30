@@ -157,7 +157,7 @@ export default function WithdrawPage() {
   if (!ready) {
     return (
       <div className="min-h-[40vh] flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-zinc-300 animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-[var(--line)] border-t-zinc-300 animate-spin" />
       </div>
     );
   }
@@ -165,15 +165,15 @@ export default function WithdrawPage() {
   if (!authenticated) {
     return (
       <div className="min-h-[60vh] px-6 py-12 flex items-center justify-center">
-        <div className="max-w-md w-full text-center bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-10">
+        <div className="max-w-md w-full text-center bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-10">
           <h2 className="text-2xl font-bold mb-2">Withdraw from your login wallet.</h2>
-          <p className="text-sm text-zinc-400 mb-6">
+          <p className="text-sm text-[var(--dim)] mb-6">
             Log in with the same account that received the funds — the wallet
             belongs to that login.
           </p>
           <button
             onClick={login}
-            className="px-5 py-2.5 rounded-lg bg-zinc-100 text-zinc-900 text-sm font-semibold hover:bg-white"
+            className="px-5 py-2.5 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:bg-[var(--ink)]"
           >
             Log in
           </button>
@@ -186,7 +186,7 @@ export default function WithdrawPage() {
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
         <h1 className="text-2xl font-bold">Withdraw</h1>
-        <p className="text-sm text-zinc-400 mt-1">
+        <p className="text-sm text-[var(--dim)] mt-1">
           Send SOL out of the embedded wallet created by this login. You sign in
           the Privy window — your key never leaves it. No fee; only the network
           cost (~0.000005 SOL).
@@ -194,15 +194,15 @@ export default function WithdrawPage() {
       </div>
 
       {wallets.length === 0 ? (
-        <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 text-sm text-zinc-400">
+        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-6 text-sm text-[var(--dim)]">
           No embedded wallet on this login yet. If your funds arrived on a
           different account, log out and back in with that exact account
           (same X / Telegram / email).
         </div>
       ) : (
         <div className="space-y-4">
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5">
-            <div className="text-xs uppercase tracking-wide text-zinc-500 mb-3">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5">
+            <div className="text-xs uppercase tracking-wide text-[var(--faint)] mb-3">
               From wallet
             </div>
             <div className="space-y-2">
@@ -212,12 +212,12 @@ export default function WithdrawPage() {
                   onClick={() => setSelected(w.address)}
                   className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border text-left ${
                     wallet?.address === w.address
-                      ? "border-zinc-500 bg-zinc-800"
-                      : "border-zinc-800 bg-zinc-900 hover:border-zinc-700"
+                      ? "border-[var(--dim)] bg-[rgba(128,128,128,.18)]"
+                      : "border-[var(--line)] bg-[var(--card)] hover:border-[var(--line)]"
                   }`}
                 >
                   <span className="font-mono text-sm">{short(w.address)}</span>
-                  <span className="text-sm text-zinc-300">
+                  <span className="text-sm text-[var(--ink)]">
                     {balances[w.address] != null
                       ? `${balances[w.address].toFixed(6)} SOL`
                       : "…"}
@@ -227,9 +227,9 @@ export default function WithdrawPage() {
             </div>
           </div>
 
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-5 space-y-4">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4">
             <div>
-              <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">
+              <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
                 Destination address
               </label>
               <input
@@ -237,17 +237,17 @@ export default function WithdrawPage() {
                 onChange={(e) => setDest(e.target.value)}
                 placeholder="Solana address"
                 spellCheck={false}
-                className="w-full px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none font-mono text-base sm:text-sm"
+                className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none font-mono text-base sm:text-sm"
               />
               {dest.trim() && !isValidSolanaAddress(dest.trim()) && (
-                <p className="text-xs text-red-400 mt-1.5">
+                <p className="text-xs text-[#e06c5a] mt-1.5">
                   That doesn&apos;t look like a valid Solana address.
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-xs uppercase tracking-wide text-zinc-500 mb-2">
+              <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
                 Amount (SOL)
               </label>
               <div className="flex gap-2">
@@ -256,18 +256,18 @@ export default function WithdrawPage() {
                   onChange={(e) => setAmount(e.target.value.replace(/^\./, "0."))}
                   placeholder="0.0"
                   inputMode="decimal"
-                  className="flex-1 px-4 py-3 rounded-lg bg-zinc-950 border border-zinc-800 focus:border-zinc-600 outline-none text-base sm:text-sm"
+                  className="flex-1 px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm"
                 />
                 <button
                   onClick={() => maxSol != null && setAmount(maxSol.toFixed(9).replace(/0+$/, "").replace(/\.$/, ""))}
                   disabled={maxSol == null || maxSol <= 0}
-                  className="px-4 py-3 rounded-lg border border-zinc-700 text-sm text-zinc-300 hover:bg-zinc-800 disabled:opacity-40"
+                  className="px-4 py-3 rounded-lg border border-[var(--line)] text-sm text-[var(--ink)] hover:bg-[rgba(128,128,128,.18)] disabled:opacity-40"
                 >
                   Max
                 </button>
               </div>
               {maxSol != null && (
-                <p className="text-xs text-zinc-500 mt-1.5">
+                <p className="text-xs text-[var(--faint)] mt-1.5">
                   Max {maxSol.toFixed(6)} SOL (balance minus network fee)
                 </p>
               )}
@@ -276,13 +276,13 @@ export default function WithdrawPage() {
             <button
               onClick={handleSend}
               disabled={!canSend}
-              className="w-full py-3 rounded-lg bg-zinc-100 text-zinc-900 text-sm font-semibold hover:bg-white disabled:opacity-40"
+              className="w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:bg-[var(--ink)] disabled:opacity-40"
             >
               {busy ? "Signing…" : "Sign & send"}
             </button>
 
             {sig && (
-              <div className="text-sm text-emerald-400 break-all">
+              <div className="text-sm text-[var(--good)] break-all">
                 Sent.{" "}
                 <a
                   href={`https://solscan.io/tx/${sig}`}
@@ -294,17 +294,17 @@ export default function WithdrawPage() {
                 </a>
               </div>
             )}
-            {error && <div className="text-sm text-red-400 break-all">{error}</div>}
+            {error && <div className="text-sm text-[#e06c5a] break-all">{error}</div>}
           </div>
 
-          <div className="flex items-center justify-between text-xs text-zinc-500 px-1">
+          <div className="flex items-center justify-between text-xs text-[var(--faint)] px-1">
             <button
               onClick={() => wallet && exportWallet({ address: wallet.address })}
-              className="underline hover:text-zinc-300"
+              className="underline hover:text-[var(--ink)]"
             >
               Export private key instead
             </button>
-            <Link href="/send" className="underline hover:text-zinc-300">
+            <Link href="/send" className="underline hover:text-[var(--ink)]">
               Back to Send
             </Link>
           </div>

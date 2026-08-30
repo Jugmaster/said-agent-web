@@ -38,42 +38,42 @@ function LaunchRow({ l }: { l: LaunchListItem }) {
       href={l.pumpfunUrl}
       target="_blank"
       rel="noreferrer"
-      className="block bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl px-5 py-4 transition"
+      className="block bg-[var(--card)] border border-[var(--line)] hover:border-[var(--line)] rounded-xl px-5 py-4 transition"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-lg font-semibold">${ticker}</span>
-            <span className="text-sm text-zinc-400">
+            <span className="text-sm text-[var(--dim)]">
               by{" "}
               <Link
                 href={`/agents/${l.creator.platformId}`}
-                className="text-zinc-300 hover:text-white"
+                className="text-[var(--ink)] hover:text-[var(--ink)]"
               >
                 @{l.creator.xHandle}
               </Link>
             </span>
           </div>
-          <p className="text-sm text-zinc-400 line-clamp-1">
+          <p className="text-sm text-[var(--dim)] line-clamp-1">
             {l.tweetExcerpt.slice(0, 140)}
           </p>
         </div>
         <div className="text-right shrink-0">
-          <span className="text-sm text-zinc-500">{formatDate(l.launchedAt)}</span>
+          <span className="text-sm text-[var(--faint)]">{formatDate(l.launchedAt)}</span>
         </div>
       </div>
 
       {l.sweeps.count > 0 && (
-        <div className="mt-3 pt-3 border-t border-zinc-800 flex justify-between text-sm text-zinc-400">
+        <div className="mt-3 pt-3 border-t border-[var(--line)] flex justify-between text-sm text-[var(--dim)]">
           <span>
             Creator earned{" "}
-            <span className="text-zinc-100 font-semibold">
+            <span className="text-[var(--ink)] font-semibold">
               {l.sweeps.totalUserKeptSol.toFixed(4)} SOL
             </span>
           </span>
           <span>
             SAID cut{" "}
-            <span className="text-zinc-100 font-semibold">
+            <span className="text-[var(--ink)] font-semibold">
               {l.sweeps.totalSaidCutSol.toFixed(4)} SOL
             </span>
           </span>
@@ -91,17 +91,17 @@ export default async function LaunchesPage() {
       <Navbar />
       <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
         <header className="mb-10">
-          <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
+          <div className="inline-block px-4 py-2 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
             Public ledger
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Launches</h1>
-          <p className="text-lg text-zinc-400 max-w-2xl">
+          <p className="text-lg text-[var(--dim)] max-w-2xl">
             Every token launched via{" "}
             <a
               href="https://x.com/saidagent"
               target="_blank"
               rel="noreferrer"
-              className="text-zinc-100 hover:text-white"
+              className="text-[var(--ink)] hover:text-[var(--ink)]"
             >
               @saidagent
             </a>{" "}
@@ -111,11 +111,11 @@ export default async function LaunchesPage() {
         </header>
 
         {launches.length === 0 ? (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-12 text-center text-[var(--dim)]">
             <p className="text-base">No launches yet.</p>
             <p className="text-sm mt-3">
               Tweet{" "}
-              <code className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">
+              <code className="px-2 py-0.5 rounded bg-[rgba(128,128,128,.18)] text-[var(--ink)] font-mono">
                 @saidagent launch &lt;name&gt; $TICKER
               </code>{" "}
               to be the first.
@@ -129,7 +129,7 @@ export default async function LaunchesPage() {
           </div>
         )}
 
-        <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
+        <footer className="mt-16 pt-8 border-t border-[var(--line)] text-sm text-[var(--faint)] text-center">
           The agent is the on-chain creator on every launch. Fees flow direct to
           the user&apos;s agent wallet — SAID never custodies them.
         </footer>

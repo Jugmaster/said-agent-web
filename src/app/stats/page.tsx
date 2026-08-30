@@ -42,10 +42,10 @@ function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-8">
-      <div className="text-sm text-zinc-500 mb-2">{label}</div>
+    <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-8">
+      <div className="text-sm text-[var(--faint)] mb-2">{label}</div>
       <div className="text-4xl font-bold tracking-tight mb-1">{value}</div>
-      {sub && <div className="text-xs text-zinc-500">{sub}</div>}
+      {sub && <div className="text-xs text-[var(--faint)]">{sub}</div>}
     </div>
   );
 }
@@ -58,11 +58,11 @@ export default async function StatsPage() {
       <Navbar />
       <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
         <header className="mb-10">
-          <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
+          <div className="inline-block px-4 py-2 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
             Live · refreshes every minute
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Protocol stats</h1>
-          <p className="text-lg text-zinc-400 max-w-2xl">
+          <p className="text-lg text-[var(--dim)] max-w-2xl">
             Every agent registered on SAID Protocol has its own Solana wallet,
             on-chain identity, and rolling reputation. These numbers are pulled
             live from{" "}
@@ -70,7 +70,7 @@ export default async function StatsPage() {
               href="https://api.saidprotocol.com/api/stats"
               target="_blank"
               rel="noreferrer"
-              className="text-zinc-300 hover:text-white underline-offset-4 hover:underline"
+              className="text-[var(--ink)] hover:text-[var(--ink)] underline-offset-4 hover:underline"
             >
               api.saidprotocol.com/api/stats
             </a>
@@ -79,7 +79,7 @@ export default async function StatsPage() {
         </header>
 
         {!stats ? (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-12 text-center text-[var(--dim)]">
             <p>Couldn&apos;t fetch live stats right now. Try again in a minute.</p>
           </div>
         ) : (
@@ -105,25 +105,25 @@ export default async function StatsPage() {
               />
             </div>
 
-            <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-6 text-sm text-zinc-400 leading-relaxed">
-              <h2 className="text-base font-semibold text-zinc-200 mb-3">
+            <section className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-6 text-sm text-[var(--dim)] leading-relaxed">
+              <h2 className="text-base font-semibold text-[var(--ink)] mb-3">
                 What this counts
               </h2>
               <ul className="space-y-2 list-disc list-inside">
                 <li>
-                  <span className="text-zinc-200 font-medium">Total agents</span>{" "}
+                  <span className="text-[var(--ink)] font-medium">Total agents</span>{" "}
                   — every wallet that ever registered a SAID identity PDA
                   on-chain, across all integrations (butler, SAID Hosting,
                   Clawpump, direct API users).
                 </li>
                 <li>
-                  <span className="text-zinc-200 font-medium">Verified</span> —
+                  <span className="text-[var(--ink)] font-medium">Verified</span> —
                   agents that completed the verify step (pays the 0.01 SOL
                   verification fee to treasury, gets the verified badge).
                   Sponsored end-to-end via butler so no user-side SOL required.
                 </li>
                 <li>
-                  <span className="text-zinc-200 font-medium">
+                  <span className="text-[var(--ink)] font-medium">
                     Avg reputation
                   </span>{" "}
                   — rolling positive-feedback ratio averaged across all agents
@@ -135,13 +135,13 @@ export default async function StatsPage() {
           </>
         )}
 
-        <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
+        <footer className="mt-16 pt-8 border-t border-[var(--line)] text-sm text-[var(--faint)] text-center">
           Want your own agent?{" "}
           <a
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
+            className="text-[var(--ink)] hover:text-[var(--ink)]"
           >
             message @saidinfrabot
           </a>{" "}
@@ -150,7 +150,7 @@ export default async function StatsPage() {
             href="https://x.com/saidagent"
             target="_blank"
             rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
+            className="text-[var(--ink)] hover:text-[var(--ink)]"
           >
             @saidagent
           </a>

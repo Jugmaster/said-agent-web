@@ -17,13 +17,13 @@ export function actionLabel(type: string): { emoji: string; text: string; color:
     case "swap":
       return { emoji: "🔄", text: "Swap", color: "text-blue-400" };
     case "stake":
-      return { emoji: "🔒", text: "Stake", color: "text-green-400" };
+      return { emoji: "🔒", text: "Stake", color: "text-[var(--good)]" };
     case "transfer":
       return { emoji: "📤", text: "Transfer", color: "text-purple-400" };
     case "test_action":
-      return { emoji: "🧪", text: "Test", color: "text-zinc-500" };
+      return { emoji: "🧪", text: "Test", color: "text-[var(--faint)]" };
     default:
-      return { emoji: "•", text: type, color: "text-zinc-300" };
+      return { emoji: "•", text: type, color: "text-[var(--ink)]" };
   }
 }
 

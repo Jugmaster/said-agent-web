@@ -42,7 +42,7 @@ function AgentRow({ a }: { a: AgentListItem }) {
   return (
     <Link
       href={`/agents/${a.platformId}`}
-      className="block bg-zinc-900 border border-zinc-800 hover:border-zinc-700 rounded-xl px-5 py-4 transition"
+      className="block bg-[var(--card)] border border-[var(--line)] hover:border-[var(--line)] rounded-xl px-5 py-4 transition"
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex-1 min-w-0">
@@ -51,24 +51,24 @@ function AgentRow({ a }: { a: AgentListItem }) {
               {handlePrefix}
               {a.displayName ?? "Unnamed"}
             </span>
-            <span className="text-sm text-zinc-500">{platformLabel}</span>
+            <span className="text-sm text-[var(--faint)]">{platformLabel}</span>
             {a.proTier && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-yellow-950/50 text-yellow-300 border border-yellow-900/60">
                 Pro
               </span>
             )}
             {a.verified && !a.proTier && (
-              <span className="text-xs px-2 py-0.5 rounded-full bg-emerald-950/50 text-emerald-300 border border-emerald-900/60">
+              <span className="text-xs px-2 py-0.5 rounded-full bg-[rgba(61,163,93,.12)] text-[var(--good)] border border-[rgba(61,163,93,.30)]">
                 verified
               </span>
             )}
           </div>
-          <code className="text-sm text-zinc-500 block font-mono">
+          <code className="text-sm text-[var(--faint)] block font-mono">
             {shortAddr(a.walletAddress)}
           </code>
         </div>
-        <div className="text-right text-sm text-zinc-500 shrink-0">
-          <div className="text-zinc-300 font-semibold">{a.activity.total}</div>
+        <div className="text-right text-sm text-[var(--faint)] shrink-0">
+          <div className="text-[var(--ink)] font-semibold">{a.activity.total}</div>
           <div>{formatRelative(a.createdAt)}</div>
         </div>
       </div>
@@ -97,11 +97,11 @@ export default async function AgentsPage({ searchParams }: PageProps) {
       <Navbar />
       <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
         <header className="mb-10">
-          <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
+          <div className="inline-block px-4 py-2 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
             Directory
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Agents</h1>
-          <p className="text-lg text-zinc-400 max-w-2xl">
+          <p className="text-lg text-[var(--dim)] max-w-2xl">
             Every SAID agent. Each one personal — own wallet, own identity, own
             on-chain history.
           </p>
@@ -114,8 +114,8 @@ export default async function AgentsPage({ searchParams }: PageProps) {
               href={`/agents?sort=${opt.key}`}
               className={`text-sm px-4 py-2 rounded-lg transition ${
                 sort === opt.key
-                  ? "bg-white text-black font-semibold"
-                  : "border border-zinc-700 hover:border-zinc-500 text-zinc-300"
+                  ? "bg-[var(--ink)] text-[var(--bg)] font-semibold"
+                  : "border border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)]"
               }`}
             >
               {opt.label}
@@ -124,7 +124,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
         </nav>
 
         {agents.length === 0 ? (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
+          <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-6 py-12 text-center text-[var(--dim)]">
             <p>No agents in this slice yet.</p>
           </div>
         ) : (
@@ -135,13 +135,13 @@ export default async function AgentsPage({ searchParams }: PageProps) {
           </div>
         )}
 
-        <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
+        <footer className="mt-16 pt-8 border-t border-[var(--line)] text-sm text-[var(--faint)] text-center">
           To create your own:{" "}
           <a
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
+            className="text-[var(--ink)] hover:text-[var(--ink)]"
           >
             message @saidinfrabot
           </a>{" "}
@@ -150,7 +150,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
             href="https://x.com/saidagent"
             target="_blank"
             rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
+            className="text-[var(--ink)] hover:text-[var(--ink)]"
           >
             @saidagent
           </a>

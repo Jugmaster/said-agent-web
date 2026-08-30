@@ -27,7 +27,7 @@ export default function PartnerTicker() {
           animation: partner-scroll 30s linear infinite;
         }
       `}</style>
-      <p className="text-center text-[11px] text-zinc-600 uppercase tracking-widest mb-6">
+      <p className="text-center text-[11px] text-[var(--faint)] uppercase tracking-widest mb-6">
         Integrated with · Ecosystem partners
       </p>
       <div
@@ -46,7 +46,7 @@ export default function PartnerTicker() {
               href={partner.url}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2.5 px-4 py-2 mx-3 shrink-0 group bg-zinc-800/80 border border-zinc-700/60 rounded-full hover:bg-zinc-700/80 transition"
+              className="flex items-center gap-2.5 px-4 py-2 mx-3 shrink-0 group bg-[rgba(128,128,128,.18)] border border-[var(--line)] rounded-full hover:bg-[rgba(128,128,128,.22)] transition"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -56,7 +56,7 @@ export default function PartnerTicker() {
                   partner.name === "IDLE" ? "invert" : ""
                 }`}
               />
-              <span className="text-zinc-400 text-xs font-medium whitespace-nowrap group-hover:text-zinc-200 transition-colors">
+              <span className="text-[var(--dim)] text-xs font-medium whitespace-nowrap group-hover:text-[var(--ink)] transition-colors">
                 {partner.name}
               </span>
             </a>

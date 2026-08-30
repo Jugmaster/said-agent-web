@@ -40,11 +40,11 @@ export default function InviteWebClaim({ platform }: Props) {
         <button
           type="button"
           onClick={() => router.push("/chat")}
-          className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-zinc-200 font-medium transition"
+          className="w-full text-center text-sm px-4 py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] hover:opacity-85 font-medium transition"
         >
           Open my agent
         </button>
-        <p className="text-xs text-zinc-500 text-center">
+        <p className="text-xs text-[var(--faint)] text-center">
           You&apos;re already signed in. If this invite is for a different{" "}
           {label} account, sign out first, then sign back in with that account
           to claim it.
@@ -61,7 +61,7 @@ export default function InviteWebClaim({ platform }: Props) {
         login();
       }}
       disabled={!ready}
-      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-zinc-200 font-medium disabled:opacity-50 transition"
+      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] hover:opacity-85 font-medium disabled:opacity-50 transition"
     >
       Claim here → sign in with {label}
     </button>

@@ -83,16 +83,16 @@ export default async function InvitePage({ params }: PageProps) {
     // Butler blip ≠ dead invite. A recipient clicking "someone sent you money"
     // must never see a 404 for a transient failure — that reads as a scam.
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto flex flex-col items-center justify-center text-center">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto flex flex-col items-center justify-center text-center">
         <p className="text-3xl mb-4">⏳</p>
         <h1 className="text-xl font-bold mb-2">One moment…</h1>
-        <p className="text-sm text-zinc-400 mb-6">
+        <p className="text-sm text-[var(--dim)] mb-6">
           We couldn&apos;t load this invite right now — your funds are safe and
           the link is still good. Refresh in a few seconds.
         </p>
         <a
           href=""
-          className="px-5 py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200"
+          className="px-5 py-2.5 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85"
         >
           Retry
         </a>
@@ -107,9 +107,9 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "claimed") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-[var(--faint)] hover:text-[var(--ink)]">
             ← SAID Agent
           </Link>
         </header>
@@ -118,7 +118,7 @@ export default async function InvitePage({ params }: PageProps) {
           <p className="text-sm font-medium text-green-300 mb-1">
             Already claimed
           </p>
-          <p className="text-sm text-zinc-400 mb-3">
+          <p className="text-sm text-[var(--dim)] mb-3">
             {senderName} sent {invite.amount} {invite.asset} to {recipientLabel}.
             Claimed on {invite.claimedAt ? formatDate(invite.claimedAt) : "—"}.
           </p>
@@ -127,14 +127,14 @@ export default async function InvitePage({ params }: PageProps) {
               href={`https://solscan.io/tx/${invite.claimTx}`}
               target="_blank"
               rel="noreferrer"
-              className="text-sm text-zinc-400 hover:text-zinc-200 underline break-all block mb-4"
+              className="text-sm text-[var(--dim)] hover:text-[var(--ink)] underline break-all block mb-4"
             >
               View transaction
             </a>
           )}
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
           >
             Get your own agent →
           </Link>
@@ -145,21 +145,21 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "cancelled") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-[var(--faint)] hover:text-[var(--ink)]">
             ← SAID Agent
           </Link>
         </header>
-        <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
+        <section className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-6 text-center">
           <p className="text-3xl mb-2">↩</p>
           <p className="text-sm font-medium mb-1">Cancelled</p>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-[var(--faint)]">
             {senderName} cancelled this send. Funds returned to their wallet.
           </p>
           <Link
             href="/"
-            className="mt-4 inline-block text-sm px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-500"
+            className="mt-4 inline-block text-sm px-4 py-2 rounded-lg border border-[var(--line)] hover:border-[var(--ink)]"
           >
             Home
           </Link>
@@ -170,16 +170,16 @@ export default async function InvitePage({ params }: PageProps) {
 
   if (invite.status === "expired") {
     return (
-      <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
+      <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
-          <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
+          <Link href="/" className="text-sm text-[var(--faint)] hover:text-[var(--ink)]">
             ← SAID Agent
           </Link>
         </header>
-        <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
+        <section className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-6 text-center">
           <p className="text-3xl mb-2">⏰</p>
           <p className="text-sm font-medium mb-1">Expired</p>
-          <p className="text-sm text-zinc-500">
+          <p className="text-sm text-[var(--faint)]">
             This invite expired on {formatDate(invite.expiresAt)}. Funds returned to {senderName}.
           </p>
         </section>
@@ -192,28 +192,28 @@ export default async function InvitePage({ params }: PageProps) {
   const xDeepLink = `https://x.com/saidagent`;
 
   return (
-    <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
+    <main className="min-h-dvh bg-[var(--bg)] text-[var(--ink)] px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
       <header className="mb-6">
-        <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
+        <Link href="/" className="text-sm text-[var(--faint)] hover:text-[var(--ink)]">
           ← SAID Agent
         </Link>
       </header>
 
       <section className="mb-8">
-        <p className="text-sm text-zinc-500 mb-2">
+        <p className="text-sm text-[var(--faint)] mb-2">
           {senderName} sent you crypto.
         </p>
         <h1 className="text-3xl font-semibold mb-1">
           {invite.amount} {invite.asset}
         </h1>
-        <p className="text-sm text-zinc-400">
-          to <span className="text-zinc-200">{recipientLabel}</span>
+        <p className="text-sm text-[var(--dim)]">
+          to <span className="text-[var(--ink)]">{recipientLabel}</span>
         </p>
       </section>
 
-      <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5 mb-6">
+      <section className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-5 mb-6">
         <h2 className="text-sm font-medium mb-3">Claim your crypto</h2>
-        <p className="text-sm text-zinc-500 mb-4">
+        <p className="text-sm text-[var(--faint)] mb-4">
           Sign in with the same {platformLabel(invite.recipient.platform)} account
           (@{invite.recipient.handle}) and your funds drop in automatically — no
           need to leave the web.
@@ -226,7 +226,7 @@ export default async function InvitePage({ params }: PageProps) {
           />
           <a
             href={tgDeepLink}
-            className="w-full text-center text-sm px-4 py-3 rounded-lg border border-zinc-700 hover:border-zinc-500"
+            className="w-full text-center text-sm px-4 py-3 rounded-lg border border-[var(--line)] hover:border-[var(--ink)]"
           >
             Or open Telegram → @saidinfrabot
           </a>
@@ -235,7 +235,7 @@ export default async function InvitePage({ params }: PageProps) {
               href={xDeepLink}
               target="_blank"
               rel="noreferrer"
-              className="w-full text-center text-sm px-4 py-3 rounded-lg border border-zinc-700 hover:border-zinc-500"
+              className="w-full text-center text-sm px-4 py-3 rounded-lg border border-[var(--line)] hover:border-[var(--ink)]"
             >
               Or reply on X → @saidagent
             </a>
@@ -243,14 +243,14 @@ export default async function InvitePage({ params }: PageProps) {
         </div>
       </section>
 
-      <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 text-xs text-zinc-500">
+      <section className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3 text-xs text-[var(--faint)]">
         <div className="flex justify-between mb-1">
           <span>Sent on</span>
-          <span className="text-zinc-300">{formatDate(invite.createdAt)}</span>
+          <span className="text-[var(--ink)]">{formatDate(invite.createdAt)}</span>
         </div>
         <div className="flex justify-between mb-1">
           <span>Expires</span>
-          <span className="text-zinc-300">{formatDate(invite.expiresAt)}</span>
+          <span className="text-[var(--ink)]">{formatDate(invite.expiresAt)}</span>
         </div>
         <div className="flex justify-between">
           <span>Status</span>
@@ -258,7 +258,7 @@ export default async function InvitePage({ params }: PageProps) {
         </div>
       </section>
 
-      <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
+      <footer className="mt-12 pt-6 border-t border-[var(--line)] text-xs text-[var(--faint)] text-center">
         <p>
           Funds stay in {senderName}&apos;s wallet until you claim — no escrow,
           the money isn&apos;t parked anywhere. A name → wallet route through SAID Protocol.

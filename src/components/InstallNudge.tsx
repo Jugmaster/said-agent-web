@@ -123,19 +123,19 @@ export default function InstallNudge() {
       style={{
         bottom: "max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))",
       }}
-      className="fixed left-1/2 -translate-x-1/2 z-50 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
+      className="fixed left-1/2 -translate-x-1/2 z-50 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-[var(--line)] bg-[var(--bg)] backdrop-blur-md shadow-xl"
     >
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-white flex-shrink-0 overflow-hidden">
+        <div className="w-9 h-9 rounded-lg bg-[var(--ink)] flex-shrink-0 overflow-hidden">
           {/* Reuse the manifest icon — already in /public */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/icon-192.png" alt="" className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">
+          <p className="text-sm font-semibold text-[var(--ink)] truncate">
             Install SAID Agent
           </p>
-          <p className="text-xs text-zinc-400 truncate">
+          <p className="text-xs text-[var(--dim)] truncate">
             {platform === "ios"
               ? "Add to Home Screen for the full app"
               : "One tap — fits on your home screen"}
@@ -144,14 +144,14 @@ export default function InstallNudge() {
         {platform === "android" && deferred ? (
           <button
             onClick={() => void install()}
-            className="px-3 py-1.5 bg-white text-black text-xs font-semibold rounded-full hover:bg-zinc-200 transition whitespace-nowrap"
+            className="px-3 py-1.5 bg-[var(--ink)] text-[var(--bg)] text-xs font-semibold rounded-full hover:opacity-85 transition whitespace-nowrap"
           >
             Install
           </button>
         ) : platform === "ios" ? (
           <button
             onClick={() => setExpanded((v) => !v)}
-            className="px-3 py-1.5 border border-zinc-700 text-zinc-200 text-xs font-semibold rounded-full hover:border-zinc-500 transition whitespace-nowrap"
+            className="px-3 py-1.5 border border-[var(--line)] text-[var(--ink)] text-xs font-semibold rounded-full hover:border-[var(--ink)] transition whitespace-nowrap"
           >
             {expanded ? "Got it" : "How"}
           </button>
@@ -159,20 +159,20 @@ export default function InstallNudge() {
         <button
           onClick={dismiss}
           aria-label="Dismiss"
-          className="text-zinc-500 hover:text-white text-lg leading-none px-1"
+          className="text-[var(--faint)] hover:text-[var(--ink)] text-lg leading-none px-1"
         >
           ×
         </button>
       </div>
       {expanded && platform === "ios" && (
-        <div className="mt-3 pt-3 border-t border-zinc-800/80 text-xs text-zinc-400 space-y-1.5">
+        <div className="mt-3 pt-3 border-t border-[var(--line)] text-xs text-[var(--dim)] space-y-1.5">
           <p>
-            1. Tap the <span className="text-zinc-200">Share</span> icon (square
+            1. Tap the <span className="text-[var(--ink)]">Share</span> icon (square
             with up arrow) at the bottom of Safari.
           </p>
           <p>
             2. Scroll down and tap{" "}
-            <span className="text-zinc-200">Add to Home Screen</span>.
+            <span className="text-[var(--ink)]">Add to Home Screen</span>.
           </p>
           <p>3. Tap Add — done. SAID Agent will open like a native app.</p>
         </div>

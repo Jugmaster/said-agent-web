@@ -44,14 +44,14 @@ function Section({
       <h2 className="text-2xl md:text-3xl font-bold mb-4 tracking-tight">
         {title}
       </h2>
-      <div className="space-y-4 text-zinc-300 leading-relaxed">{children}</div>
+      <div className="space-y-4 text-[var(--ink)] leading-relaxed">{children}</div>
     </section>
   );
 }
 
 function Code({ children }: { children: React.ReactNode }) {
   return (
-    <code className="px-1.5 py-0.5 rounded bg-zinc-800/80 border border-zinc-800 text-zinc-200 font-mono text-[0.9em]">
+    <code className="px-1.5 py-0.5 rounded bg-[rgba(128,128,128,.18)]/80 border border-[var(--line)] text-[var(--ink)] font-mono text-[0.9em]">
       {children}
     </code>
   );
@@ -59,13 +59,13 @@ function Code({ children }: { children: React.ReactNode }) {
 
 function Block({ label, children }: { label?: string; children: React.ReactNode }) {
   return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden my-4">
+    <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl overflow-hidden my-4">
       {label && (
-        <div className="px-4 py-2 border-b border-zinc-800 text-xs text-zinc-500 font-mono">
+        <div className="px-4 py-2 border-b border-[var(--line)] text-xs text-[var(--faint)] font-mono">
           {label}
         </div>
       )}
-      <pre className="px-4 py-3 text-sm text-zinc-200 font-mono overflow-x-auto whitespace-pre-wrap break-words">
+      <pre className="px-4 py-3 text-sm text-[var(--ink)] font-mono overflow-x-auto whitespace-pre-wrap break-words">
         {children}
       </pre>
     </div>
@@ -80,8 +80,8 @@ export default function DocsPage() {
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* SIDEBAR */}
           <aside className="md:w-56 shrink-0">
-            <div className="md:sticky md:top-28 bg-zinc-900/70 backdrop-blur-md border border-zinc-800 rounded-xl p-4 shadow-lg shadow-black/20">
-              <div className="text-xs text-zinc-500 uppercase tracking-wider mb-3">
+            <div className="md:sticky md:top-28 bg-[var(--card)]/70 backdrop-blur-md border border-[var(--line)] rounded-xl p-4 shadow-lg shadow-black/20">
+              <div className="text-xs text-[var(--faint)] uppercase tracking-wider mb-3">
                 Docs
               </div>
               <nav className="flex flex-col gap-0.5">
@@ -89,9 +89,9 @@ export default function DocsPage() {
                   <a
                     key={s.id}
                     href={`#${s.id}`}
-                    className="group flex items-baseline gap-2 px-2 py-1.5 rounded-md text-sm text-zinc-400 hover:text-white hover:bg-zinc-800/40 transition"
+                    className="group flex items-baseline gap-2 px-2 py-1.5 rounded-md text-sm text-[var(--dim)] hover:text-[var(--ink)] hover:bg-[rgba(128,128,128,.12)] transition"
                   >
-                    <span className="text-[10px] text-zinc-600 font-mono tabular-nums w-4 text-right">
+                    <span className="text-[10px] text-[var(--faint)] font-mono tabular-nums w-4 text-right">
                       {String(i + 1).padStart(2, "0")}
                     </span>
                     <span className="leading-tight">{s.title}</span>
@@ -99,12 +99,12 @@ export default function DocsPage() {
                 ))}
               </nav>
 
-              <div className="hidden md:block mt-8 pt-6 border-t border-zinc-800 text-xs text-zinc-500 space-y-2">
+              <div className="hidden md:block mt-8 pt-6 border-t border-[var(--line)] text-xs text-[var(--faint)] space-y-2">
                 <a
                   href="https://t.me/saidinfrabot"
                   target="_blank"
                   rel="noreferrer"
-                  className="block hover:text-zinc-300 transition"
+                  className="block hover:text-[var(--ink)] transition"
                 >
                   @saidinfrabot →
                 </a>
@@ -112,7 +112,7 @@ export default function DocsPage() {
                   href="https://x.com/saidagent"
                   target="_blank"
                   rel="noreferrer"
-                  className="block hover:text-zinc-300 transition"
+                  className="block hover:text-[var(--ink)] transition"
                 >
                   @saidagent →
                 </a>
@@ -120,7 +120,7 @@ export default function DocsPage() {
                   href="https://www.saidprotocol.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="block hover:text-zinc-300 transition"
+                  className="block hover:text-[var(--ink)] transition"
                 >
                   saidprotocol.com →
                 </a>
@@ -131,13 +131,13 @@ export default function DocsPage() {
           {/* CONTENT */}
           <main className="flex-1 min-w-0 max-w-3xl">
             <header className="mb-12">
-              <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
+              <div className="inline-block px-4 py-2 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
                 Docs
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
                 SAID Agent.
               </h1>
-              <p className="text-lg text-zinc-400 max-w-2xl">
+              <p className="text-lg text-[var(--dim)] max-w-2xl">
                 Your AI agent on Solana — its own wallet, its own identity,
                 yours forever. Live in Telegram and right here on the web.
               </p>
@@ -170,7 +170,7 @@ export default function DocsPage() {
                   href="https://t.me/saidinfrabot"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   @saidinfrabot
                 </a>
@@ -238,11 +238,11 @@ swap 100 USDC for USDC on arbitrum`}</Block>
               </p>
               <p>
                 Beyond instant swaps, your agent can place{" "}
-                <span className="text-white font-medium">limit orders</span>{" "}
+                <span className="text-[var(--ink)] font-medium">limit orders</span>{" "}
                 (fill when a price is hit) and{" "}
-                <span className="text-white font-medium">recurring / DCA</span>{" "}
+                <span className="text-[var(--ink)] font-medium">recurring / DCA</span>{" "}
                 buys. In a group chat, it can also run a{" "}
-                <span className="text-white font-medium">group swap</span> and
+                <span className="text-[var(--ink)] font-medium">group swap</span> and
                 tally everyone&apos;s positions.
               </p>
               <Block label="orders">{`buy JUP when it hits $0.40
@@ -257,7 +257,7 @@ swap 5 USDC to BONK (in a group — everyone joins)`}</Block>
                   href="https://x402.org"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   x402
                 </a>{" "}
@@ -283,7 +283,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                   href="https://earnidle.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   IDLE
                 </a>
@@ -309,7 +309,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 verified-badge NFT — no deposit required.
               </p>
               <p>Verification unlocks:</p>
-              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+              <ul className="list-disc pl-6 space-y-1 text-[var(--ink)]">
                 <li>
                   The verified badge in the directory and on your agent&apos;s
                   public profile
@@ -336,21 +336,21 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 Your agent&apos;s wallet is a normal Solana wallet — fund it two
                 ways:
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+              <ul className="list-disc pl-6 space-y-1 text-[var(--ink)]">
                 <li>
-                  <span className="text-white font-medium">Buy with card</span> —
-                  tap <span className="text-white">Add funds</span> in the web app
+                  <span className="text-[var(--ink)] font-medium">Buy with card</span> —
+                  tap <span className="text-[var(--ink)]">Add funds</span> in the web app
                   to buy with a card or Apple Pay, right inside the app. The funds
                   land in your agent&apos;s wallet a couple of minutes after
                   payment confirms — no external wallet needed.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Crypto deposit</span>{" "}
+                  <span className="text-[var(--ink)] font-medium">Crypto deposit</span>{" "}
                   — send SOL or any SPL token to your agent&apos;s wallet address
                   from any wallet or exchange.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Scan to pay</span> —
+                  <span className="text-[var(--ink)] font-medium">Scan to pay</span> —
                   the Fund screen shows a Solana Pay QR any wallet app can scan
                   to top up your agent.
                 </li>
@@ -381,7 +381,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 effective cost —{" "}
                 <a
                   href="#cashback"
-                  className="text-white underline underline-offset-2 hover:text-zinc-300"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:text-[var(--ink)]"
                 >
                   see Cashback
                 </a>
@@ -401,7 +401,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 activity, it climbs tiers — and each tier rebates a bigger slice
                 of the 1% fee straight into your wallet.
               </p>
-              <div className="bg-zinc-900 border border-zinc-800 rounded-xl overflow-hidden my-4 divide-y divide-zinc-800">
+              <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl overflow-hidden my-4 divide-y divide-[var(--line)]">
                 {[
                   { tier: "New", back: "0%", req: "just getting started" },
                   { tier: "Bronze", back: "15%", req: "verified & active" },
@@ -417,11 +417,11 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                     key={t.tier}
                     className="flex items-center gap-3 px-4 py-3 text-sm"
                   >
-                    <span className="font-medium text-white w-20">{t.tier}</span>
-                    <span className="font-mono text-white w-24">
+                    <span className="font-medium text-[var(--ink)] w-20">{t.tier}</span>
+                    <span className="font-mono text-[var(--ink)] w-24">
                       {t.back} back
                     </span>
-                    <span className="text-xs text-zinc-500 flex-1 text-right">
+                    <span className="text-xs text-[var(--faint)] flex-1 text-right">
                       {t.req}
                     </span>
                   </div>
@@ -461,7 +461,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                   href="https://www.saidprotocol.com"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   saidprotocol.com
                 </a>
@@ -474,42 +474,42 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 The web app is a full surface, not just a viewer. Sign in with
                 Telegram or X and you get:
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+              <ul className="list-disc pl-6 space-y-1 text-[var(--ink)]">
                 <li>
-                  <span className="text-white font-medium">Home</span> — your
+                  <span className="text-[var(--ink)] font-medium">Home</span> — your
                   dashboard: balance, holdings, recent activity, and one-tap
                   actions the moment you open the app.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Send</span> — pay
+                  <span className="text-[var(--ink)] font-medium">Send</span> — pay
                   anyone by their Telegram or X handle; they don&apos;t need a
                   wallet or to have ever heard of SAID.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Chat</span> — talk to
+                  <span className="text-[var(--ink)] font-medium">Chat</span> — talk to
                   your agent and run every action in natural language, same as
                   Telegram.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Wallet</span> — your
+                  <span className="text-[var(--ink)] font-medium">Wallet</span> — your
                   live balance and token holdings in one place. The agent&apos;s
                   service wallets are handled automatically, out of sight.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Activity</span> —
+                  <span className="text-[var(--ink)] font-medium">Activity</span> —
                   your agent&apos;s on-chain history (swaps, transfers, stakes),
                   each linkable to its Solana transaction.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Launches</span> —
+                  <span className="text-[var(--ink)] font-medium">Launches</span> —
                   tokens launched through the agent ecosystem.
                 </li>
                 <li>
-                  <span className="text-white font-medium">Leaderboard</span> —
+                  <span className="text-[var(--ink)] font-medium">Leaderboard</span> —
                   agents ranked by IDLE earnings (jobs completed, USDC earned).
                 </li>
                 <li>
-                  <span className="text-white font-medium">Stats</span> — live
+                  <span className="text-[var(--ink)] font-medium">Stats</span> — live
                   SAID Protocol numbers: agents registered, verified on-chain,
                   average reputation.
                 </li>
@@ -525,32 +525,32 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 One agent, every platform. Same wallet, same identity, same
                 on-chain history no matter where you reach it.
               </p>
-              <ul className="list-disc pl-6 space-y-1 text-zinc-300">
+              <ul className="list-disc pl-6 space-y-1 text-[var(--ink)]">
                 <li>
-                  <span className="text-white font-medium">Telegram</span> — live.{" "}
+                  <span className="text-[var(--ink)] font-medium">Telegram</span> — live.{" "}
                   <a
                     href="https://t.me/saidinfrabot"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-white underline underline-offset-2"
+                    className="text-[var(--ink)] underline underline-offset-2"
                   >
                     @saidinfrabot
                   </a>
                 </li>
                 <li>
-                  <span className="text-white font-medium">Web app</span> — live.
+                  <span className="text-[var(--ink)] font-medium">Web app</span> — live.
                   Create or claim an agent and run everything in the browser;
                   sign in with Telegram or X.
                 </li>
                 <li>
-                  <span className="text-white font-medium">X</span> — used today
+                  <span className="text-[var(--ink)] font-medium">X</span> — used today
                   for send-by-handle and sign-in; broader in-app support is
                   expanding. Tag{" "}
                   <a
                     href="https://x.com/saidagent"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-white underline underline-offset-2"
+                    className="text-[var(--ink)] underline underline-offset-2"
                   >
                     @saidagent
                   </a>{" "}
@@ -560,7 +560,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
             </Section>
 
             <Section id="faq" title="FAQ">
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 Do I need a Solana wallet first?
               </h3>
               <p>
@@ -570,7 +570,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 you want, but it&apos;s not required.
               </p>
 
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 Is this an actual on-chain identity, or a database row?
               </h3>
               <p>
@@ -580,7 +580,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 chain.
               </p>
 
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 What happens if I lose my Telegram account?
               </h3>
               <p>
@@ -589,7 +589,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 part of the broader SAID Hosting platform.
               </p>
 
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 Can I see what my agent did?
               </h3>
               <p>
@@ -597,7 +597,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 anchored into a Merkle-tree summary periodically. The{" "}
                 <Link
                   href="/activity"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   Activity
                 </Link>{" "}
@@ -605,14 +605,14 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 profile in the{" "}
                 <Link
                   href="/agents"
-                  className="text-white underline underline-offset-2 hover:no-underline"
+                  className="text-[var(--ink)] underline underline-offset-2 hover:no-underline"
                 >
                   directory
                 </Link>
                 .
               </p>
 
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 How does the agent know who to send to with @handle?
               </h3>
               <p>
@@ -623,7 +623,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 agent.
               </p>
 
-              <h3 className="text-base font-semibold text-white mt-6">
+              <h3 className="text-base font-semibold text-[var(--ink)] mt-6">
                 Where do the 1% fees go?
               </h3>
               <p>
@@ -635,14 +635,14 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
             </Section>
 
-            <footer className="mt-20 pt-8 border-t border-zinc-800 text-sm text-zinc-500">
+            <footer className="mt-20 pt-8 border-t border-[var(--line)] text-sm text-[var(--faint)]">
               <p>
                 Questions? Tag{" "}
                 <a
                   href="https://x.com/saidagent"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-zinc-300 hover:text-white"
+                  className="text-[var(--ink)] hover:text-[var(--ink)]"
                 >
                   @saidagent
                 </a>{" "}
@@ -651,14 +651,14 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                   href="https://t.me/saidinfrabot"
                   target="_blank"
                   rel="noreferrer"
-                  className="text-zinc-300 hover:text-white"
+                  className="text-[var(--ink)] hover:text-[var(--ink)]"
                 >
                   @saidinfrabot
                 </a>{" "}
                 directly — your agent will answer.
               </p>
               <p className="mt-2">
-                <Link href="/" className="text-zinc-300 hover:text-white">
+                <Link href="/" className="text-[var(--ink)] hover:text-[var(--ink)]">
                   ← back to SAID Agent
                 </Link>
               </p>

@@ -90,11 +90,11 @@ function LinkAgent({ platformId }: { platformId: string }) {
 
   return (
     <div className="mx-auto max-w-2xl px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-6 md:pt-10 md:pb-12">
-      <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-300">
+      <Link href="/settings" className="text-sm text-[var(--faint)] hover:text-[var(--ink)]">
         ← Settings
       </Link>
       <h1 className="mt-4 text-2xl font-bold">Link an existing agent</h1>
-      <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+      <p className="mt-2 text-sm leading-relaxed text-[var(--dim)]">
         Registered an agent outside this app? Prove you control its wallet and
         your fees here get priced off the reputation it already earned. The
         wallet stays where it is, we never take a key, and it keeps earning its
@@ -102,12 +102,12 @@ function LinkAgent({ platformId }: { platformId: string }) {
       </p>
 
       {current?.wallet ? (
-        <div className="mt-6 rounded-2xl border border-emerald-800/60 bg-emerald-950/20 p-5">
-          <div className="text-xs uppercase tracking-wide text-emerald-500">Linked</div>
-          <div className="mt-1 break-all font-mono text-sm text-zinc-200">{current.wallet}</div>
+        <div className="mt-6 rounded-2xl border border-[rgba(61,163,93,.35)]/60 bg-[rgba(61,163,93,.12)]/20 p-5">
+          <div className="text-xs uppercase tracking-wide text-[var(--good)]">Linked</div>
+          <div className="mt-1 break-all font-mono text-sm text-[var(--ink)]">{current.wallet}</div>
           {current.tier && (
-            <div className="mt-2 text-sm text-zinc-300">
-              Tier: <span className="font-semibold capitalize text-emerald-300">{current.tier}</span>
+            <div className="mt-2 text-sm text-[var(--ink)]">
+              Tier: <span className="font-semibold capitalize text-[var(--good)]">{current.tier}</span>
               {" — your cashback is priced at this tier."}
             </div>
           )}
@@ -119,15 +119,15 @@ function LinkAgent({ platformId }: { platformId: string }) {
               setBusy(false);
             }}
             disabled={busy}
-            className="mt-4 rounded-lg border border-zinc-700 px-4 py-2.5 text-sm text-zinc-300 hover:border-zinc-500 disabled:opacity-50"
+            className="mt-4 rounded-lg border border-[var(--line)] px-4 py-2.5 text-sm text-[var(--ink)] hover:border-[var(--ink)] disabled:opacity-50"
           >
             Unlink
           </button>
         </div>
       ) : (
-        <div className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <div className="mt-6 space-y-4 rounded-2xl border border-[var(--line)] bg-[var(--card)] p-5">
           <div>
-            <label className="mb-2 block text-xs uppercase tracking-wide text-zinc-500">
+            <label className="mb-2 block text-xs uppercase tracking-wide text-[var(--faint)]">
               Step 1 — your agent&apos;s wallet address
             </label>
             <input
@@ -138,7 +138,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
               }}
               placeholder="Solana address"
               spellCheck={false}
-              className="w-full rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 font-mono text-base outline-none focus:border-zinc-600 sm:text-sm"
+              className="w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-4 py-3 font-mono text-base outline-none focus:border-[var(--dim)] sm:text-sm"
             />
           </div>
 
@@ -146,26 +146,26 @@ function LinkAgent({ platformId }: { platformId: string }) {
             <button
               onClick={() => setChallenge(challengeFor(platformId, wallet.trim()))}
               disabled={!walletValid}
-              className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+              className="w-full rounded-lg bg-[var(--ink)] py-3 text-sm font-semibold text-[var(--bg)] hover:opacity-85 disabled:opacity-40"
             >
               Generate challenge
             </button>
           ) : (
             <>
               <div>
-                <label className="mb-2 block text-xs uppercase tracking-wide text-zinc-500">
+                <label className="mb-2 block text-xs uppercase tracking-wide text-[var(--faint)]">
                   Step 2 — sign this exact message with that wallet
                 </label>
-                <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap break-all rounded-lg border border-zinc-800 bg-zinc-950 p-3 font-mono text-xs text-zinc-400">
+                <pre className="max-h-40 overflow-y-auto whitespace-pre-wrap break-all rounded-lg border border-[var(--line)] bg-[var(--bg)] p-3 font-mono text-xs text-[var(--dim)]">
                   {challenge}
                 </pre>
                 <button
                   onClick={() => void copyChallenge()}
-                  className="mt-2 rounded-lg border border-zinc-700 px-3 py-2 text-xs text-zinc-300 hover:border-zinc-500"
+                  className="mt-2 rounded-lg border border-[var(--line)] px-3 py-2 text-xs text-[var(--ink)] hover:border-[var(--ink)]"
                 >
                   {copied ? "Copied ✓" : "Copy message"}
                 </button>
-                <p className="mt-2 text-xs text-zinc-500">
+                <p className="mt-2 text-xs text-[var(--faint)]">
                   Any wallet&apos;s &ldquo;sign message&rdquo; feature works, or sign it
                   with your keypair directly. This is a signature, not a
                   transaction — it can&apos;t move anything. Valid for 15 minutes.
@@ -173,7 +173,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
               </div>
 
               <div>
-                <label className="mb-2 block text-xs uppercase tracking-wide text-zinc-500">
+                <label className="mb-2 block text-xs uppercase tracking-wide text-[var(--faint)]">
                   Step 3 — paste the signature
                 </label>
                 <textarea
@@ -182,21 +182,21 @@ function LinkAgent({ platformId }: { platformId: string }) {
                   rows={3}
                   placeholder="base58 signature"
                   spellCheck={false}
-                  className="w-full resize-none rounded-lg border border-zinc-800 bg-zinc-950 px-4 py-3 font-mono text-base outline-none focus:border-zinc-600 sm:text-sm"
+                  className="w-full resize-none rounded-lg border border-[var(--line)] bg-[var(--bg)] px-4 py-3 font-mono text-base outline-none focus:border-[var(--dim)] sm:text-sm"
                 />
               </div>
 
               <button
                 onClick={() => void submit()}
                 disabled={!signature.trim() || busy}
-                className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+                className="w-full rounded-lg bg-[var(--ink)] py-3 text-sm font-semibold text-[var(--bg)] hover:opacity-85 disabled:opacity-40"
               >
                 {busy ? "Verifying…" : "Link agent"}
               </button>
             </>
           )}
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-[#e06c5a]">{error}</p>}
         </div>
       )}
     </div>
