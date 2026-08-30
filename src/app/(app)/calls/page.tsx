@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import DotSeam from "@/components/DotSeam";
 import AuthGate from "@/components/AuthGate";
 import { commsCall, commsEmail, getComms, type CommsCallRecord } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
@@ -33,7 +34,7 @@ function CallCard({ call }: { call: CommsCallRecord }) {
   const [open, setOpen] = useState(false);
   const hasDetail = call.summary || call.transcript || call.recordingUrl;
   return (
-    <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl px-4 py-3">
+    <div className="rounded-[14px] border border-[var(--line)] px-4 py-3">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
@@ -202,24 +203,25 @@ function CallsInner({ platformId }: { platformId: string }) {
   return (
     // Mobile scrolling happens in AppShell's internal container (body is
     // locked so the fixed tab bar can't drift on iOS/Telegram webviews).
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Comms</h1>
-        <p className="text-sm text-[var(--dim)] mt-1">
-          Your agent calls, emails, and (soon) texts on your behalf — paid from
-          your balance, only when it works. Transcripts and recordings land
-          here.
-        </p>
+    <div className="col mx-auto w-full max-w-[860px]">
+      <div className="head">
+        <div>
+          <div className="kickm">Comms · calls &amp; email</div>
+          <div className="big">{calls?.length ? calls.length : "—"}</div>
+          <div className="subline">
+            calls and emails placed by your agent<i>·</i>paid from your balance
+          </div>
+        </div>
       </div>
 
-      <div className="flex gap-1 mb-5 bg-[var(--card)] border border-[var(--line)] rounded-xl p-1 w-fit">
+      <DotSeam />
+
+      <div className="tabs" style={{ marginTop: 0 }}>
         {(["call", "email", "text"] as const).map((t) => (
           <button
             key={t}
             onClick={() => setTab(t)}
-            className={`px-4 py-2.5 rounded-lg text-sm font-medium capitalize transition ${
-              tab === t ? "bg-[var(--ink)] text-[var(--bg)]" : "text-[var(--dim)] hover:text-[var(--ink)]"
-            }`}
+            className={`tab${tab === t ? " on" : ""}`}
           >
             {t}
           </button>
@@ -227,9 +229,9 @@ function CallsInner({ platformId }: { platformId: string }) {
       </div>
 
       {tab === "call" && (
-      <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4 mb-6">
+      <div className="fstack">
         <div>
-          <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
+          <label>
             Phone number
           </label>
           <input
@@ -238,7 +240,7 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="+14155551234"
             inputMode="tel"
             spellCheck={false}
-            className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none font-mono text-base sm:text-sm"
+            className="font-mono"
           />
           {phone.trim() && !phoneValid && (
             <p className="text-xs text-[var(--faint)] mt-1.5">
@@ -248,7 +250,7 @@ function CallsInner({ platformId }: { platformId: string }) {
           )}
         </div>
         <div>
-          <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">
+          <label>
             What should your agent say?
           </label>
           <textarea
@@ -257,13 +259,13 @@ function CallsInner({ platformId }: { platformId: string }) {
             placeholder="Call this restaurant and book a table for 2 tomorrow at 8pm under the name Callum."
             rows={3}
             maxLength={500}
-            className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm resize-none"
+            className=""
           />
         </div>
         <button
           onClick={() => void placeCall()}
           disabled={!canCall}
-          className="w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85 disabled:opacity-40"
+          className="fill w-full"
         >
           {placing ? "Placing call…" : `Call now · ${CALL_COST}`}
         </button>
@@ -272,43 +274,43 @@ function CallsInner({ platformId }: { platformId: string }) {
       )}
 
       {tab === "email" && (
-        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-5 space-y-4 mb-6">
+        <div className="fstack">
           <div>
-            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">To</label>
+            <label>To</label>
             <input
               value={emailTo}
               onChange={(e) => setEmailTo(e.target.value)}
               placeholder="alice@example.com"
               inputMode="email"
               spellCheck={false}
-              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm"
+              className=""
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">Subject</label>
+            <label>Subject</label>
             <input
               value={emailSubject}
               onChange={(e) => setEmailSubject(e.target.value)}
               maxLength={200}
               placeholder="Quick question"
-              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm"
+              className=""
             />
           </div>
           <div>
-            <label className="block text-xs uppercase tracking-wide text-[var(--faint)] mb-2">Message</label>
+            <label>Message</label>
             <textarea
               value={emailBody}
               onChange={(e) => setEmailBody(e.target.value)}
               rows={5}
               maxLength={5000}
               placeholder="Write the email your agent should send…"
-              className="w-full px-4 py-3 rounded-lg bg-[var(--bg)] border border-[var(--line)] focus:border-[var(--dim)] outline-none text-base sm:text-sm resize-none"
+              className=""
             />
           </div>
           <button
             onClick={() => void sendEmail()}
             disabled={!emailValid}
-            className="w-full py-3 rounded-lg bg-[var(--ink)] text-[var(--bg)] text-sm font-semibold hover:opacity-85 disabled:opacity-40"
+            className="fill w-full"
           >
             {placing ? "Sending…" : "Send email · $0.03"}
           </button>
@@ -317,15 +319,15 @@ function CallsInner({ platformId }: { platformId: string }) {
       )}
 
       {tab === "text" && (
-        <div className="bg-[var(--card)] border border-[var(--line)] rounded-xl p-6 mb-6 text-center">
-          <p className="text-sm text-[var(--ink)] font-medium mb-1">Texts are coming soon.</p>
-          <p className="text-xs text-[var(--faint)]">
-            SMS from your agent is on the way — calls and email work today.
-          </p>
+        <div className="soon">
+          <b>Texts are coming soon.</b>
+          <span>SMS from your agent is on the way, calls and email work today.</span>
         </div>
       )}
 
-      <div className="space-y-2">
+      <div className="sect">
+        <span className="lbl">Recent</span>
+        <div className="qlist" style={{ gap: 8 }}>
         {calls === null ? (
           <div className="flex justify-center py-8">
             <div className="w-6 h-6 rounded-full border-2 border-[var(--line)] border-t-zinc-300 animate-spin" />
@@ -345,6 +347,7 @@ function CallsInner({ platformId }: { platformId: string }) {
             );
           })()
         )}
+        </div>
       </div>
     </div>
   );

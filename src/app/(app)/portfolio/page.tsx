@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
+import DotSeam from "@/components/DotSeam";
 import {
   getBalance,
   getPortfolio,
@@ -79,26 +80,24 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
   const identityCard = (
-    <section className="rounded-2xl border border-[var(--line)] bg-[var(--card)] p-4">
-      <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[rgba(128,128,128,.22)] to-[rgba(128,128,128,.18)] text-sm font-semibold text-[var(--ink)]">
-          {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
-        </div>
-        <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-[var(--ink)]">{balance?.displayName ?? "Your agent"}</div>
-          <div className="text-xs">
-            {balance?.verified ? <span className="text-[var(--good)]">● Verified</span> : balance?.registered ? <span className="text-[var(--warn)]">● Registered</span> : <span className="text-[var(--faint)]">○ Unverified</span>}
+    <section className="card">
+      <div className="idrow">
+        <span className="av">{(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}</span>
+        <span className="min-w-0 flex-1">
+          <b className="truncate">{balance?.displayName ?? "Your agent"}</b>
+          <span className="text-xs">
+            {balance?.verified ? <span className="vchip">● Verified</span> : balance?.registered ? <span className="text-[var(--warn)]">● Registered</span> : <span className="text-[var(--faint)]">○ Unverified</span>}
             {balance && balance.proTier > 0 && <span className="ml-2 text-[var(--warn)]">Pro</span>}
-          </div>
-        </div>
+          </span>
+        </span>
       </div>
       {balance?.saidWallet && (
-        <button onClick={() => void copy(balance.saidWallet!)} className="mt-3 w-full rounded-lg border border-[var(--line)] bg-[var(--bg)] px-3 py-3 text-left font-mono text-sm text-[var(--dim)] hover:text-[var(--ink)]">
+        <button onClick={() => void copy(balance.saidWallet!)} className="addr">
           {truncMiddle(balance.saidWallet, 6, 6)} {copied ? "✓" : "⧉"}
         </button>
       )}
       {balance?.saidPda && (
-        <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="mt-3 block rounded-lg border border-[var(--line)] py-3 text-center text-sm font-medium text-[var(--ink)] transition hover:border-[var(--dim)] hover:text-[var(--ink)]">
+        <Link href={`/agents/${encodeURIComponent(balance.platformId)}`} className="outline">
           Public profile →
         </Link>
       )}
@@ -106,74 +105,78 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   );
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="surface">
       {/* MAIN */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="col min-w-0 flex-1 overflow-y-auto">
         {/* Hero */}
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="head">
           <div>
-            <div className="flex items-center gap-2 text-sm text-[var(--faint)]">
-              <span>Total value</span>
+            <div className="kickm">
+              Wallet
               {balance?.verified ? (
-                <span className="text-[var(--good)]">· Verified</span>
+                <> · <span style={{ color: "var(--good)" }}>verified</span></>
               ) : balance?.registered ? (
-                <span className="text-[var(--warn)]">· Registered</span>
+                <> · <span style={{ color: "var(--warn)" }}>registered</span></>
               ) : null}
             </div>
-            <div className="mt-1 text-4xl font-semibold tracking-tight text-[var(--ink)] md:text-5xl">
+            <div className="big">
               {main == null && !error ? <span className="text-[var(--faint)]">$·····</span> : fmtUsd(total)}
             </div>
-            <div className="mt-1.5 text-sm text-[var(--dim)]">
-              {main ? `${main.solBalance.toFixed(4)} SOL · ${holdings.length} token${holdings.length === 1 ? "" : "s"}` : "—"}
+            <div className="subline">
+              {main ? (
+                <>
+                  {main.solBalance.toFixed(4)} SOL<i>·</i>{holdings.length} token{holdings.length === 1 ? "" : "s"}
+                </>
+              ) : (
+                "—"
+              )}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <button onClick={() => void load()} disabled={refreshing} className="rounded-xl border border-[var(--line)] px-4 py-2.5 text-sm text-[var(--ink)] transition hover:border-[var(--ink)] disabled:opacity-40">
-              {refreshing ? "Refreshing…" : "↻ Refresh"}
+          <div className="flex items-center gap-2.5">
+            <button onClick={() => void load()} disabled={refreshing} className="ghost disabled:opacity-40">
+              {refreshing ? "Refreshing…" : "Refresh"}
             </button>
             {balance?.saidWallet ? (
-              <button onClick={() => setFunding(true)} className="rounded-xl bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-[var(--bg)] transition hover:opacity-85">
-                Add funds
-              </button>
+              <button onClick={() => setFunding(true)} className="fill">Add funds</button>
             ) : (
-              <Link href="/fund" className="rounded-xl bg-[var(--ink)] px-5 py-2.5 text-sm font-semibold text-[var(--bg)] transition hover:opacity-85">
-                Set up agent
-              </Link>
+              <Link href="/fund" className="fill">Set up agent</Link>
             )}
           </div>
         </div>
 
+        <DotSeam />
+
         {error && (
-          <div className="mb-6 rounded-xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+          <div className="mt-6 rounded-[14px] border border-[rgba(224,108,90,.35)] bg-[rgba(224,108,90,.08)] px-4 py-3 text-sm text-[#e06c5a]">{error}</div>
         )}
 
         {/* Holdings */}
-        <section className="mb-9">
-          <h2 className="mb-3 text-sm font-medium text-[var(--ink)]">Holdings</h2>
-          <div className="overflow-hidden rounded-2xl border border-[var(--line)]">
+        <section className="sect" style={{ marginTop: 0 }}>
+          <div className="head"><span className="h2">Holdings</span><Link href="/activity" className="more">Activity →</Link></div>
+          <>
             {main == null && !error ? (
-              <div className="divide-y divide-[var(--line)]">
+              <div className="grid3">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-16 animate-pulse bg-[var(--card)]" />
+                  <div key={i} className="hold animate-pulse" style={{ height: 73 }} />
                 ))}
               </div>
             ) : (
-              <div className="divide-y divide-[var(--line)]">
+              <div className="grid3">
                 <HoldingRow symbol="SOL" balance={main?.solBalance ?? 0} usd={main?.solUsdValue ?? null} />
                 {holdings.map((t) => (
                   <HoldingRow key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} />
                 ))}
                 {holdings.length === 0 && (main?.solBalance ?? 0) === 0 && (
-                  <div className="px-4 py-6 text-center text-sm text-[var(--faint)]">
+                  <div className="hold justify-center text-sm text-[var(--faint)]">
                     Nothing here yet.{" "}
-                    <button onClick={() => setFunding(true)} className="text-[var(--ink)] underline underline-offset-2 hover:text-[var(--ink)]">
+                    <button onClick={() => setFunding(true)} className="ml-1 text-[var(--ink)] underline underline-offset-2">
                       Add funds
                     </button>
                   </div>
                 )}
               </div>
             )}
-          </div>
+          </>
         </section>
 
         {/* Aside content inline on smaller screens. The identity card carries
@@ -186,7 +189,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT PANEL */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-[var(--line)] p-5 pt-10 xl:flex">
+      <aside className="rail hidden shrink-0 overflow-y-auto xl:flex">
 {identityCard}
         <RecentActivity receipts={receipts} />
       </aside>
@@ -207,17 +210,15 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
 function HoldingRow({ symbol, balance, usd }: { symbol: string; balance: number; usd: number | null }) {
   return (
-    <div className="flex items-center gap-3 bg-[var(--card)] px-4 py-3">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[rgba(128,128,128,.18)] text-xs font-semibold text-[var(--ink)]">
-        {symbol.slice(0, 3).toUpperCase()}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold text-[var(--ink)]">{symbol}</div>
-        <div className="truncate text-xs text-[var(--faint)]">
+    <div className="hold">
+      <span className="tok">{symbol.slice(0, 3).toUpperCase()}</span>
+      <span className="m">
+        <b className="truncate">{symbol}</b>
+        <span className="truncate">
           {balance.toLocaleString(undefined, { maximumFractionDigits: balance < 1 ? 6 : 4 })}
-        </div>
-      </div>
-      <div className="text-right text-sm font-medium text-[var(--ink)]">{usd != null && usd > 0 ? fmtUsd(usd) : "—"}</div>
+        </span>
+      </span>
+      <span className="usd">{usd != null && usd > 0 ? fmtUsd(usd) : "—"}</span>
     </div>
   );
 }
@@ -225,23 +226,23 @@ function HoldingRow({ symbol, balance, usd }: { symbol: string; balance: number;
 function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
   return (
     <section>
-      <div className="mb-2 flex items-baseline justify-between">
-        <h2 className="text-xs font-medium uppercase tracking-wider text-[var(--faint)]">Recent activity</h2>
-        <Link href="/activity" className="-my-1 py-2 text-sm text-[var(--dim)] transition hover:text-[var(--ink)]">View all →</Link>
+      <div className="head">
+        <span className="lbl">Recent activity</span>
+        <Link href="/activity" className="more">View all →</Link>
       </div>
       {receipts === null ? (
-        <p className="text-xs text-[var(--faint)]">Loading…</p>
+        <p className="mt-2 text-xs text-[var(--faint)]">Loading…</p>
       ) : receipts.length === 0 ? (
-        <p className="text-xs italic text-[var(--faint)]">Nothing on-chain yet.</p>
+        <p className="mt-2 text-xs italic text-[var(--faint)]">Nothing on-chain yet.</p>
       ) : (
-        <div className="flex flex-col gap-1.5">
+        <div className="qlist">
           {receipts.map((r) => {
             const label = actionLabel(r.type);
             return (
-              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--card)] px-3 py-2">
+              <div key={r.seq} className="actrow">
                 <span className="text-base leading-none">{label.emoji}</span>
-                <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
-                <span className="text-[11px] text-[var(--faint)]">{timeAgo(r.occurredAt)}</span>
+                <span className="flex-1">{label.text}</span>
+                <span className="when">{timeAgo(r.occurredAt)}</span>
               </div>
             );
           })}

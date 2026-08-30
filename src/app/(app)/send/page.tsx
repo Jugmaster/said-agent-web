@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useState } from "react";
+import DotSeam from "@/components/DotSeam";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { chat, agentSend, getSends, type SendRecord } from "@/lib/api";
@@ -417,23 +418,30 @@ function SendScreen({ platformId }: { platformId: string }) {
   }, [handle, platform, amount, asset, walletAddress]);
 
   return (
-    <div className="flex min-h-dvh">
+    <div className="surface">
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1">Send</h1>
-          <p className="text-sm text-[var(--faint)]">
-            One handle. Any chain. Your agent figures out the rest.
-          </p>
+      <div className="col min-w-0 flex-1 overflow-y-auto">
+        <div className="kickm">Send · Solana mainnet</div>
+        <div className="big">
+          {amount || "0"} <span style={{ color: "var(--faint)", fontSize: ".42em", letterSpacing: 0 }}>{asset}</span>
         </div>
+        <div className="subline">
+          {handle ? (
+            <>to <b style={{ fontWeight: 500, color: "var(--ink)" }}>{handle}</b><i>·</i>screened before funds move</>
+          ) : (
+            "One handle. Any chain. Your agent figures out the rest."
+          )}
+        </div>
+
+        <DotSeam />
 
         <div className="flex w-full flex-col">
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
-            <div className="mb-6 flex items-center justify-between rounded-xl border border-[var(--line)] bg-[var(--card)] px-4 py-3">
+            <div className="mb-6 flex items-center justify-between rounded-[14px] border border-[var(--line)] px-4 py-3">
               <div>
-                <div className="text-xs text-[var(--faint)] mb-0.5">Your balance</div>
+                <div className="lbl mb-1">Your balance</div>
                 {bal.error ? (
                   <span className="text-sm text-[var(--warn)]">couldn’t load</span>
                 ) : bal.loading ? (
@@ -459,16 +467,12 @@ function SendScreen({ platformId }: { platformId: string }) {
           )}
 
           {/* Recipient — handle-first */}
-          <label className="block text-xs text-[var(--faint)] mb-2">RECIPIENT</label>
+          <label className="lbl mb-2 block">Recipient</label>
           <div className="flex gap-2 mb-2">
             <button
               type="button"
               onClick={() => setPlatform("telegram")}
-              className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
-                platform === "telegram"
-                  ? "border-white bg-[var(--ink)] text-[var(--bg)]"
-                  : "border-[var(--line)] text-[var(--dim)] hover:border-[var(--ink)]"
-              }`}
+              className={`tab${platform === "telegram" ? " on" : ""}`}
             >
               Telegram
             </button>

@@ -381,11 +381,9 @@ function ChatScreen({ platformId }: { platformId: string }) {
               keeps its sidebar total and skips this strip entirely. */}
           <div className="mx-auto mb-3 w-full max-w-3xl md:hidden">
             <Link href="/portfolio" className="block">
-              <div className="text-[11px] uppercase tracking-wide text-[var(--faint)]">
-                Your balance
-              </div>
+              <div className="lbl">Your balance</div>
               <div className="flex items-baseline gap-2">
-                <span className="text-3xl font-bold tracking-tight text-[var(--ink)]">
+                <span className="text-[28px] font-medium tracking-[-.02em] tabular-nums text-[var(--ink)]">
                   {portfolio?.totalUsdValue != null
                     ? `$${portfolio.totalUsdValue.toFixed(2)}`
                     : "···"}
@@ -398,13 +396,14 @@ function ChatScreen({ platformId }: { platformId: string }) {
           </div>
           <div className="mx-auto flex w-full max-w-3xl items-center justify-between">
             <div>
-              <h1 className="text-base font-semibold">{agentName}</h1>
+              <div className="kickm" style={{ marginBottom: 5 }}>Chat · your agent</div>
+              <h1 className="text-[19px] font-medium tracking-[-.02em]">{agentName}</h1>
               {/* Never the backend platform id: it means nothing to a user and
                   reads like a leaked internal. Their own handle plus live
                   status is the same line's worth of space, actually useful. */}
-              <p className="text-xs text-[var(--faint)]">
+              <p className="mt-0.5 text-xs text-[var(--faint)]">
                 {isLive ? (
-                  <span className="text-[var(--good)]">● Live on SAID</span>
+                  <span style={{ color: "var(--good)" }}>● Live on SAID</span>
                 ) : (
                   <span>Setting up</span>
                 )}
@@ -416,7 +415,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 <button
                   type="button"
                   onClick={() => void send("verify")}
-                  className="text-sm px-3.5 py-2.5 rounded-lg bg-blue-500 hover:bg-blue-400 text-[var(--bg)] font-semibold"
+                  className="fill text-sm"
                 >
                   Verify
                 </button>
@@ -480,7 +479,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
         )}
 
         {needsFunding && (
-          <div className="px-4 py-3 bg-blue-950/30 border-b border-blue-900/50">
+          <div className="px-4 py-3 bg-[rgba(122,167,217,.10)] border-b border-[rgba(122,167,217,.30)]">
             <div className="mx-auto flex w-full max-w-3xl items-start gap-3">
               <span className="text-lg leading-none">✨</span>
               <div className="flex-1 text-sm">
@@ -623,7 +622,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 onKeyDown={onKeyDown}
                 placeholder="Message your agent…"
                 rows={1}
-                className="flex-1 resize-none overflow-y-hidden rounded-xl bg-[var(--card)] border border-[var(--line)] px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-[var(--dim)] max-h-32"
+                className="flex-1 resize-none overflow-y-hidden rounded-[20px] bg-[var(--card)] border border-[var(--line)] px-4 py-[11px] text-base sm:text-[14.5px] focus:outline-none focus:border-[var(--dim)] max-h-32"
                 disabled={sending}
               />
               <button
