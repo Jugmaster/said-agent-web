@@ -787,3 +787,181 @@ html[data-theme="light"] .lswap .lw {
 body:has(.landing-page) .dotgrid-layer {
   display: none;
 }
+
+/* ── Chat surface ────────────────────────────────────────────────────────
+   Bubbles, the empty state and the composer rail. */
+.sa .msg {
+  max-width: 76%;
+  width: fit-content;
+  min-width: 0;
+  padding: 9px 16px;
+  border-radius: 18px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.sa .msg.user {
+  margin-left: auto;
+  background: var(--ink);
+  color: var(--bg);
+  border-bottom-right-radius: 5px;
+}
+.sa .msg.agent {
+  margin-right: auto;
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-bottom-left-radius: 5px;
+}
+.sa .thinking {
+  margin-right: auto;
+  width: fit-content;
+  background: var(--card);
+  border: 1px solid var(--line);
+  color: var(--faint);
+  border-radius: 18px;
+  border-bottom-left-radius: 5px;
+  padding: 9px 16px;
+  font-size: 13.5px;
+  font-style: italic;
+}
+
+/* Empty state. The big avatar and the two-up starter grid are the whole
+   first-run screen, so they carry the weight the hero does elsewhere. */
+.sa .chatempty {
+  padding: clamp(20px, 5vh, 52px) 0 8px;
+  text-align: center;
+}
+.sa .bigav {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: var(--ink);
+  color: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  font-weight: 500;
+}
+.sa .chatempty h2 {
+  margin-top: 22px;
+  font-size: clamp(26px, 3vw, 34px);
+  font-weight: 500;
+  letter-spacing: -0.03em;
+}
+.sa .chatempty p {
+  margin: 12px auto 0;
+  max-width: 46ch;
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--dim);
+}
+.sa .chatempty p b {
+  color: var(--ink);
+  font-weight: 500;
+}
+.sa .starters {
+  margin-top: 30px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  overflow: hidden;
+  text-align: left;
+}
+.sa .starters button {
+  border: none;
+  background: var(--bg);
+  box-shadow: 0 0 0 1px var(--line);
+  padding: 18px 20px;
+  color: var(--ink);
+  transition: background 0.3s;
+}
+.sa .starters button:hover:not(:disabled) {
+  background: var(--card);
+}
+.sa .starters button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.sa .starters .si {
+  display: flex;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(128, 128, 128, 0.18);
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin-bottom: 12px;
+  color: var(--dim);
+}
+.sa .starters b {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+.sa .starters span:last-child {
+  display: block;
+  margin-top: 3px;
+  font-size: 12px;
+  color: var(--faint);
+}
+@media (max-width: 700px) {
+  .sa .starters {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Balance chip in the chat header */
+.sa .balchip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: none;
+  padding: 9px 16px;
+  color: var(--ink);
+  transition: border-color 0.2s;
+}
+.sa .balchip:hover {
+  border-color: var(--ink);
+}
+.sa .balchip b {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Composer chip rail */
+.sa .chiprail button,
+.sa .chiprail a {
+  flex: none;
+  border: 1px solid var(--line);
+  border-radius: 99px;
+  background: none;
+  color: var(--dim);
+  padding: 9px 16px;
+  font-size: 13.5px;
+  white-space: nowrap;
+  transition: color 0.2s, border-color 0.2s;
+}
+.sa .chiprail button:hover,
+.sa .chiprail a:hover {
+  color: var(--ink);
+  border-color: var(--ink);
+}
+.sa .hints {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 7px;
+  font-size: 11px;
+  color: var(--faint);
+}

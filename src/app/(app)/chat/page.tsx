@@ -35,6 +35,16 @@ type AgentStep =
   | "returning_verified";
 
 // Short enough to read on a chip; phrased as things you'd actually ask.
+/** First-run starters. Each is a real prompt the agent can act on — the
+ *  design's example used a hardcoded handle, which would fail for anyone who
+ *  is not sending to @mike, so the send starter names the job instead. */
+const STARTERS: { icon: string; title: string; sub: string; q: string }[] = [
+  { icon: "\u2726", title: "Show my portfolio", sub: "Balances and holdings", q: "show my portfolio" },
+  { icon: "\u21c4", title: "Swap 0.01 SOL for USDC", sub: "Best route via Jupiter", q: "swap 0.01 SOL for USDC" },
+  { icon: "\u2197", title: "Send by handle", sub: "Screened before it moves", q: "send USDC to a handle" },
+  { icon: "\u25f7", title: "DCA $1 into SOL daily", sub: "Set a standing rule", q: "DCA $1 into SOL daily" },
+];
+
 const MOBILE_PROMPTS = [
   "What can you do?",
   "Watch SOL under $150",
@@ -542,29 +552,37 @@ function ChatScreen({ platformId }: { platformId: string }) {
               </div>
             )}
             {isReturning && (
-              <div className="text-center text-[var(--faint)] text-sm pt-12">
-                <p>Welcome back, {agentName}.</p>
-                <p className="mt-2 text-xs">
-                  Try: &quot;portfolio&quot; or &quot;swap 0.01 SOL for USDC&quot;.
+              <div className="chatempty">
+                <span className="bigav">{(agentName ?? "A").slice(0, 1).toUpperCase()}</span>
+                <h2>Welcome back.</h2>
+                <p>
+                  {agentName} is live on SAID
+                  {portfolio?.totalUsdValue != null ? (
+                    <> with <b>${portfolio.totalUsdValue.toFixed(2)}</b> ready to move</>
+                  ) : null}
+                  . Ask in plain words, it handles routing, screening and receipts.
                 </p>
+                <div className="starters">
+                  {STARTERS.map((st) => (
+                    <button key={st.q} type="button" onClick={() => void send(st.q)} disabled={sending}>
+                      <span className="si">{st.icon}</span>
+                      <b>{st.title}</b>
+                      <span>{st.sub}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             {messages.map((m) => (
               <div
                 key={m.id}
-                className={
-                  m.role === "user"
-                    ? "ml-auto max-w-[80%] md:max-w-[70%] w-fit min-w-0 bg-[var(--ink)] text-[var(--bg)] rounded-2xl rounded-br-sm px-4 py-2 whitespace-pre-wrap break-words"
-                    : "mr-auto max-w-[80%] md:max-w-[70%] w-fit min-w-0 bg-[var(--card)] border border-[var(--line)] text-[var(--ink)] rounded-2xl rounded-bl-sm px-4 py-2 whitespace-pre-wrap break-words"
-                }
+                className={m.role === "user" ? "msg user" : "msg agent"}
               >
                 {m.role === "user" ? m.text : <MessageText text={m.text} />}
               </div>
             ))}
             {sending && (
-              <div className="mr-auto w-fit bg-[var(--card)] border border-[var(--line)] text-[var(--faint)] rounded-2xl rounded-bl-sm px-4 py-2 text-sm italic">
-                thinking…
-              </div>
+              <div className="thinking">thinking…</div>
             )}
           </div>
         </div>
@@ -583,10 +601,10 @@ function ChatScreen({ platformId }: { platformId: string }) {
             {/* Mobile action rail: the desktop context rail is xl-only, so on a
                 phone there was nothing tappable at all. These are the jobs, not
                 navigation: two go to typed flows, the rest talk to the agent. */}
-            <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <div className="chiprail mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
               <Link
                 href="/calls"
-                className="shrink-0 rounded-full border border-[var(--line)] bg-[var(--card)] px-3.5 py-2 text-sm font-medium text-[var(--ink)] active:bg-[rgba(128,128,128,.18)]"
+                className="shrink-0"
               >
                 ☏ Comms
               </Link>
@@ -596,7 +614,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   type="button"
                   onClick={() => void send(q)}
                   disabled={sending}
-                  className="shrink-0 rounded-full border border-[var(--line)] bg-[var(--bg)] px-3.5 py-2 text-sm text-[var(--dim)] active:bg-[var(--card)] disabled:opacity-50"
+                  className="shrink-0 disabled:opacity-50"
                 >
                   {q}
                 </button>
