@@ -39,7 +39,7 @@ export default function ThemeToggle({ className = "" }: { className?: string }) 
       onClick={toggle}
       title="Toggle dark mode"
       aria-label={light ? "Switch to dark mode" : "Switch to light mode"}
-      className={`relative flex h-8 w-8 items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink)] transition-colors hover:border-[var(--ink)] ${className}`}
+      className={`relative flex h-10 w-10 items-center justify-center rounded-full border border-[var(--line)] text-[var(--ink)] transition-colors hover:border-[var(--ink)] sm:h-8 sm:w-8 ${className}`}
     >
       <svg
         width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor"

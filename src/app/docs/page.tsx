@@ -89,7 +89,7 @@ export default function DocsPage() {
                   <a
                     key={s.id}
                     href={`#${s.id}`}
-                    className="group flex items-baseline gap-2 px-2 py-1.5 rounded-md text-sm text-[var(--dim)] hover:text-[var(--ink)] hover:bg-[rgba(128,128,128,.12)] transition"
+                    className="group flex items-baseline gap-2 rounded-md px-2 py-3 text-sm text-[var(--dim)] transition hover:bg-[rgba(128,128,128,.12)] hover:text-[var(--ink)] sm:py-1.5"
                   >
                     <span className="text-[10px] text-[var(--faint)] font-mono tabular-nums w-4 text-right">
                       {String(i + 1).padStart(2, "0")}

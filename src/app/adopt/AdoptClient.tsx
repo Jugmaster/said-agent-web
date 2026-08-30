@@ -94,7 +94,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
         <div className="flex gap-2">
           <Link
             href="/chat"
-            className="text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
+            className="text-sm px-4 py-3 rounded-full bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
           >
             Open chat →
           </Link>
@@ -102,7 +102,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className="text-sm px-4 py-2 rounded-lg border border-[var(--line)] hover:border-[var(--ink)]"
+            className="text-sm px-4 py-3 rounded-full border border-[var(--line)] hover:border-[var(--ink)]"
           >
             Open Telegram
           </a>
@@ -127,7 +127,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
       ) : !authenticated ? (
         <button
           onClick={login}
-          className="w-full text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
+          className="w-full text-sm px-4 py-3 rounded-full bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
         >
           {expectedXUserId ? "Sign in with X →" : "Sign in →"}
         </button>
@@ -152,7 +152,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
           <button
             onClick={() => void handleClaim()}
             disabled={state.kind === "verifying" || xMismatch}
-            className="w-full text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85 disabled:bg-[rgba(128,128,128,.18)] disabled:text-[var(--faint)]"
+            className="w-full text-sm px-4 py-3 rounded-full bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85 disabled:bg-[rgba(128,128,128,.18)] disabled:text-[var(--faint)]"
           >
             {state.kind === "verifying" ? "Claiming…" : "Claim agent"}
           </button>

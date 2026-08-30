@@ -39,7 +39,7 @@ export default function HomePage() {
       <HeroDots />
 
       <nav className="relative z-[1] flex items-center justify-between px-[clamp(20px,4vw,48px)] py-[22px]">
-        <Link href="/" className="relative flex items-center gap-2.5 text-[15px] font-bold tracking-[.02em] text-[var(--ink)]">
+        <Link href="/" className="relative -my-2 flex items-center gap-2.5 py-2 text-[15px] font-bold tracking-[.02em] text-[var(--ink)]">
           <span className="lswap h-6 w-6">
             <Image className="lb" src="/logo-black.png" alt="" width={24} height={24} />
             <Image className="lw" src="/logo-white.png" alt="" width={24} height={24} />
@@ -52,7 +52,7 @@ export default function HomePage() {
           <Link href="/docs" className="hidden text-[var(--dim)] transition-colors hover:text-[var(--ink)] sm:inline">Docs</Link>
           <a href="https://saidprotocol.com" target="_blank" rel="noreferrer" className="hidden text-[var(--dim)] transition-colors hover:text-[var(--ink)] sm:inline">Protocol</a>
           {authed ? (
-            <Link href="/home" className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75">
+            <Link href="/home" className="rounded-full bg-[var(--ink)] px-5 py-3 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75">
               Open app
             </Link>
           ) : (
@@ -60,7 +60,7 @@ export default function HomePage() {
               type="button"
               onClick={() => { setLoginInitiated(true); login(); }}
               disabled={!ready}
-              className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75 disabled:opacity-50"
+              className="rounded-full bg-[var(--ink)] px-5 py-3 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75 disabled:opacity-50"
             >
               {ready ? "Log in" : "…"}
             </button>
@@ -111,14 +111,14 @@ export default function HomePage() {
 
       <footer className="relative z-[1] flex flex-wrap items-center justify-between gap-5 px-[clamp(20px,4vw,48px)] py-[22px] text-[12.5px] text-[var(--faint)]">
         <span>SAID Agent · on Solana</span>
-        <span className="flex items-center gap-[22px]">
+        <span className="flex items-center gap-4">
           <a
             href="https://x.com/saidagent"
             target="_blank"
             rel="noreferrer"
             aria-label="SAID Agent on X"
             title="X"
-            className="transition-colors hover:text-[var(--ink)]"
+            className="-m-3 flex h-11 w-11 items-center justify-center transition-colors hover:text-[var(--ink)]"
           >
             <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
@@ -130,7 +130,7 @@ export default function HomePage() {
             rel="noreferrer"
             aria-label="SAID Agent on Telegram"
             title="Telegram"
-            className="transition-colors hover:text-[var(--ink)]"
+            className="-m-3 flex h-11 w-11 items-center justify-center transition-colors hover:text-[var(--ink)]"
           >
             <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
               <path d="M21.94 4.6 18.9 19.02c-.23 1.01-.83 1.26-1.68.79l-4.64-3.42-2.24 2.16c-.25.25-.46.46-.94.46l.33-4.73 8.6-7.77c.37-.33-.08-.52-.58-.19L7.13 13.2l-4.58-1.43c-1-.31-1.02-1 .21-1.48l17.9-6.9c.83-.3 1.56.2 1.28 1.21z" />
@@ -140,7 +140,7 @@ export default function HomePage() {
             href="/docs"
             aria-label="Documentation"
             title="Docs"
-            className="transition-colors hover:text-[var(--ink)]"
+            className="-m-3 flex h-11 w-11 items-center justify-center transition-colors hover:text-[var(--ink)]"
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M14 2.5H7a1.5 1.5 0 0 0-1.5 1.5v16A1.5 1.5 0 0 0 7 21.5h10a1.5 1.5 0 0 0 1.5-1.5V7z" />

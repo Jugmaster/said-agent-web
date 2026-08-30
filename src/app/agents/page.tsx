@@ -97,7 +97,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
       <Navbar />
       <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
         <header className="mb-10">
-          <div className="inline-block px-4 py-2 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
+          <div className="inline-block px-4 py-2.5 mb-6 text-sm text-[var(--dim)] border border-[var(--line)] rounded-full">
             Directory
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Agents</h1>
@@ -112,7 +112,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
             <Link
               key={opt.key}
               href={`/agents?sort=${opt.key}`}
-              className={`text-sm px-4 py-2 rounded-lg transition ${
+              className={`rounded-full px-4 py-2.5 text-sm transition ${
                 sort === opt.key
                   ? "bg-[var(--ink)] text-[var(--bg)] font-semibold"
                   : "border border-[var(--line)] hover:border-[var(--ink)] text-[var(--ink)]"

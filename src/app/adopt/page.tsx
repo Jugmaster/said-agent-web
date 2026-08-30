@@ -62,7 +62,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
           </code>
           <Link
             href="/"
-            className="mt-4 inline-block text-sm px-4 py-2 rounded-lg bg-[var(--ink)] text-[var(--bg)] font-semibold hover:opacity-85"
+            className="mt-4 inline-block rounded-full bg-[var(--ink)] px-5 py-3 text-sm font-medium text-[var(--bg)] hover:opacity-85"
           >
             Home
           </Link>

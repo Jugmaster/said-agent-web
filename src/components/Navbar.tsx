@@ -62,7 +62,7 @@ export default function Navbar() {
     >
       <nav className="flex items-center justify-between gap-4 px-[clamp(20px,4vw,48px)] py-[18px]">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2.5 text-[15px] font-bold tracking-[.02em] text-[var(--ink)]">
+        <Link href="/" className="-my-2 flex items-center gap-2.5 py-2 text-[15px] font-bold tracking-[.02em] text-[var(--ink)]">
           <span className="lswap h-6 w-6">
             <Image className="lb" src="/logo-black.png" alt="" width={24} height={24} priority />
             <Image className="lw" src="/logo-white.png" alt="" width={24} height={24} priority />
@@ -107,7 +107,7 @@ export default function Navbar() {
           ) : !authenticated ? (
             <button
               onClick={login}
-              className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75 whitespace-nowrap"
+              className="rounded-full bg-[var(--ink)] px-5 py-3 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75 whitespace-nowrap"
             >
               Log in
             </button>
