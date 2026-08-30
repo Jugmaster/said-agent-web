@@ -779,3 +779,11 @@ html[data-theme="light"] .lswap .lw {
     transform: none;
   }
 }
+
+/* The landing page paints its own logo-shaped dot field, so the global one
+   stands down there. Done in CSS rather than by branching on usePathname
+   inside DotGridBackground: that component renders from the root layout, and
+   a navigation hook there made /docs hang forever under Turbopack. */
+body:has(.landing-page) .dotgrid-layer {
+  display: none;
+}
