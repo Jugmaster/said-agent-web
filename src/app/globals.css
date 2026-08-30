@@ -725,3 +725,57 @@ a,
   font-size: 13px;
   color: var(--faint);
 }
+
+/* ── Landing page ────────────────────────────────────────────────────────
+   Not scoped to .sa: this is the public surface. */
+
+/* Logo swaps on theme. Both images are stacked and cross-faded rather than
+   swapped on src, so there is no flash of a missing image on toggle. */
+.lswap {
+  position: relative;
+  display: block;
+}
+.lswap img {
+  display: block;
+  transition: opacity 0.5s;
+}
+.lswap .lb {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+}
+.lswap .lw {
+  opacity: 1;
+}
+html[data-theme="light"] .lswap .lb {
+  opacity: 1;
+}
+html[data-theme="light"] .lswap .lw {
+  opacity: 0;
+}
+
+/* Staggered entrance. Skipped entirely under reduced motion — the content is
+   already in place, so there is nothing to reveal. */
+.hero-fade {
+  opacity: 0;
+  transform: translateY(16px);
+  animation: heroUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.hero-fade.d1 { animation-delay: 0.1s; }
+.hero-fade.d2 { animation-delay: 0.22s; }
+.hero-fade.d3 { animation-delay: 0.34s; }
+.hero-fade.d4 { animation-delay: 0.46s; }
+@keyframes heroUp {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-fade {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

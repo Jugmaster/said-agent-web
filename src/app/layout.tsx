@@ -72,6 +72,15 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Apply the stored theme before first paint. Without this the page
+            renders dark, then snaps to light for anyone who chose it. Dark is
+            the default, so only "light" stamps an attribute. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(localStorage.getItem('said-theme')==='light')document.documentElement.dataset.theme='light'}catch(e){}",
+          }}
+        />
         {/* Telegram Web App SDK — exposes window.Telegram.WebApp inside Telegram */}
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>

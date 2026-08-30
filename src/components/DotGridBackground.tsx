@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 // ═══ 3D Simplex Noise ═══
 const grad3 = [
@@ -72,6 +73,9 @@ export default function DotGridBackground({
   driftAmount = 0.2,
   bg = '#09090b',
 }: DotGridBackgroundProps) {
+  // The landing page draws its own logo-shaped dot field; running both
+  // stacks two canvases and the mark stops reading.
+  const pathname = usePathname();
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const vignetteRef = useRef<HTMLDivElement | null>(null);
 
@@ -227,6 +231,9 @@ export default function DotGridBackground({
       cancelAnimationFrame(raf);
     };
   }, [spacingProp, energyProp, breatheAmp, breatheSpeed, drift, driftAmount, bg]);
+
+  // Hooks run unconditionally above; only the render is skipped.
+  if (pathname === "/") return null;
 
   return (
     <>
