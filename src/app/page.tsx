@@ -71,7 +71,7 @@ export default function HomePage() {
 
       <main className="relative z-[1] flex flex-1 flex-col items-center justify-center px-[clamp(20px,5vw,48px)] text-center">
         <span className="lswap hero-fade h-14 w-14">
-          <Image className="lb" src="/logo-black.png" alt="" width={56} height={56} />
+          <Image className="lb" src="/logo-black.png" alt="" width={56} height={56} priority />
           <Image className="lw" src="/logo-white.png" alt="" width={56} height={56} priority />
         </span>
 

@@ -218,7 +218,15 @@ function ChatScreen({ platformId }: { platformId: string }) {
           role: m.role === "assistant" ? "agent" : "user",
           text: m.content,
         }));
-        setMessages((prev) => (prev.length ? [...history, ...prev] : history));
+        // Merge by id rather than length: re-running this effect must not
+        // prepend the same history twice (dev StrictMode double-invokes it,
+        // and 100 duplicate-key warnings is what that looked like).
+        setMessages((prev) => {
+          if (!prev.length) return history;
+          const seen = new Set(prev.map((m) => m.id));
+          const fresh = history.filter((m) => !seen.has(m.id));
+          return fresh.length ? [...fresh, ...prev] : prev;
+        });
       })
       .catch(() => {
         // best-effort — empty history is the existing fallback

@@ -65,6 +65,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
+      // globals.css sets scroll-behavior: smooth; this marker lets Next
+      // suppress it during route transitions instead of warning about it.
+      data-scroll-behavior="smooth"
       className={`${inter.variable} h-full antialiased`}
       // The Telegram Web App SDK below stamps --tg-viewport-* style vars onto
       // <html> before React hydrates, so the attribute never matches the
