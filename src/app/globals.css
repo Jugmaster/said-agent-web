@@ -784,7 +784,8 @@ html[data-theme="light"] .lswap .lw {
    stands down there. Done in CSS rather than by branching on usePathname
    inside DotGridBackground: that component renders from the root layout, and
    a navigation hook there made /docs hang forever under Turbopack. */
-body:has(.landing-page) .dotgrid-layer {
+body:has(.landing-page) .dotgrid-layer,
+body:has(.app-authed) .dotgrid-layer {
   display: none;
 }
 

@@ -336,7 +336,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           signed-out keeps the plain flow so login/marketing are untouched. */}
       <div
         key={pathname}
-        className={`sa flex-1 flex flex-col min-w-0 ${
+        className={`sa ${authed ? "app-authed " : ""}flex-1 flex flex-col min-w-0 ${
           authed
             ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-[264px]"
             : ""
