@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import ThemeToggle from "./ThemeToggle";
 import { useState, useRef, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
@@ -13,7 +14,7 @@ function shortAddr(a: string | null | undefined): string {
 }
 
 const NAV_LINK =
-  "px-3 py-1.5 text-sm text-[var(--dim)] hover:text-[var(--ink)] transition rounded-full hover:bg-[rgba(128,128,128,.18)]/50 whitespace-nowrap";
+  "text-[13.5px] text-[var(--dim)] transition-colors hover:text-[var(--ink)] whitespace-nowrap";
 
 export default function Navbar() {
   const { ready, authenticated, user, login } = usePrivy();
@@ -54,37 +55,23 @@ export default function Navbar() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4"
-      // max(1rem, safe-area): in a PWA (no status bar) this drops the pill
-      // below the notch/Dynamic Island instead of riding up under the speaker.
-      style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+      className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg)]/85 backdrop-blur-md"
+      // max(0, safe-area): in a PWA (no status bar) this keeps the bar below
+      // the notch/Dynamic Island instead of riding up under the speaker.
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav
-        className="
-          flex items-center gap-1 rounded-full
-          border border-[var(--line)]
-          transition-all duration-500 ease-in-out
-          px-3 py-2 bg-[var(--bg)] backdrop-blur-md
-          max-w-full
-        "
-      >
+      <nav className="flex items-center justify-between gap-4 px-[clamp(20px,4vw,48px)] py-[18px]">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2 px-2">
-          {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
-              logo isn't distorted (and Next doesn't warn about it). */}
-          <Image
-            src="/logo-dark.png"
-            alt="SAID"
-            width={354}
-            height={370}
-            className="h-5 w-auto"
-            priority
-          />
-          <span className="text-sm font-bold tracking-wide">SAID Agent</span>
+        <Link href="/" className="flex items-center gap-2.5 text-[15px] font-bold tracking-[.02em] text-[var(--ink)]">
+          <span className="lswap h-6 w-6">
+            <Image className="lb" src="/logo-black.png" alt="" width={24} height={24} priority />
+            <Image className="lw" src="/logo-white.png" alt="" width={24} height={24} priority />
+          </span>
+          <span>SAID Agent</span>
         </Link>
 
         {/* Public links (hidden on mobile) */}
-        <div className="hidden md:flex items-center gap-1">
+        <div className="ml-auto hidden items-center gap-[22px] md:flex">
           <Link href="/agents" className={NAV_LINK}>
             Agents
           </Link>
@@ -105,12 +92,12 @@ export default function Navbar() {
         </div>
 
         {/* Right cluster: telegram + auth */}
-        <div className="flex items-center gap-1 ml-1">
+        <div className="flex items-center gap-[22px] md:ml-[22px]">
           <a
             href="https://t.me/saidinfrabot"
             target="_blank"
             rel="noreferrer"
-            className={`${NAV_LINK} hidden sm:inline-flex`}
+            className={`${NAV_LINK} hidden sm:inline`}
           >
             Telegram
           </a>
@@ -120,7 +107,7 @@ export default function Navbar() {
           ) : !authenticated ? (
             <button
               onClick={login}
-              className="ml-1 px-4 py-1.5 bg-[var(--ink)] text-[var(--bg)] rounded-full text-sm font-semibold hover:opacity-85 transition whitespace-nowrap"
+              className="rounded-full bg-[var(--ink)] px-5 py-2.5 text-[13px] font-medium text-[var(--bg)] transition-opacity hover:opacity-75 whitespace-nowrap"
             >
               Log in
             </button>
@@ -223,6 +210,7 @@ export default function Navbar() {
               )}
             </div>
           )}
+          <ThemeToggle />
         </div>
       </nav>
     </div>
