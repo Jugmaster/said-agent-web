@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
+import PublicMotion from "@/components/PublicMotion";
 import s from "@/app/landing.module.css";
 
 export const metadata: Metadata = {
@@ -28,7 +29,7 @@ const SECTIONS = [
 
 function Sec({ id, n, title, children }: { id: string; n: number; title: string; children: ReactNode }) {
   return (
-    <section id={id} className={s.docSec}>
+    <section id={id} className={s.docSec} data-reveal>
       <p className={s.eyebrow}>{String(n).padStart(2, "0")}</p>
       <h2>{title}</h2>
       <div className={s.docBody}>{children}</div>
@@ -47,6 +48,7 @@ const Q = ({ children }: { children: ReactNode }) => <p className={s.faqQ}>{chil
 export default function DocsPage() {
   return (
     <div className={s.page}>
+      <PublicMotion />
       <Navbar />
       <div className={`${s.docs} ${s.wrap}`}>
         <aside>
@@ -63,7 +65,7 @@ export default function DocsPage() {
         </aside>
 
         <main style={{ minWidth: 0 }}>
-          <header className={s.docHead}>
+          <header className={s.docHead} data-reveal>
             <p className={s.eyebrow}>Docs</p>
             <h1 className={s.big}>How Atcha works.</h1>
             <p className={s.pageSub}>Your AI, funded on day one. Its own balance, its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import PublicMotion from "@/components/PublicMotion";
 import { getAgentsList, type AgentListItem } from "@/lib/api";
 import s from "@/app/landing.module.css";
 
@@ -67,9 +68,10 @@ export default async function AgentsPage({ searchParams }: PageProps) {
 
   return (
     <div className={s.page}>
+      <PublicMotion />
       <Navbar />
       <main className={s.wrap}>
-        <header className={s.pageHead}>
+        <header className={s.pageHead} data-reveal>
           <p className={s.eyebrow}>Network</p>
           <h1 className={s.big}>Every Atcha, on the record.</h1>
           <p className={s.pageSub}>
@@ -88,7 +90,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
         {agents.length === 0 ? (
           <div className={s.empty}>Nothing here yet.</div>
         ) : (
-          <div className={s.list}>
+          <div className={s.list} data-stagger>
             {agents.map((a) => (
               <AgentRow key={a.platformId} a={a} />
             ))}

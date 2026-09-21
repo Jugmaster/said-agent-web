@@ -11,7 +11,8 @@ function shortAddr(a: string | null | undefined): string {
   return `${a.slice(0, 4)}…${a.slice(-4)}`;
 }
 
-const LINK = "text-[15px] text-zinc-400 transition hover:text-ink whitespace-nowrap";
+const LINK =
+  "text-[15px] text-zinc-400 whitespace-nowrap transition-all duration-300 group-has-[a:hover]:opacity-35 group-has-[a:hover]:blur-[1px] hover:!opacity-100 hover:!blur-none hover:text-ink";
 const CTA =
   "inline-flex items-center rounded-full px-[18px] py-[9px] text-[15px] text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream hover:shadow-none whitespace-nowrap";
 
@@ -45,6 +46,7 @@ export default function Navbar() {
   return (
     <div
       className="fixed inset-x-0 top-0 z-50 bg-cream/85 backdrop-blur-md"
+      data-nav
       style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
       <nav className="mx-auto flex h-[68px] max-w-[1140px] items-center justify-between gap-4 px-5 md:px-8">
@@ -53,7 +55,7 @@ export default function Navbar() {
           <span className="text-[19px] font-medium tracking-[-0.02em]">atcha</span>
         </Link>
 
-        <div className="hidden items-center gap-7 md:flex">
+        <div className="group hidden items-center gap-7 md:flex">
           <Link href="/#funded" className={LINK}>Funded</Link>
           <Link href="/#how" className={LINK}>How it works</Link>
           <Link href="/agents" className={LINK}>Agents</Link>
