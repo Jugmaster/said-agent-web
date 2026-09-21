@@ -42,7 +42,7 @@ export default function InviteWebClaim({ platform }: Props) {
           onClick={() => router.push("/chat")}
           className="w-full text-center text-sm px-4 py-3 rounded-lg bg-coral text-cream hover:bg-coral-deep font-medium transition"
         >
-          Open my agent
+          Open my Atcha
         </button>
         <p className="text-xs text-zinc-500 text-center">
           You&apos;re already signed in. If this invite is for a different{" "}

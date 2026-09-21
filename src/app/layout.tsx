@@ -15,12 +15,12 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://agent.saidprotocol.com"),
   title: "Atcha",
   description:
-    "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
+    "Your AI comes funded. Trading credit in it on day one, sized by the chart. Pay anyone you can name, checked on SAID before a cent moves.",
   manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Atcha",
     description:
-      "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
+      "Your AI comes funded. Trading credit in it on day one, sized by the chart. Pay anyone you can name, checked on SAID before a cent moves.",
     url: "https://agent.saidprotocol.com",
     siteName: "Atcha",
     type: "website",
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Atcha",
     description:
-      "Your AI agent on Solana — one chat, one wallet, no seed phrases.",
+      "Your AI comes funded. Pay anyone you can name.",
   },
   // Favicon + apple-touch-icon are picked up automatically from
   // app/icon.png and app/apple-icon.png via Next's file convention.

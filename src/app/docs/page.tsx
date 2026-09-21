@@ -3,18 +3,18 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Docs · SAID Agent",
+  title: "Docs · Atcha",
   description:
-    "How to use SAID Agent — your AI agent on Solana. Create one on the web or in Telegram, send crypto by @handle, swap tokens, earn on IDLE, call APIs, and more.",
+    "How Atcha works. Get one on the web or in Telegram, trade with your credit, pay anyone by @handle, buy things, and climb.",
   openGraph: {
-    title: "Docs · SAID Agent",
-    description: "How to use your SAID Agent on Solana.",
+    title: "Docs · Atcha",
+    description: "How Atcha works.",
     type: "website",
   },
 };
 
 const SECTIONS = [
-  { id: "what", title: "What is SAID Agent" },
+  { id: "what", title: "What is Atcha" },
   { id: "start", title: "Quick start" },
   { id: "send", title: "Send by @handle" },
   { id: "swap", title: "Swap & cross-chain" },
@@ -135,20 +135,26 @@ export default function DocsPage() {
                 Docs
               </div>
               <h1 className="text-4xl md:text-5xl font-bold mb-3 tracking-tight">
-                SAID Agent.
+                Atcha.
               </h1>
               <p className="text-lg text-zinc-400 max-w-2xl">
-                Your AI agent on Solana — its own wallet, its own identity,
+                Your AI, funded on day one. Its own balance, its own SAID identity,
                 yours forever. Live in Telegram and right here on the web.
               </p>
             </header>
 
-            <Section id="what" title="What is SAID Agent">
+            <Section id="what" title="What is Atcha">
               <p>
-                SAID Agent is a personal AI agent that lives on Solana. Every
-                agent comes with its own Solana wallet, its own on-chain SAID
-                Protocol identity (PDA), and persistent reputation that travels
-                with you across every surface.
+                Atcha is a personal AI that lives on Solana and comes with money
+                in it. Every Atcha starts with trading credit we put in, sized by
+                what the chart earned that hour. Credit trades the majors and
+                takes the first loss. Money you add is yours, always, and is what
+                pays anyone you can name.
+              </p>
+              <p>
+                Under it is SAID: every Atcha has its own on-chain SAID identity
+                and a reputation that travels with you. Every name you send to is
+                resolved and screened on SAID before money moves.
               </p>
               <p>
                 You interact with your agent in natural language. Behind the
@@ -158,8 +164,7 @@ export default function DocsPage() {
               </p>
               <p>
                 It&apos;s free to start. You don&apos;t need a wallet, a seed
-                phrase, or an account elsewhere. The bot provisions your agent
-                and its wallet the moment you say hi.
+                phrase, or an account elsewhere. Say hi and your Atcha exists.
               </p>
             </Section>
 
@@ -177,7 +182,7 @@ export default function DocsPage() {
                 , and tap <Code>/start</Code>.
               </p>
               <Block label="telegram">{`you  →  /start
-bot  →  hey — welcome to SAID Protocol. I create personal AI agents on Solana.
+bot  →  hey, welcome to Atcha. your AI comes funded.
         your agent gets its own wallet, its own identity, and persists
         across every surface — yours forever.
         what do you want to name yours?
@@ -187,16 +192,14 @@ bot  →  ✓ Vega is being registered on-chain.
         wallet: 4Qnf...8vR3
         profile: agent.saidprotocol.com/agents/Vega`}</Block>
               <p>
-                That&apos;s it. Your agent exists. It has its own wallet, its
-                own on-chain identity, and the full capability surface
-                described below once verified.
+                That&apos;s it. Your Atcha exists, with its own balance, its own
+                SAID identity, and everything below once verified.
               </p>
               <p>
-                Prefer the web? You can create and claim an agent right here in
-                the app — sign in with Telegram or X and your agent is
-                provisioned the same way. If you already have one from the bot,
-                signing in links it; the same agent, wallet, and history show
-                up on both surfaces.
+                Prefer the web? Sign in with Telegram or X right here and your
+                Atcha is set up the same way. Already have one from the bot?
+                Signing in links it: same Atcha, same balance, same history on
+                both.
               </p>
             </Section>
 
@@ -204,7 +207,7 @@ bot  →  ✓ Vega is being registered on-chain.
               <p>
                 The differentiator. Send any token to anyone on Telegram by
                 their username — no wallet address required. If the recipient
-                doesn&apos;t have a SAID Agent yet, one is created for them
+                doesn&apos;t have a Atcha yet, one is created for them
                 when they accept the invite link.
               </p>
               <Block label="examples">{`send 5 USDC to @alex
@@ -443,7 +446,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
 
             <Section id="identity" title="On-chain identity">
               <p>
-                Every SAID Agent is registered as a Solana PDA under the SAID
+                Every Atcha is registered as a Solana PDA under the SAID
                 Protocol program (
                 <Code>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</Code>). The
                 PDA holds your agent&apos;s identity, owner, optional stake,
@@ -659,7 +662,7 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
               <p className="mt-2">
                 <Link href="/" className="text-zinc-300 hover:text-white">
-                  ← back to SAID Agent
+                  ← back to Atcha
                 </Link>
               </p>
             </footer>

@@ -68,11 +68,11 @@ function SendSuccessCard({
 
       {executed ? (
         <p className="mt-2 text-xs text-emerald-300/80">
-          They’ll see it the moment they open SAID.
+          They’ll see it the moment they open Atcha.
         </p>
       ) : (
         <p className="mt-2 text-xs text-zinc-400">
-          They’ll get it the moment they open SAID — even if they’re not on it yet.
+          They’ll get it the moment they open Atcha, even if they’re not on it yet.
         </p>
       )}
 
@@ -115,14 +115,14 @@ function HowItWorksPanel() {
   const steps = [
     {
       title: "Pick a person, not an address",
-      body: "Any Telegram or X handle works — they don’t need a wallet, or to have ever heard of SAID.",
+      body: "Any X or Telegram handle. They don’t need a wallet, or to have heard of Atcha. The name is checked on SAID before money moves.",
     },
     {
-      title: "Your agent routes it",
+      title: "Your Atcha routes it",
       body: "Funds move on Solana in seconds, with an on-chain receipt you can verify on Solscan.",
     },
     {
-      title: "Not on SAID yet?",
+      title: "Not on Atcha yet?",
       body: "Funds stay reserved in your wallet and they get an invite link. Delivery is automatic the moment they first log in.",
     },
   ];
@@ -248,7 +248,7 @@ function SendsPanel({
         ) : sends.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
             No sends yet. Your first one shows up here — with live claim status
-            for recipients who aren&apos;t on SAID yet.
+            for people who aren&apos;t on Atcha yet.
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl border border-zinc-800">
@@ -423,7 +423,7 @@ function SendScreen({ platformId }: { platformId: string }) {
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Send</h1>
           <p className="text-sm text-zinc-500">
-            One handle. Any chain. Your agent figures out the rest.
+            One name. Checked before a cent moves. Your Atcha does the rest.
           </p>
         </div>
 
@@ -513,8 +513,8 @@ function SendScreen({ platformId }: { platformId: string }) {
           )}
           {!handleLooksLikeAddress && !handleInvalid && handle.trim() && (
             <p className="text-xs text-zinc-500 mb-3">
-              If they don’t have a SAID agent yet, your funds stay in your wallet
-              and they get an invite link to claim them.
+              If they’re not on Atcha yet, the money waits in your balance under
+              their name until they log in.
             </p>
           )}
           {!handle.trim() && <div className="mb-3" />}

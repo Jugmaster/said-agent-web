@@ -17,7 +17,7 @@ import {
 
 function challengeFor(platformId: string, wallet: string): string {
   return [
-    "SAID Agent · link reputation",
+    "Atcha · link reputation",
     `Account: ${platformId}`,
     `Wallet: ${wallet}`,
     `Issued: ${new Date().toISOString()}`,

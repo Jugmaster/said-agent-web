@@ -25,12 +25,12 @@ export async function generateMetadata({
   searchParams,
 }: PageProps): Promise<Metadata> {
   const { p } = await searchParams;
-  if (!p) return { title: "Claim your agent · SAID Agent" };
+  if (!p) return { title: "Claim your Atcha · Atcha" };
   const agent = await fetchAgent(p);
   const name = agent?.displayName ?? p;
   return {
-    title: `Claim ${name} · SAID Agent`,
-    description: `${name} was launched via @saidagent. Sign in to claim your agent and chat with it on Telegram or here on the web.`,
+    title: `Claim ${name} · Atcha`,
+    description: `${name} was launched via @saidagent. Sign in to claim it and chat with it on Telegram or here on the web.`,
   };
 }
 
@@ -81,18 +81,18 @@ export default async function AdoptPage({ searchParams }: PageProps) {
     <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 py-6 max-w-md mx-auto">
       <header className="mb-6">
         <Link href="/" className="text-xs text-zinc-500 hover:text-zinc-300">
-          ← SAID Agent
+          ← Atcha
         </Link>
       </header>
 
       <section className="mb-6">
         <h1 className="text-2xl font-semibold mb-1">
-          {agent.displayName ?? "Your agent"}
+          {agent.displayName ?? "Your Atcha"}
         </h1>
         <p className="text-sm text-zinc-400">
           {isXLaunched
             ? "Launched via @saidagent on X. Claim it to chat with it on Telegram or here on the web."
-            : "Claim your agent and chat from any device."}
+            : "Claim it and chat from any device."}
         </p>
       </section>
 
@@ -118,7 +118,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
 
       <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
-          Your agent is yours. The wallet, identity, and on-chain
+          Your Atcha is yours. The wallet, identity, and on-chain
           history persist regardless of where you sign in from.
         </p>
       </footer>

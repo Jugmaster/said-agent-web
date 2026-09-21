@@ -40,10 +40,10 @@ function Stat({ label, value, sub }: { label: string; value: string; sub?: strin
 }
 
 const CAPABILITIES: { icon: ReactNode; title: string; body: string }[] = [
-  { icon: <IconSend />, title: "Send by @handle", body: "Pay any friend by their X or Telegram handle — no 44-character addresses." },
-  { icon: <IconBag />, title: "Buy real things", body: "Order from Amazon & Shopify right inside the chat. Crypto in, package out." },
-  { icon: <IconSwap />, title: "Swap, limit & DCA", body: "Market-swap any Solana token via Jupiter — plus price alerts, limit orders, and DCA." },
-  { icon: <IconBolt />, title: "Earns while idle", body: "Your agent picks up paid compute jobs on IDLE and gets paid in USDC." },
+  { icon: <IconBolt />, title: "Comes funded", body: "Trading credit in it on day one, sized by what the chart earned. It takes the first loss so your money doesn't." },
+  { icon: <IconSend />, title: "Pay anyone you can name", body: "Any X or Telegram handle. Checked on SAID before a cent moves. Not on Atcha yet? It waits under their name." },
+  { icon: <IconSwap />, title: "Trade, limit & DCA", body: "Swap the majors with credit, or anything on Solana with your own money. Price alerts, limit orders, DCA." },
+  { icon: <IconBag />, title: "Buy real things", body: "Order from Amazon and Shopify inside the chat. Your money in, package out." },
 ];
 
 export default function HomeBelowFold() {
@@ -95,8 +95,8 @@ export default function HomeBelowFold() {
       {/* What your agent can do */}
       <section className="px-6 mt-24">
         <div className="max-w-3xl mx-auto text-center mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">What your agent can do</h2>
-          <p className="text-sm text-zinc-500 mt-2">One chat. One wallet. No seed phrases.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">What your Atcha does</h2>
+          <p className="text-sm text-zinc-500 mt-2">One chat. One balance. No seed phrase.</p>
         </div>
         <div className="max-w-3xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-3">
           {CAPABILITIES.map((c) => (
@@ -114,9 +114,9 @@ export default function HomeBelowFold() {
       {/* Closing CTA */}
       <section className="px-6 mt-24">
         <div className="max-w-2xl mx-auto text-center rounded-3xl border border-zinc-800/60 bg-zinc-900/40 px-6 py-12">
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Get your agent</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">Get your Atcha</h2>
           <p className="text-sm text-zinc-400 mb-7 max-w-md mx-auto">
-            Free to start, sponsored onboarding, no SOL required. Activated in one message.
+            Free. Funded on day one. No SOL to start. Yours in one message.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
@@ -136,7 +136,7 @@ export default function HomeBelowFold() {
             </button>
           </div>
           <p className="text-[11px] text-zinc-600 mt-5">
-            Agent-managed wallet · keys secured by Privy · no seed phrase
+            Keys secured by Privy · no seed phrase · your money is always yours to take out
           </p>
         </div>
       </section>
@@ -145,9 +145,9 @@ export default function HomeBelowFold() {
       <footer className="px-6 mt-24 border-t border-zinc-900 pt-10">
         <div className="max-w-3xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-zinc-500">
           <div className="flex items-center gap-2">
-            <span className="font-bold text-zinc-300">SAID Agent</span>
+            <span className="font-bold text-zinc-300">atcha</span>
             <span className="text-zinc-700">·</span>
-            <span className="text-xs">on Solana</span>
+            <span className="text-xs">by SAID, on Solana</span>
           </div>
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2">
             <Link href="/agents" className="hover:text-white transition">Agents</Link>

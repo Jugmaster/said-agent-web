@@ -14,7 +14,7 @@ interface Props {
  *
  *   - Privy hydrating          → spinner placeholder
  *   - Not logged in            → "Log in" prompt
- *   - Logged in, claim pending → "Linking your agent…"
+ *   - Logged in, claim pending → "Opening your Atcha…"
  *   - Claim error              → retry button
  *   - Ready                    → render children with the resolved platformId
  */
@@ -37,12 +37,12 @@ export default function AuthGate({ children }: Props) {
           <div className="inline-block px-3 py-1.5 mb-5 text-xs text-zinc-400 border border-zinc-700 rounded-full">
             Sign in required
           </div>
-          <h2 className="text-2xl font-bold mb-2">Log in to use your agent.</h2>
+          <h2 className="text-2xl font-bold mb-2">Log in to open your Atcha.</h2>
           <p className="text-sm text-zinc-400 mb-6">
             Sign in with Telegram to pick up where you left off with{" "}
-            <span className="text-zinc-200">@saidinfrabot</span> — same agent,
-            same wallet, same history. Or use email, Google, X, or a wallet for
-            a fresh agent.
+            <span className="text-zinc-200">@saidinfrabot</span>: same Atcha,
+            same balance, same history. Or use X, Google, email, or a wallet for
+            a fresh one.
           </p>
           <button
             onClick={login}
@@ -71,7 +71,7 @@ export default function AuthGate({ children }: Props) {
       <div className="min-h-[60vh] flex items-center justify-center text-zinc-400">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 rounded-full border-2 border-zinc-700 border-t-zinc-300 animate-spin" />
-          <p className="text-sm">Linking your agent…</p>
+          <p className="text-sm">Opening your Atcha…</p>
         </div>
       </div>
     );
@@ -81,7 +81,7 @@ export default function AuthGate({ children }: Props) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center px-6">
         <div className="max-w-md w-full text-center bg-zinc-900 border border-red-900/40 rounded-xl px-6 py-8">
-          <h2 className="text-lg font-semibold mb-2">Couldn&apos;t link your agent</h2>
+          <h2 className="text-lg font-semibold mb-2">Couldn&apos;t open your Atcha</h2>
           <p className="text-sm text-zinc-400 mb-4">{agent.error}</p>
           <button
             onClick={agent.refresh}

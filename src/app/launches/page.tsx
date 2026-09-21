@@ -6,11 +6,11 @@ import { getLaunches, type LaunchListItem } from "@/lib/api";
 export const revalidate = 60;
 
 export const metadata: Metadata = {
-  title: "Launches · SAID Agent",
+  title: "Launches · Atcha",
   description:
     "Every token launched via @saidagent on X — creator, fees earned, SAID treasury sweeps. Public ledger.",
   openGraph: {
-    title: "Launches · SAID Agent",
+    title: "Launches · Atcha",
     description: "Every token launched via @saidagent on X. Public ledger.",
     type: "website",
   },

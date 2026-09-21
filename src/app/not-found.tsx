@@ -9,7 +9,7 @@ export default function NotFound() {
         <div className="text-center max-w-md">
           <div className="text-6xl font-bold mb-3 tracking-tight">404</div>
           <p className="text-zinc-400 mb-8">
-            This page doesn&apos;t exist — but your agent still does.
+            This page doesn&apos;t exist. Your Atcha still does.
           </p>
 
           <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm text-zinc-500 mb-8">

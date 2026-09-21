@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const agent = await fetchAgent(platformId);
   if (!agent) {
     return {
-      title: "Agent not found · SAID Agent",
+      title: "Agent not found · Atcha",
       description: "This agent doesn't exist on SAID Protocol.",
     };
   }
@@ -36,16 +36,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? `${name} is a verified SAID Protocol agent. ${agent.activityCounts.total} on-chain actions, ${agent.activityCounts.swaps} swaps, ${agent.activityCounts.stakes} stakes.`
     : `${name} is an unverified SAID Protocol agent.`;
   return {
-    title: `${name} · SAID Agent`,
+    title: `${name} · Atcha`,
     description: desc,
     openGraph: {
-      title: `${name} · SAID Agent`,
+      title: `${name} · Atcha`,
       description: desc,
       type: "profile",
     },
     twitter: {
       card: "summary",
-      title: `${name} · SAID Agent`,
+      title: `${name} · Atcha`,
       description: desc,
     },
   };

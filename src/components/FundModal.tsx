@@ -241,7 +241,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
             <p className="text-3xl mb-3">✅</p>
             <p className="text-sm font-medium mb-1">Funds added</p>
             <p className="text-xs text-zinc-400 max-w-xs mb-5">
-              Your agent is topped up and ready to swap, send, and buy.
+              Money added. Yours to take out any time, and ready to pay, buy, or trade.
             </p>
             <button
               onClick={onClose}

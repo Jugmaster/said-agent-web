@@ -180,7 +180,7 @@ function Home({ platformId }: { platformId: string }) {
         {/* Quick actions */}
         <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
           <ActionCard href="/send" title="Send" sub="Pay anyone by handle" emoji="↗" />
-          <ActionCard href="/chat" title="Ask your agent" sub="It handles the rest" emoji="✦" />
+          <ActionCard href="/chat" title="Ask your Atcha" sub="It handles the rest" emoji="✦" />
           <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" emoji="▢" />
           <ActionCard href="/calls" title="Comms" sub="Calls & email" emoji="☏" />
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
@@ -306,7 +306,7 @@ function AgentIdentity({
           {(agentName ?? "A").slice(0, 1).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-white">{agentName ?? "Your agent"}</div>
+          <div className="truncate text-sm font-semibold text-white">{agentName ?? "Your Atcha"}</div>
           <div className="flex items-center gap-1.5 text-xs">
             {verified ? (
               <span className="text-emerald-400">● Verified</span>

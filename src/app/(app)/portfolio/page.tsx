@@ -85,7 +85,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your agent"}</div>
+          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your Atcha"}</div>
           <div className="text-xs">
             {balance?.verified ? <span className="text-emerald-400">● Verified</span> : balance?.registered ? <span className="text-amber-400">● Registered</span> : <span className="text-zinc-500">○ Unverified</span>}
             {balance && balance.proTier > 0 && <span className="ml-2 text-amber-400">Pro</span>}
@@ -137,7 +137,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
               </button>
             ) : (
               <Link href="/fund" className="rounded-xl bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep">
-                Set up agent
+                Set up your Atcha
               </Link>
             )}
           </div>

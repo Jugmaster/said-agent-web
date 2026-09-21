@@ -26,19 +26,20 @@ export default function HomePage() {
       <main className="min-h-[calc(100dvh-65px)] px-6 flex items-center justify-center">
         <div className="max-w-xl w-full text-center">
           <div className="inline-block px-4 py-2 mb-8 text-sm text-zinc-400 border border-zinc-700 rounded-full">
-            Now live on Solana Mainnet
+            Comes funded · live on Solana
           </div>
 
           <h1
             className="text-4xl sm:text-5xl font-medium mb-5 tracking-[-0.04em] leading-[1.05]"
           >
-            Send money. Buy anything. Swap tokens.
+            Your AI comes funded.
           </h1>
           <p
             className="text-base sm:text-lg text-zinc-400 mb-8 max-w-md mx-auto"
           >
-            All from one chat — your own AI agent on Solana. No seed phrases, no
-            setup.
+            Every Atcha starts with trading credit in it, sized by the chart. Ours
+            takes the first loss. Add your own to pay anyone you can name. One chat,
+            no seed phrase, no setup.
           </p>
 
           {/* Guests: Telegram-first (one tap), web app secondary.
@@ -86,8 +87,8 @@ export default function HomePage() {
           </div>
 
           <p className="text-xs text-zinc-500">
-            Agent-managed wallet · keys secured by Privy · no seed phrase · no
-            SOL to start
+            Credit trades the majors · your money is always yours to take out · keys
+            secured by Privy · no SOL to start
           </p>
 
           <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">

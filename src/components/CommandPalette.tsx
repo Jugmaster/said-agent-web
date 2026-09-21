@@ -107,7 +107,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={onInputKeyDown}
-          placeholder="Type a command — or just tell your agent what to do…"
+          placeholder="Type a command, or just tell your Atcha what to do…"
           spellCheck={false}
           role="combobox"
           aria-expanded="true"
@@ -150,7 +150,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
             >
               <span className="text-zinc-500">✦</span>
               <span className="flex-1">
-                Ask your agent:{" "}
+                Ask your Atcha:{" "}
                 <span className="text-zinc-400">“{query.trim()}”</span>
               </span>
               <span className="text-[10px] font-medium uppercase tracking-widest text-zinc-600">
@@ -170,7 +170,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
           <span>↑↓ navigate</span>
           <span>↵ select</span>
           <span>esc close</span>
-          <span className="ml-auto">anything else goes to your agent</span>
+          <span className="ml-auto">anything else goes to your Atcha</span>
         </div>
       </div>
     </div>

@@ -99,7 +99,7 @@ function Settings({ platformId }: { platformId: string }) {
     <div className="mx-auto max-w-2xl px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-6 md:pt-10 md:pb-12">
       <h1 className="mb-6 text-2xl font-bold">Settings</h1>
 
-      <Section title="Your agent">
+      <Section title="Your Atcha">
         <Row label="Name" value={agentName ?? "—"} />
         <Row
           label="Wallet"
@@ -110,7 +110,7 @@ function Settings({ platformId }: { platformId: string }) {
           <div className="px-4 pb-2 text-xs text-emerald-400">Address copied</div>
         )}
         <Row label="Public profile" href={`/agents/${encodeURIComponent(platformId)}`} />
-        <Row label="Link an existing agent" href="/settings/link-agent" />
+        <Row label="Link an agent you already run" href="/settings/link-agent" />
       </Section>
 
       <Section title="Account">
@@ -130,7 +130,7 @@ function Settings({ platformId }: { platformId: string }) {
       </Section>
 
       <p className="px-1 pb-2 text-center text-xs text-zinc-600">
-        SAID Agent · your keys are secured by Privy
+        Atcha, by SAID · your keys are secured by Privy
       </p>
     </div>
   );

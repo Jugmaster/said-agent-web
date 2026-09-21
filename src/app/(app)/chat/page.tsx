@@ -507,12 +507,12 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <div className="max-w-md mx-auto pt-8">
                 <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
                   <h2 className="text-lg font-semibold mb-2">
-                    {step === "unknown" ? "Meet your butler" : "Name your agent"}
+                    {step === "unknown" ? "Meet your Atcha" : "Name it"}
                   </h2>
                   <p className="text-sm text-zinc-400 mb-5">
                     {step === "unknown"
-                      ? "A personal AI agent on Solana. Your own wallet, your own identity, yours forever."
-                      : "One step to activate — give your agent a name. It's free, no SOL needed."}
+                      ? "Your AI, funded on day one. Its own balance, its own identity, yours forever."
+                      : "One step: give it a name. Free, no SOL needed."}
                   </p>
                   {step === "unknown" ? (
                     <button
@@ -537,7 +537,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 </div>
                 <p className="text-xs text-zinc-600 text-center mt-4">
                   {step === "unknown"
-                    ? 'Or try: "create my agent", "what can you do?"'
+                    ? 'Or try: "what can you do?", "how much credit do I have?"'
                     : "Or type any name in the box below."}
                 </p>
               </div>
@@ -621,7 +621,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                     e.target.scrollHeight > 128 ? "auto" : "hidden";
                 }}
                 onKeyDown={onKeyDown}
-                placeholder="Message your agent…"
+                placeholder="Tell your Atcha what to do…"
                 rows={1}
                 className="flex-1 resize-none overflow-y-hidden rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
                 disabled={sending}

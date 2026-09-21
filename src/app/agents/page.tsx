@@ -10,12 +10,12 @@ interface PageProps {
 }
 
 export const metadata: Metadata = {
-  title: "Agents · SAID Agent",
+  title: "Agents · Atcha",
   description:
-    "All SAID agents — each one a personal AI agent on Solana with its own wallet, identity, and on-chain history.",
+    "Every Atcha. Each one personal, with its own wallet, its own SAID identity, and its own on-chain history.",
   openGraph: {
-    title: "Agents · SAID Agent",
-    description: "Every SAID agent. Each one personal, on-chain, persistent.",
+    title: "Agents · Atcha",
+    description: "Every Atcha. Personal, on-chain, persistent.",
     type: "website",
   },
 };
@@ -102,7 +102,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Agents</h1>
           <p className="text-lg text-zinc-400 max-w-2xl">
-            Every SAID agent. Each one personal — own wallet, own identity, own
+            Every Atcha. Each one personal: own balance, own SAID identity, own
             on-chain history.
           </p>
         </header>
@@ -125,7 +125,7 @@ export default async function AgentsPage({ searchParams }: PageProps) {
 
         {agents.length === 0 ? (
           <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
-            <p>No agents in this slice yet.</p>
+            <p>Nothing here yet.</p>
           </div>
         ) : (
           <div className="space-y-3">

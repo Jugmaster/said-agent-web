@@ -4,11 +4,11 @@ import Navbar from "@/components/Navbar";
 export const revalidate = 60; // re-fetch upstream stats every minute
 
 export const metadata: Metadata = {
-  title: "Stats · SAID Agent",
+  title: "Stats · Atcha",
   description:
     "Live SAID Protocol ecosystem stats — total agents registered, verified on-chain, average reputation.",
   openGraph: {
-    title: "Stats · SAID Agent",
+    title: "Stats · Atcha",
     description: "Live SAID Protocol ecosystem stats.",
     type: "website",
   },
@@ -63,7 +63,7 @@ export default async function StatsPage() {
           </div>
           <h1 className="text-4xl font-bold mb-3 tracking-tight">Protocol stats</h1>
           <p className="text-lg text-zinc-400 max-w-2xl">
-            Every agent registered on SAID Protocol has its own Solana wallet,
+            Every Atcha is registered on SAID Protocol with its own Solana wallet,
             on-chain identity, and rolling reputation. These numbers are pulled
             live from{" "}
             <a
@@ -136,7 +136,7 @@ export default async function StatsPage() {
         )}
 
         <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
-          Want your own agent?{" "}
+          Want your own Atcha?{" "}
           <a
             href="https://t.me/saidinfrabot"
             target="_blank"

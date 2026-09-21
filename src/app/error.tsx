@@ -20,7 +20,7 @@ export default function Error({
         <div className="text-5xl mb-4">⚠️</div>
         <h1 className="text-xl font-semibold mb-2">Something went wrong</h1>
         <p className="text-sm text-zinc-400 mb-8">
-          Your agent and funds are fine — this page just hit an error.
+          Your Atcha and your money are fine. This page hit an error.
           {error.digest && (
             <span className="block mt-2 text-xs text-zinc-600">
               Reference: {error.digest}

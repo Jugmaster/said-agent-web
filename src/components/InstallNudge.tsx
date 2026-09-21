@@ -119,7 +119,7 @@ export default function InstallNudge() {
   return (
     <div
       role="dialog"
-      aria-label="Install SAID Agent to your home screen"
+      aria-label="Install Atcha to your home screen"
       style={{
         bottom: "max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))",
       }}
@@ -133,7 +133,7 @@ export default function InstallNudge() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white truncate">
-            Install SAID Agent
+            Install Atcha
           </p>
           <p className="text-xs text-zinc-400 truncate">
             {platform === "ios"
@@ -174,7 +174,7 @@ export default function InstallNudge() {
             2. Scroll down and tap{" "}
             <span className="text-zinc-200">Add to Home Screen</span>.
           </p>
-          <p>3. Tap Add — done. SAID Agent will open like a native app.</p>
+          <p>3. Tap Add. Atcha will open like a native app.</p>
         </div>
       )}
     </div>
