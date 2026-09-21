@@ -14,7 +14,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
  *   data-count             numbers count up when revealed
  *   data-marquee           velocity-linked chip ticker
  *   data-stage             the pinned send demo, scrubbed by scroll
- *   data-bars              the identity bars merging into one
+ *   data-close             the closing coral panel growing in
  *   data-nav               hides on scroll down, returns on scroll up
  */
 export default function PublicMotion() {
@@ -65,6 +65,7 @@ export default function PublicMotion() {
     }
 
     if (reduced) {
+      q<HTMLElement>("[data-close]").forEach((el) => { el.dataset.close = "in"; el.style.transform = "none"; el.style.opacity = "1"; });
       q<HTMLElement>("[data-step]").forEach((s) => (s.dataset.on = ""));
       q<HTMLElement>("[data-done]").forEach((s) => (s.dataset.on = ""));
       return () => cleanups.forEach((f) => f());
@@ -146,19 +147,16 @@ export default function PublicMotion() {
       q<HTMLElement>("[data-done]").forEach((s) => (s.dataset.on = ""));
     }
 
-    // Identity bars merge into one.
-    const bars = document.querySelector<HTMLElement>("[data-bars]");
-    if (bars && bars.children.length === 3) {
-      const [b1, b2, b3] = Array.from(bars.children) as HTMLElement[];
+    // The closing panel grows to full size as it arrives, then its content rises.
+    const close = document.querySelector<HTMLElement>("[data-close]");
+    if (close) {
       const st = ScrollTrigger.create({
-        trigger: bars, start: "top 85%", end: "top 30%", scrub: true,
+        trigger: close, start: "top 90%", end: "top 35%", scrub: true,
         onUpdate: (self) => {
-          const mp = Math.max(0, Math.min(1, (self.progress - 0.35) / 0.55));
-          const e = mp * mp * (3 - 2 * mp);
-          const d1 = b3.offsetTop - b1.offsetTop, d2 = b3.offsetTop - b2.offsetTop;
-          b1.style.transform = `translateY(${d1 * e}px)`; b2.style.transform = `translateY(${d2 * e}px)`;
-          b1.style.opacity = String(1 - e); b2.style.opacity = String(1 - e);
-          b3.style.transform = `scale(${1 + 0.03 * e})`;
+          const e = self.progress * self.progress * (3 - 2 * self.progress);
+          close.style.transform = `scale(${0.94 + 0.06 * e})`;
+          close.style.opacity = String(0.85 + 0.15 * e);
+          if (self.progress > 0.7) close.dataset.close = "in";
         },
       });
       cleanups.push(() => st.kill());
