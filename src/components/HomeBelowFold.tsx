@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { usePrivy } from "@privy-io/react-auth";
-import { getIdleLeaderboard, getStats } from "@/lib/api";
+import { getStats } from "@/lib/api";
 import PartnerTicker from "@/components/PartnerTicker";
 
 /* ── icons (lucide paths, inline so no dep) ── */
@@ -50,7 +50,6 @@ export default function HomeBelowFold() {
   const { ready, login } = usePrivy();
   const [agents, setAgents] = useState<number | null>(null);
   const [actions, setActions] = useState<number | null>(null);
-  const [jobs, setJobs] = useState<number | null>(null);
 
   useEffect(() => {
     getStats()
@@ -59,11 +58,6 @@ export default function HomeBelowFold() {
           setAgents(s.agents.total);
           setActions(s.activity.totalReceipts);
         }
-      })
-      .catch(() => {});
-    getIdleLeaderboard(1)
-      .then((l) => {
-        if (l) setJobs(l.aggregate.jobsCompleted);
       })
       .catch(() => {});
   }, []);
@@ -85,7 +79,6 @@ export default function HomeBelowFold() {
             </span>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Stat label="Jobs completed" value={fmt(jobs)} sub="via IDLE compute" />
             <Stat label="Actions executed" value={fmt(actions)} sub="on-chain" />
             <Stat label="Agents" value={fmt(agents)} sub="and growing" />
           </div>

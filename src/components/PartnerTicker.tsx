@@ -5,7 +5,6 @@ const partners = [
   { name: "OpenClaw", logo: "/platforms/openclaw.png", url: "https://openclaw.ai" },
   { name: "Privy", logo: "/platforms/privy.jpg", url: "https://www.privy.io/" },
   { name: "Claw Pump", logo: "/clawpump-logo.png", url: "https://clawpump.tech" },
-  { name: "IDLE", logo: "/platforms/idle.png", url: "https://earnidle.com" },
 ];
 
 // Repeat the small set so the marquee track is wide enough to loop seamlessly.
@@ -52,9 +51,7 @@ export default function PartnerTicker() {
               <img
                 src={partner.logo}
                 alt={partner.name}
-                className={`w-5 h-5 rounded-full object-cover ${
-                  partner.name === "IDLE" ? "invert" : ""
-                }`}
+                className="w-5 h-5 rounded-full object-cover"
               />
               <span className="text-zinc-400 text-xs font-medium whitespace-nowrap group-hover:text-zinc-200 transition-colors">
                 {partner.name}

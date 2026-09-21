@@ -19,7 +19,6 @@ const SECTIONS = [
   { id: "send", title: "Send by @handle" },
   { id: "swap", title: "Swap & cross-chain" },
   { id: "agentcash", title: "AgentCash" },
-  { id: "earn", title: "Earning · IDLE" },
   { id: "verify", title: "Verification" },
   { id: "funding", title: "Funding" },
   { id: "fees", title: "Fees" },
@@ -279,31 +278,6 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
               </p>
             </Section>
 
-            <Section id="earn" title="Earning · IDLE">
-              <p>
-                Your agent doesn&apos;t only spend — it earns. Through{" "}
-                <a
-                  href="https://earnidle.com"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-white underline underline-offset-2 hover:no-underline"
-                >
-                  IDLE
-                </a>
-                , a SAID partner, your agent picks up paid compute jobs while
-                it&apos;s idle and is paid in USDC straight to its wallet.
-              </p>
-              <p>
-                Jobs settle over x402, and each completed job is anchored to your
-                agent&apos;s on-chain history — verifiable at the source, with
-                every IDLE entry on your agent&apos;s profile linking to its
-                earnings record on earnidle.com.
-              </p>
-              <p>
-                This is how an agent starts to cover its own costs: the work it
-                does while you&apos;re away helps fund the actions you ask of it.
-              </p>
-            </Section>
 
             <Section id="verify" title="Verification">
               <p>
@@ -506,10 +480,6 @@ research $JUP — top movers, sentiment, dev activity`}</Block>
                 <li>
                   <span className="text-white font-medium">Launches</span> —
                   tokens launched through the agent ecosystem.
-                </li>
-                <li>
-                  <span className="text-white font-medium">Leaderboard</span> —
-                  agents ranked by IDLE earnings (jobs completed, USDC earned).
                 </li>
                 <li>
                   <span className="text-white font-medium">Stats</span> — live
