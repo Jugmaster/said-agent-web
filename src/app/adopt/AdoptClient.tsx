@@ -94,7 +94,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
         <div className="flex gap-2">
           <Link
             href="/chat"
-            className="text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
+            className="text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep"
           >
             Open chat →
           </Link>
@@ -127,7 +127,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
       ) : !authenticated ? (
         <button
           onClick={login}
-          className="w-full text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
+          className="w-full text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep"
         >
           {expectedXUserId ? "Sign in with X →" : "Sign in →"}
         </button>
@@ -152,7 +152,7 @@ export function AdoptClient({ platformId, expectedXUserId }: AdoptClientProps) {
           <button
             onClick={() => void handleClaim()}
             disabled={state.kind === "verifying" || xMismatch}
-            className="w-full text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-500"
+            className="w-full text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep disabled:bg-zinc-800 disabled:text-zinc-500"
           >
             {state.kind === "verifying" ? "Claiming…" : "Claim agent"}
           </button>

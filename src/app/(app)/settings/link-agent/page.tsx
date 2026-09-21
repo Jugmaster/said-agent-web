@@ -146,7 +146,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
             <button
               onClick={() => setChallenge(challengeFor(platformId, wallet.trim()))}
               disabled={!walletValid}
-              className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+              className="w-full rounded-lg bg-coral py-3 text-sm font-semibold text-cream hover:bg-coral-deep disabled:opacity-40"
             >
               Generate challenge
             </button>
@@ -189,7 +189,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
               <button
                 onClick={() => void submit()}
                 disabled={!signature.trim() || busy}
-                className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+                className="w-full rounded-lg bg-coral py-3 text-sm font-semibold text-cream hover:bg-coral-deep disabled:opacity-40"
               >
                 {busy ? "Verifying…" : "Link agent"}
               </button>

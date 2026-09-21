@@ -132,11 +132,11 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
               {refreshing ? "Refreshing…" : "↻ Refresh"}
             </button>
             {balance?.saidWallet ? (
-              <button onClick={() => setFunding(true)} className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+              <button onClick={() => setFunding(true)} className="rounded-xl bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep">
                 Add funds
               </button>
             ) : (
-              <Link href="/fund" className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+              <Link href="/fund" className="rounded-xl bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep">
                 Set up agent
               </Link>
             )}

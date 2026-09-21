@@ -70,7 +70,7 @@ export default function DotGridBackground({
   breatheSpeed = 1.5,
   drift = true,
   driftAmount = 0.2,
-  bg = '#09090b',
+  bg = '#F6F4EE',
 }: DotGridBackgroundProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const vignetteRef = useRef<HTMLDivElement | null>(null);
@@ -119,7 +119,7 @@ export default function DotGridBackground({
       const total = i / 64;
       return {
         r: 0.5 + total * 3.5,
-        style: `hsla(${Math.round(42 + total * 18)},${Math.round(3 + total * 25)}%,${Math.round(8 + total * 52)}%,${(0.08 + total * 0.58).toFixed(3)})`,
+        style: `hsla(${Math.round(30 + total * 12)},${Math.round(8 + total * 30)}%,${Math.round(72 - total * 40)}%,${(0.06 + total * 0.34).toFixed(3)})`,
       };
     });
 
@@ -236,7 +236,7 @@ export default function DotGridBackground({
       />
       <div
         ref={vignetteRef}
-        style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 30%, rgba(9,9,11,.8) 100%)' }}
+        style={{ position: 'fixed', inset: 0, zIndex: 1, pointerEvents: 'none', background: 'radial-gradient(ellipse at center, transparent 30%, rgba(246,244,238,.85) 100%)' }}
       />
     </>
   );

@@ -639,7 +639,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                   type="button"
                   onClick={() => void submit()}
                   disabled={sending}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-coral text-cream text-sm font-semibold hover:bg-coral-deep transition disabled:opacity-50"
                 >
                   {sending ? "Sending…" : "Confirm send"}
                 </button>
@@ -649,7 +649,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             <button
               onClick={() => setConfirming(true)}
               disabled={!canSubmit}
-              className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="w-full py-3.5 bg-coral text-cream rounded-xl font-semibold hover:bg-coral-deep disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               {sending
                 ? "Sending…"

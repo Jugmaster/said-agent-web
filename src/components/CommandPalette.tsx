@@ -99,7 +99,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
         role="dialog"
         aria-modal="true"
         aria-label="Command palette"
-        className="w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl shadow-black/60"
+        className="w-full max-w-lg overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-950/95 shadow-2xl shadow-ink/15"
         onClick={(e) => e.stopPropagation()}
       >
         <input

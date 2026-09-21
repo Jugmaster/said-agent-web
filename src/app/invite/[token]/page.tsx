@@ -92,7 +92,7 @@ export default async function InvitePage({ params }: PageProps) {
         </p>
         <a
           href=""
-          className="px-5 py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200"
+          className="px-5 py-2.5 rounded-lg bg-coral text-cream text-sm font-semibold hover:bg-coral-deep"
         >
           Retry
         </a>
@@ -134,7 +134,7 @@ export default async function InvitePage({ params }: PageProps) {
           )}
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep"
           >
             Get your own agent →
           </Link>

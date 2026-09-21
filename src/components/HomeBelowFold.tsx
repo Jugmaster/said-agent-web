@@ -123,7 +123,7 @@ export default function HomeBelowFold() {
               href="https://t.me/saidinfrabot"
               target="_blank"
               rel="noreferrer"
-              className="w-full sm:w-auto px-8 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+              className="w-full sm:w-auto px-8 py-3 bg-coral text-cream rounded-lg font-semibold hover:bg-coral-deep transition"
             >
               Start in Telegram →
             </a>

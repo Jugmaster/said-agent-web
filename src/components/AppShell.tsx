@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "./Navbar";
@@ -183,16 +182,9 @@ export default function AppShell({ children }: { children: ReactNode }) {
           >
             {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
                 logo isn't distorted (and Next doesn't warn about it). */}
-            <Image
-              src="/logo-dark.png"
-              alt="SAID"
-              width={354}
-              height={370}
-              className="h-[22px] w-auto"
-              priority
-            />
-            <span className="hidden lg:inline text-sm font-bold tracking-wide">
-              SAID Agent
+            <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-[7px] bg-coral text-[13px] font-semibold leading-none text-cream">@</span>
+            <span className="hidden lg:inline text-[17px] font-medium tracking-[-0.02em]">
+              atcha
             </span>
           </Link>
 
@@ -268,7 +260,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setFunding(true)}
-                  className="mt-2.5 w-full rounded-lg bg-white text-black text-xs font-semibold py-2 hover:bg-zinc-200 transition"
+                  className="mt-2.5 w-full rounded-lg bg-coral text-cream text-xs font-semibold py-2 hover:bg-coral-deep transition"
                 >
                   Add funds
                 </button>

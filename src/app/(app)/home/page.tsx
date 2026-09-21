@@ -5,12 +5,21 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
+import FundedCard from "@/components/FundedCard";
+import DailyTasks from "@/components/DailyTasks";
+import ReputationCard from "@/components/ReputationCard";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
 import {
   getPortfolio,
   getActivity,
   getBalance,
+  getCashback,
+  getCredits,
+  getCreditsToday,
+  type CashbackResponse,
+  type CreditsSummary,
+  type CreditsToday,
   type FullPortfolio,
   type ActivityReceipt,
   type BalanceResponse,
@@ -85,6 +94,10 @@ function Home({ platformId }: { platformId: string }) {
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
   const [balance, setBalance] = useState<BalanceResponse | null>(null);
   const [funding, setFunding] = useState(false);
+  const [cashback, setCashback] = useState<CashbackResponse | null>(null);
+  // undefined = loading, null = credits not available on this API
+  const [credits, setCredits] = useState<CreditsSummary | null | undefined>(undefined);
+  const [creditsToday, setCreditsToday] = useState<CreditsToday | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -98,6 +111,15 @@ function Home({ platformId }: { platformId: string }) {
       .catch(() => !cancelled && setReceipts([]));
     getBalance(platformId)
       .then((b) => !cancelled && setBalance(b))
+      .catch(() => {});
+    getCashback(platformId)
+      .then((c) => !cancelled && setCashback(c))
+      .catch(() => {});
+    getCredits(platformId)
+      .then((c) => !cancelled && setCredits(c))
+      .catch(() => !cancelled && setCredits(null));
+    getCreditsToday()
+      .then((t) => !cancelled && setCreditsToday(t))
       .catch(() => {});
     return () => {
       cancelled = true;
@@ -116,9 +138,19 @@ function Home({ platformId }: { platformId: string }) {
     <div className="flex min-h-dvh">
       {/* MAIN — fills the width (no narrow centered column) */}
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
-        {/* Hero */}
+        {/* Hero: the funded account. Falls back to the plain wallet total when
+            this API predates credits, so nothing here depends on the deploy. */}
         <div className="mb-8">
           <p className="text-sm text-zinc-500">{greeting()}{userName ? `, ${userName}` : ""}</p>
+          {credits !== null ? (
+            <div className="mt-3">
+              <FundedCard
+                summary={credits === undefined ? undefined : { ...credits, balanceUsd: credits.balanceUsd ?? total }}
+                today={creditsToday}
+                onAddMoney={() => setFunding(true)}
+              />
+            </div>
+          ) : (
           <div className="mt-1 flex flex-wrap items-end justify-between gap-4">
             <div>
               <div className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
@@ -137,11 +169,12 @@ function Home({ platformId }: { platformId: string }) {
             <button
               type="button"
               onClick={() => setFunding(true)}
-              className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200"
+              className="rounded-xl bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep"
             >
-              Add funds
+              Add money
             </button>
           </div>
+          )}
         </div>
 
         {/* Quick actions */}
@@ -190,6 +223,10 @@ function Home({ platformId }: { platformId: string }) {
 
         {/* Aside content inline on smaller screens (aside is xl-only) */}
         <div className="mt-9 space-y-6 xl:hidden">
+          {credits && credits.funded && (
+            <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
+          )}
+          <ReputationCard balance={balance} cashback={cashback} rungName={credits?.funded ? credits.rungName : null} />
           <AgentIdentity agentName={agentName} walletAddress={walletAddress} balance={balance} />
           <RecentActivity receipts={receipts} />
         </div>
@@ -197,6 +234,10 @@ function Home({ platformId }: { platformId: string }) {
 
       {/* RIGHT CONTEXT PANEL — like chat, fills the width on wide screens */}
       <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+        {credits && credits.funded && (
+          <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
+        )}
+        <ReputationCard balance={balance} cashback={cashback} rungName={credits?.funded ? credits.rungName : null} />
         <AgentIdentity agentName={agentName} walletAddress={walletAddress} balance={balance} />
         <RecentActivity receipts={receipts} />
       </aside>
@@ -208,6 +249,7 @@ function Home({ platformId }: { platformId: string }) {
           onFunded={() => {
             setFunding(false);
             if (walletAddress) getPortfolio(walletAddress).then(setPortfolio).catch(() => {});
+            getCredits(platformId).then(setCredits).catch(() => {});
           }}
         />
       )}

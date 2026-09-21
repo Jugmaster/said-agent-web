@@ -30,14 +30,12 @@ export default function HomePage() {
           </div>
 
           <h1
-            className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight"
-            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 0 60px rgba(102,126,234,0.15)" }}
+            className="text-4xl sm:text-5xl font-medium mb-5 tracking-[-0.04em] leading-[1.05]"
           >
             Send money. Buy anything. Swap tokens.
           </h1>
           <p
             className="text-base sm:text-lg text-zinc-400 mb-8 max-w-md mx-auto"
-            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
           >
             All from one chat — your own AI agent on Solana. No seed phrases, no
             setup.
@@ -50,7 +48,7 @@ export default function HomePage() {
               <>
                 <Link
                   href="/home"
-                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-coral text-cream rounded-lg font-semibold hover:bg-coral-deep transition"
                 >
                   Open app →
                 </Link>
@@ -69,7 +67,7 @@ export default function HomePage() {
                   href="https://t.me/saidinfrabot"
                   target="_blank"
                   rel="noreferrer"
-                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
+                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-coral text-cream rounded-lg font-semibold hover:bg-coral-deep transition"
                 >
                   Start in Telegram →
                 </a>

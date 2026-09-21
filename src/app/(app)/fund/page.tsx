@@ -105,7 +105,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           </p>
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep transition"
           >
             Open chat →
           </Link>
@@ -164,7 +164,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           agent gets provisioned on first message.
           <Link
             href="/chat"
-            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-coral text-cream font-semibold hover:bg-coral-deep transition"
           >
             Open chat →
           </Link>

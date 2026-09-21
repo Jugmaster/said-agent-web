@@ -40,7 +40,7 @@ export default function InviteWebClaim({ platform }: Props) {
         <button
           type="button"
           onClick={() => router.push("/chat")}
-          className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-zinc-200 font-medium transition"
+          className="w-full text-center text-sm px-4 py-3 rounded-lg bg-coral text-cream hover:bg-coral-deep font-medium transition"
         >
           Open my agent
         </button>
@@ -61,7 +61,7 @@ export default function InviteWebClaim({ platform }: Props) {
         login();
       }}
       disabled={!ready}
-      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-white text-black hover:bg-zinc-200 font-medium disabled:opacity-50 transition"
+      className="w-full text-center text-sm px-4 py-3 rounded-lg bg-coral text-cream hover:bg-coral-deep font-medium disabled:opacity-50 transition"
     >
       Claim here → sign in with {label}
     </button>

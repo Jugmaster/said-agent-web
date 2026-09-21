@@ -144,7 +144,7 @@ export default function InstallNudge() {
         {platform === "android" && deferred ? (
           <button
             onClick={() => void install()}
-            className="px-3 py-1.5 bg-white text-black text-xs font-semibold rounded-full hover:bg-zinc-200 transition whitespace-nowrap"
+            className="px-3 py-1.5 bg-coral text-cream text-xs font-semibold rounded-full hover:bg-coral-deep transition whitespace-nowrap"
           >
             Install
           </button>

@@ -214,7 +214,7 @@ export default function FundOnrampPage() {
         </p>
         <button
           onClick={close}
-          className="px-6 py-3 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition"
+          className="px-6 py-3 bg-coral text-cream rounded-xl font-semibold hover:bg-coral-deep transition"
         >
           Done — back to chat
         </button>
@@ -256,7 +256,7 @@ export default function FundOnrampPage() {
 
         <button
           onClick={() => void start()}
-          className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition mb-2"
+          className="w-full py-3.5 bg-coral text-cream rounded-xl font-semibold hover:bg-coral-deep transition mb-2"
         >
           Continue to payment →
         </button>

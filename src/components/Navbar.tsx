@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useState, useRef, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
@@ -72,15 +71,8 @@ export default function Navbar() {
         <Link href="/" className="flex items-center gap-2 px-2">
           {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
               logo isn't distorted (and Next doesn't warn about it). */}
-          <Image
-            src="/logo-dark.png"
-            alt="SAID"
-            width={354}
-            height={370}
-            className="h-5 w-auto"
-            priority
-          />
-          <span className="text-sm font-bold tracking-wide">SAID Agent</span>
+          <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-[7px] bg-coral text-[13px] font-semibold leading-none text-cream">@</span>
+          <span className="text-[17px] font-medium tracking-[-0.02em]">atcha</span>
         </Link>
 
         {/* Public links (hidden on mobile) */}
@@ -120,7 +112,7 @@ export default function Navbar() {
           ) : !authenticated ? (
             <button
               onClick={login}
-              className="ml-1 px-4 py-1.5 bg-white text-black rounded-full text-sm font-semibold hover:bg-zinc-200 transition whitespace-nowrap"
+              className="ml-1 px-4 py-1.5 bg-coral text-cream rounded-full text-sm font-semibold hover:bg-coral-deep transition whitespace-nowrap"
             >
               Log in
             </button>

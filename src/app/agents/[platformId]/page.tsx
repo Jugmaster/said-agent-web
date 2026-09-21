@@ -135,7 +135,7 @@ export default async function AgentProfilePage({ params }: PageProps) {
             <div className="mt-6 md:mt-0 md:w-72 shrink-0">
               <Link
                 href={tipHref}
-                className="block w-full text-center rounded-xl bg-white text-black font-semibold py-3 hover:bg-zinc-200 transition"
+                className="block w-full text-center rounded-xl bg-coral text-cream font-semibold py-3 hover:bg-coral-deep transition"
               >
                 Send {name} a tip →
               </Link>

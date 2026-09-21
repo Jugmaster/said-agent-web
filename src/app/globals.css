@@ -1,5 +1,70 @@
 @import "tailwindcss";
 
+/*
+ * Atcha design system, applied at the token level. The app was written on
+ * Tailwind's zinc scale for a dark ground; the scale is remapped here to the
+ * Atcha neutrals (cream ground, ink text) so the layout stays and the palette
+ * changes. white/black are swapped to ink/cream for the same reason: a
+ * `bg-white text-black` button is the primary button, and stays one.
+ */
+@theme {
+  --color-cream: #F6F4EE;
+  --color-card: #ECE9E1;
+  --color-btn: #E3E0D7;
+  --color-ink: #171613;
+  --color-grey: #6F6B62;
+  --color-line: #E3E0D6;
+  --color-coral: #E8542E;
+  --color-coral-deep: #C9401D;
+  --color-coral-soft: #FAE4DC;
+  --color-coral-text: #B93A16;
+
+  --color-white: #171613;
+  --color-black: #F6F4EE;
+
+  --color-zinc-50: #171613;
+  --color-zinc-100: #211F1B;
+  --color-zinc-200: #2F2D28;
+  --color-zinc-300: #4B4841;
+  --color-zinc-400: #63605A;
+  --color-zinc-500: #6F6B62;
+  --color-zinc-600: #A6A196;
+  --color-zinc-700: #D3CFC4;
+  --color-zinc-800: #E3E0D6;
+  --color-zinc-900: #ECE9E1;
+  --color-zinc-950: #F6F4EE;
+
+  /* Status colours. The app tints with `bg-x-950/30 border-x-900 text-x-300`
+     (dark tint, light text); on cream the 950 is chosen so that /30 over
+     cream lands on the Atcha pill fill, and the light steps become the deep
+     pill text. */
+  --color-green-950: #A6E7CD; --color-emerald-950: #A6E7CD;
+  --color-green-900: #C6E3D0; --color-emerald-900: #C6E3D0;
+  --color-green-500: #157E4E; --color-emerald-500: #157E4E;
+  --color-green-400: #157E4E; --color-emerald-400: #157E4E;
+  --color-green-300: #157E4E; --color-emerald-300: #157E4E;
+  --color-green-200: #126B42; --color-emerald-200: #126B42;
+
+  --color-amber-950: #FDE097; --color-yellow-950: #FDE097;
+  --color-amber-900: #EEDFB3; --color-yellow-900: #EEDFB3;
+  --color-amber-600: #8F6A12; --color-yellow-600: #8F6A12;
+  --color-amber-500: #B98A1C; --color-yellow-500: #B98A1C;
+  --color-amber-400: #B98A1C; --color-yellow-400: #B98A1C;
+  --color-amber-300: #B98A1C; --color-yellow-300: #B98A1C;
+
+  --color-red-950: #FFBFB2; --color-rose-950: #FFBFB2;
+  --color-red-900: #F2C9BC; --color-rose-900: #F2C9BC;
+  --color-red-400: #B93A16; --color-rose-400: #B93A16;
+  --color-red-300: #B93A16; --color-rose-300: #B93A16;
+  --color-red-200: #9E2F10; --color-rose-200: #9E2F10;
+
+  --color-blue-950: #DFE9F6; --color-sky-950: #DFE9F6;
+  --color-blue-500: #3D6BB8; --color-blue-400: #3D6BB8; --color-blue-300: #3D6BB8; --color-blue-200: #2F5799;
+  --color-sky-300: #3D6BB8;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
   /* Stop iOS/Android auto-inflating text; with 16px inputs this kills the
@@ -10,11 +75,11 @@ html {
 
 :root {
   /* Match DotGridBackground bg + vignette tint */
-  --background: #09090b;
-  --foreground: #ffffff;
-  --bg-secondary: #141414;
-  --border: #2a2a2a;
-  --text-secondary: #999;
+  --background: #F6F4EE;
+  --foreground: #171613;
+  --bg-secondary: #ECE9E1;
+  --border: #E3E0D6;
+  --text-secondary: #6F6B62;
   /* Mobile bottom tab bar height (incl. iOS home-indicator safe area). */
   --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
   /* Fixed pill navbar height incl. the iOS notch inset. Pages must clear this
@@ -27,7 +92,7 @@ html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 button,
@@ -46,9 +111,9 @@ a,
   background: var(--bg-secondary);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #D3CFC4;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #A6A196;
 }

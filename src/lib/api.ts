@@ -723,3 +723,82 @@ export async function unlinkReputation(platformId: string): Promise<boolean> {
   );
   return res.ok;
 }
+
+// ─── Funded agents ──────────────────────────────────────────────────────────
+// Read models from said-butler/src/credits/api.ts. Shapes mirror that file.
+
+export interface CreditsToday {
+  enabled: boolean;
+  live: boolean;
+  fundingUsd: number;
+  capUsd: number;
+  sizedBy: "cap" | "pool";
+  agentsFunded: number;
+  fundedLastHour: number;
+  fundedToday: number;
+  asOf: string;
+}
+
+export interface CreditTask {
+  id: string;
+  type: "pay" | "hire" | "buy" | "lock" | "trade";
+  title: string;
+  detail: string;
+  minUsd: number;
+  scores: boolean;
+  done: boolean;
+  needsOwnMoney: boolean;
+}
+
+export interface CreditEventRow {
+  kind: string;
+  amountUsd: number;
+  asset: string | null;
+  tx: string | null;
+  ref: string | null;
+  at: string;
+}
+
+export interface CreditsSummary {
+  platformId: string;
+  funded: boolean;
+  balanceUsd: number | null;
+  creditUsd: number;
+  ownUsd: number;
+  withdrawableUsd: number;
+  lockedUsd: number;
+  pnlUsd: number;
+  rung: number;
+  rungName: string;
+  streak: number;
+  paused: boolean;
+  tier: number;
+  limits: { spend: number; trade: number; spendLeft: number; tradeLeft: number };
+  tasks: CreditTask[];
+  recent: CreditEventRow[];
+  today: CreditsToday;
+}
+
+/** Public. Today's funding and the counter. Null when the API predates credits. */
+export async function getCreditsToday(): Promise<CreditsToday | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/today`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-only. Null when the API predates credits (404) so the UI can degrade. */
+export async function getCredits(platformId: string): Promise<CreditsSummary | null> {
+  const res = await apiFetch(`${API_BASE}/api/credits/${encodeURIComponent(platformId)}`, {
+    headers: await authHeaders(),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`credits failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}

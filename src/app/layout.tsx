@@ -13,21 +13,21 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://agent.saidprotocol.com"),
-  title: "SAID Agent",
+  title: "Atcha",
   description:
     "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
   manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "SAID Agent",
+    title: "Atcha",
     description:
       "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
     url: "https://agent.saidprotocol.com",
-    siteName: "SAID Agent",
+    siteName: "Atcha",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SAID Agent",
+    title: "Atcha",
     description:
       "Your AI agent on Solana — one chat, one wallet, no seed phrases.",
   },
@@ -38,7 +38,7 @@ export const metadata: Metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
-    title: "SAID Agent",
+    title: "Atcha",
   },
 };
 
