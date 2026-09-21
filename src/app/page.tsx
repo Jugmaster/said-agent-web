@@ -44,10 +44,9 @@ export default function LandingPage() {
           <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
         </h1>
         <p className={s.sub}>
-          Your Atcha starts with <strong>trading credit in it</strong>: ours, sized by the chart, first-loss so yours
-          is never the first to go. Trade it, grow it. Add your own to send to any <strong>@name</strong> you can
-          type, checked before a single cent moves. Hold <strong>$ATCHA</strong> for a bigger one. Climb, and the
-          upside is yours to take out.
+          It starts with <strong>trading credit in it</strong>: ours, sized by what the chart earned, first-loss so
+          yours never is. Add your own money and pay any <strong>@name</strong> you can type, checked before a cent
+          moves. Hold <strong>$ATCHA</strong> for a bigger one.
         </p>
         <div className={s.ctas}>
           <button type="button" className={s.btn} onClick={start} disabled={!ready}>
@@ -66,9 +65,9 @@ export default function LandingPage() {
           <h2 className={s.big}>It comes with credit in it. The chart sets the size.</h2>
         </div>
         <div className={s.capGrid}>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Trading credit, day one</h3><p>Real credit we put in, not points. Trade the majors with it and watch it move. Real P&amp;L from the first swap.</p></div>
-          <div className={s.cap}><span className={s.n}>02</span><h3>Sized by the chart</h3><p>Today&apos;s funding is set every hour by what $ATCHA earned. Loud chart, bigger accounts. Launch day is the biggest anyone gets.</p></div>
-          <div className={s.cap}><span className={s.n}>03</span><h3>Ours goes first</h3><p>Our credit is the first-loss layer. Add your own whenever you like; it sits above ours, and it&apos;s always yours to take back.</p></div>
+          <div className={s.cap}><span className={s.n}>01</span><h3>Trading credit, day one</h3><p>Real credit we put in, not points. Trade the majors with it and watch it move. Real P&amp;L from your first swap.</p></div>
+          <div className={s.cap}><span className={s.n}>02</span><h3>Sized by the chart</h3><p>Today&apos;s funding is set every hour by what $ATCHA earned. Loud chart, bigger accounts. Launch day is the biggest it will ever be.</p></div>
+          <div className={s.cap}><span className={s.n}>03</span><h3>Ours goes first</h3><p>Our credit takes the first loss. Your money sits above it and is always yours to take back. Climb the rungs and the upside becomes yours too.</p></div>
         </div>
       </section>
 
@@ -77,7 +76,7 @@ export default function LandingPage() {
           <div className={s.demoCopy}>
             <p className={s.eyebrow}>The send</p>
             <h2 className={s.big}>From said to settled. In seconds.</h2>
-            <p>Add money once, and paying anyone is a sentence. Type a name and the rest just happens: the identity check on SAID, the safe hold, the delivery.</p>
+            <p>Add money once and paying anyone is a sentence. Type a name and the rest just happens: the check on SAID, the safe hold, the delivery.</p>
             <div className={s.mini}>
               <span><b>Screened first.</b> Fakes and lookalikes never receive a cent.</span>
               <span><b>Held safely.</b> Not claimed? It comes back automatically.</span>
@@ -111,7 +110,7 @@ export default function LandingPage() {
         <div className={s.identity}>
           <p className={s.eyebrow}>Your name</p>
           <h2 className={s.big}>One name. Every handle. All your money.</h2>
-          <p className={s.lede}>Claim your @name once, then link the accounts you already have: X, Telegram, and every social that comes next. They all resolve to you on SAID, so money sent to any of them arrives in the same pocket.</p>
+          <p className={s.lede}>Claim your @name once, then link the accounts you already have: X, Telegram, and every social that comes next. They all resolve to you on SAID, so money sent to any of them lands in the same pocket.</p>
           <div className={s.idGrid}>
             <div className={s.bars} aria-hidden>
               <div className={`${s.bar} ${s.b1}`}><span className={s.bdot} />@renata_paints on X<span className={s.tag}>linked</span></div>
@@ -125,7 +124,7 @@ export default function LandingPage() {
 
       <section className={`${s.claim} ${s.wrap}`} id="claim">
         <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
-        <p className={s.csub}>Free. Funded on day one. No seed phrase, no SOL to start. Sign in with X or Telegram and it&apos;s yours in one message.</p>
+        <p className={s.csub}>Free, funded on day one, no seed phrase. Sign in with X or Telegram and it&apos;s yours in one message.</p>
         <div className={s.ctas}>
           <button type="button" className={s.btn} onClick={start} disabled={!ready}>
             {ready ? (authenticated ? "Open your Atcha" : "Get your funded Atcha") : "Loading…"}
@@ -201,7 +200,7 @@ function Counter({ today }: { today: CreditsToday | null | undefined }) {
           <span><b>{today.fundedLastHour.toLocaleString()}</b> in the last hour</span>
         </>
       ) : (
-        <span>Launch day: the first hundred Atchas get the biggest funding there will ever be.</span>
+        <span>The first hundred Atchas on launch day get the biggest funding there will ever be.</span>
       )}
     </div>
   );
