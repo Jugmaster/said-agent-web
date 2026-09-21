@@ -161,33 +161,20 @@ export default async function AgentProfilePage({ params }: PageProps) {
           <section>
             <h2 className="text-sm font-medium text-zinc-400 mb-3">Recent</h2>
             <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-2">
-              {agent.recentActivity.map((a) => (
+              {agent.recentActivity.filter((a) => a.type !== "idle_compute").map((a) => (
                 <div
                   key={a.seq}
                   className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between"
                 >
                   <div>
                     <span className="text-sm font-medium capitalize">
-                      {a.type === "idle_compute"
-                        ? "IDLE compute"
-                        : a.type.replace(/_/g, " ")}
+                      {a.type.replace(/_/g, " ")}
                     </span>
                     <span className="text-xs text-zinc-500 ml-2">
                       {formatDate(a.occurredAt)}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    {a.type === "idle_compute" && agent.saidWallet && (
-                      <a
-                        href={`https://api.earnidle.com/api/public/node-earnings?wallet=${agent.saidWallet}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-emerald-400/80 hover:text-emerald-300"
-                        title="Verify this agent's IDLE work at the source"
-                      >
-                        verify on IDLE ↗
-                      </a>
-                    )}
                     {a.onChainTx && (
                       <a
                         href={`https://solscan.io/tx/${a.onChainTx}`}
