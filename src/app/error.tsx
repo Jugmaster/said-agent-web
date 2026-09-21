@@ -30,7 +30,7 @@ export default function Error({
         <div className="flex items-center justify-center gap-3">
           <button
             onClick={() => unstable_retry()}
-            className="px-5 py-2.5 bg-coral text-cream rounded-lg text-sm font-semibold hover:bg-coral-deep transition"
+            className="px-5 py-2.5 bg-ink text-cream rounded-lg text-sm font-semibold hover:bg-coral-deep transition"
           >
             Try again
           </button>

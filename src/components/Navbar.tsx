@@ -112,7 +112,7 @@ export default function Navbar() {
           ) : !authenticated ? (
             <button
               onClick={login}
-              className="ml-1 px-4 py-1.5 bg-coral text-cream rounded-full text-sm font-semibold hover:bg-coral-deep transition whitespace-nowrap"
+              className="ml-1 px-4 py-1.5 bg-ink text-cream rounded-full text-sm font-semibold hover:bg-coral-deep transition whitespace-nowrap"
             >
               Log in
             </button>

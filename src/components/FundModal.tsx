@@ -162,7 +162,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
             </div>
             <button
               onClick={() => void start()}
-              className="w-full py-3.5 bg-coral text-cream rounded-xl font-semibold hover:bg-coral-deep transition mb-2"
+              className="w-full py-3.5 bg-ink text-cream rounded-xl font-semibold hover:bg-coral-deep transition mb-2"
             >
               Continue to payment →
             </button>
@@ -245,7 +245,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-coral text-cream rounded-xl font-semibold hover:bg-coral-deep transition"
+              className="px-6 py-3 bg-ink text-cream rounded-xl font-semibold hover:bg-coral-deep transition"
             >
               Done
             </button>

@@ -260,7 +260,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setFunding(true)}
-                  className="mt-2.5 w-full rounded-lg bg-coral text-cream text-xs font-semibold py-2 hover:bg-coral-deep transition"
+                  className="mt-2.5 w-full rounded-lg bg-ink text-cream text-xs font-semibold py-2 hover:bg-coral-deep transition"
                 >
                   Add funds
                 </button>

@@ -263,7 +263,7 @@ function CallsInner({ platformId }: { platformId: string }) {
         <button
           onClick={() => void placeCall()}
           disabled={!canCall}
-          className="w-full py-3 rounded-lg bg-coral text-cream text-sm font-semibold hover:bg-coral-deep disabled:opacity-40"
+          className="w-full py-3 rounded-lg bg-ink text-cream text-sm font-semibold hover:bg-coral-deep disabled:opacity-40"
         >
           {placing ? "Placing call…" : `Call now · ${CALL_COST}`}
         </button>
@@ -308,7 +308,7 @@ function CallsInner({ platformId }: { platformId: string }) {
           <button
             onClick={() => void sendEmail()}
             disabled={!emailValid}
-            className="w-full py-3 rounded-lg bg-coral text-cream text-sm font-semibold hover:bg-coral-deep disabled:opacity-40"
+            className="w-full py-3 rounded-lg bg-ink text-cream text-sm font-semibold hover:bg-coral-deep disabled:opacity-40"
           >
             {placing ? "Sending…" : "Send email · $0.03"}
           </button>

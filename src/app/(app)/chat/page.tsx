@@ -517,7 +517,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   {step === "unknown" ? (
                     <button
                       onClick={() => void send("hi")}
-                      className="w-full px-4 py-3 rounded-xl bg-coral text-cream font-semibold hover:bg-coral-deep transition"
+                      className="w-full px-4 py-3 rounded-xl bg-ink text-cream font-semibold hover:bg-coral-deep transition"
                     >
                       Say hi to start
                     </button>
@@ -629,7 +629,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <button
                 type="submit"
                 disabled={sending || !input.trim()}
-                className="rounded-xl bg-coral text-cream hover:bg-coral-deep disabled:bg-zinc-800 disabled:text-zinc-600 px-4 py-2 text-sm font-semibold transition"
+                className="rounded-xl bg-ink text-cream hover:bg-coral-deep disabled:bg-zinc-800 disabled:text-zinc-600 px-4 py-2 text-sm font-semibold transition"
               >
                 Send
               </button>

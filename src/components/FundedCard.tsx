@@ -101,7 +101,7 @@ export default function FundedCard({
           <button
             type="button"
             onClick={onAddMoney}
-            className="rounded-xl bg-coral px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep"
+            className="rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep"
           >
             Add money
           </button>

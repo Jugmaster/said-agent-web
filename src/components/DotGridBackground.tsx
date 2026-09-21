@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
 
 // ═══ 3D Simplex Noise ═══
 const grad3 = [
@@ -63,6 +64,8 @@ interface DotGridBackgroundProps {
   bg?: string;
 }
 
+const APP_PREFIXES = ['/home','/chat','/send','/portfolio','/activity','/calls','/settings','/fund'];
+
 export default function DotGridBackground({
   spacing: spacingProp = 9,
   energy: energyProp = 0.7,
@@ -72,6 +75,9 @@ export default function DotGridBackground({
   driftAmount = 0.2,
   bg = '#F6F4EE',
 }: DotGridBackgroundProps) {
+  // The grid is the signed-in app's texture. Public pages are plain cream.
+  const pathname = usePathname();
+  const inApp = APP_PREFIXES.some((x) => pathname === x || pathname.startsWith(x + '/'));
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const vignetteRef = useRef<HTMLDivElement | null>(null);
 
@@ -228,6 +234,7 @@ export default function DotGridBackground({
     };
   }, [spacingProp, energyProp, breatheAmp, breatheSpeed, drift, driftAmount, bg]);
 
+  if (!inApp) return null;
   return (
     <>
       <canvas
