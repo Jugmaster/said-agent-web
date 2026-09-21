@@ -1,17 +1,14 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
+import s from "@/app/landing.module.css";
 
-export const revalidate = 60; // re-fetch upstream stats every minute
+export const revalidate = 60;
 
 export const metadata: Metadata = {
   title: "Stats · Atcha",
-  description:
-    "Live SAID Protocol ecosystem stats — total agents registered, verified on-chain, average reputation.",
-  openGraph: {
-    title: "Stats · Atcha",
-    description: "Live SAID Protocol ecosystem stats.",
-    type: "website",
-  },
+  description: "The network, counted live: Atchas registered on SAID, verified on-chain, average reputation.",
+  openGraph: { title: "Stats · Atcha", description: "The network, counted live.", type: "website" },
 };
 
 interface ProtocolStats {
@@ -22,9 +19,7 @@ interface ProtocolStats {
 
 async function getStats(): Promise<ProtocolStats | null> {
   try {
-    const res = await fetch("https://api.saidprotocol.com/api/stats", {
-      next: { revalidate: 60 },
-    });
+    const res = await fetch("https://api.saidprotocol.com/api/stats", { next: { revalidate: 60 } });
     if (!res.ok) return null;
     return (await res.json()) as ProtocolStats;
   } catch {
@@ -32,131 +27,74 @@ async function getStats(): Promise<ProtocolStats | null> {
   }
 }
 
-function StatCard({
-  label,
-  value,
-  sub,
-}: {
-  label: string;
-  value: string;
-  sub?: string;
-}) {
-  return (
-    <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-8">
-      <div className="text-sm text-zinc-500 mb-2">{label}</div>
-      <div className="text-4xl font-bold tracking-tight mb-1">{value}</div>
-      {sub && <div className="text-xs text-zinc-500">{sub}</div>}
-    </div>
-  );
-}
-
 export default async function StatsPage() {
   const stats = await getStats();
+  const pct = stats ? (stats.verifiedAgents / Math.max(stats.totalAgents, 1)) * 100 : 0;
 
   return (
-    <>
+    <div className={s.page}>
       <Navbar />
-      <main className="px-4 md:px-8 pt-28 pb-12 max-w-3xl mx-auto">
-        <header className="mb-10">
-          <div className="inline-block px-4 py-2 mb-6 text-sm text-zinc-400 border border-zinc-700 rounded-full">
-            Live · refreshes every minute
-          </div>
-          <h1 className="text-4xl font-bold mb-3 tracking-tight">Protocol stats</h1>
-          <p className="text-lg text-zinc-400 max-w-2xl">
-            Every Atcha is registered on SAID Protocol with its own Solana wallet,
-            on-chain identity, and rolling reputation. These numbers are pulled
-            live from{" "}
-            <a
-              href="https://api.saidprotocol.com/api/stats"
-              target="_blank"
-              rel="noreferrer"
-              className="text-zinc-300 hover:text-white underline-offset-4 hover:underline"
-            >
-              api.saidprotocol.com/api/stats
-            </a>
-            .
+      <main className={s.wrap}>
+        <header className={s.pageHead}>
+          <p className={s.eyebrow}>Live · refreshes every minute</p>
+          <h1 className={s.big}>The network, counted.</h1>
+          <p className={s.pageSub}>
+            Every Atcha is registered on SAID with its own Solana wallet, on-chain identity and a rolling reputation. These
+            numbers come straight from{" "}
+            <a href="https://api.saidprotocol.com/api/stats" target="_blank" rel="noreferrer">api.saidprotocol.com</a>.
           </p>
         </header>
 
         {!stats ? (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-12 text-center text-zinc-400">
-            <p>Couldn&apos;t fetch live stats right now. Try again in a minute.</p>
-          </div>
+          <div className={s.empty} style={{ marginTop: 44 }}>Couldn&apos;t fetch live stats right now. Try again in a minute.</div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-10">
-              <StatCard
-                label="Total agents"
-                value={stats.totalAgents.toLocaleString()}
-                sub="registered on SAID"
-              />
-              <StatCard
-                label="Verified on-chain"
-                value={stats.verifiedAgents.toLocaleString()}
-                sub={`${(
-                  (stats.verifiedAgents / Math.max(stats.totalAgents, 1)) *
-                  100
-                ).toFixed(1)}% of total`}
-              />
-              <StatCard
-                label="Avg reputation"
-                value={`${(stats.averageReputation * 100).toFixed(1)}%`}
-                sub="across all agents"
-              />
+          <div className={s.tiles}>
+            <div className={s.tile}>
+              <span className={s.eyebrow} style={{ margin: 0 }}>Registered</span>
+              <div className={s.val}>{stats.totalAgents.toLocaleString()}</div>
+              <div className={s.tsub}>identities on SAID, every surface</div>
             </div>
-
-            <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-6 text-sm text-zinc-400 leading-relaxed">
-              <h2 className="text-base font-semibold text-zinc-200 mb-3">
-                What this counts
-              </h2>
-              <ul className="space-y-2 list-disc list-inside">
-                <li>
-                  <span className="text-zinc-200 font-medium">Total agents</span>{" "}
-                  — every wallet that ever registered a SAID identity PDA
-                  on-chain, across all integrations (butler, SAID Hosting,
-                  Clawpump, direct API users).
-                </li>
-                <li>
-                  <span className="text-zinc-200 font-medium">Verified</span> —
-                  agents that completed the verify step (pays the 0.01 SOL
-                  verification fee to treasury, gets the verified badge).
-                  Sponsored end-to-end via butler so no user-side SOL required.
-                </li>
-                <li>
-                  <span className="text-zinc-200 font-medium">
-                    Avg reputation
-                  </span>{" "}
-                  — rolling positive-feedback ratio averaged across all agents
-                  with any feedback recorded. Built from on-chain feedback
-                  receipts.
-                </li>
-              </ul>
-            </section>
-          </>
+            <div className={s.tile}>
+              <span className={s.eyebrow} style={{ margin: 0 }}>Verified on-chain</span>
+              <div className={s.val}>{stats.verifiedAgents.toLocaleString()}</div>
+              <div className={s.tsub}>{pct.toFixed(1)}% of registered</div>
+            </div>
+            <div className={s.tile}>
+              <span className={s.eyebrow} style={{ margin: 0 }}>Average reputation</span>
+              <div className={s.val}>{(stats.averageReputation * 100).toFixed(1)}%</div>
+              <div className={s.tsub}>across everyone with feedback on record</div>
+            </div>
+          </div>
         )}
 
-        <footer className="mt-16 pt-8 border-t border-zinc-800 text-sm text-zinc-500 text-center">
-          Want your own Atcha?{" "}
-          <a
-            href="https://t.me/saidinfrabot"
-            target="_blank"
-            rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
-          >
-            message @saidinfrabot
-          </a>{" "}
-          or tweet at{" "}
-          <a
-            href="https://x.com/saidagent"
-            target="_blank"
-            rel="noreferrer"
-            className="text-zinc-300 hover:text-white"
-          >
-            @saidagent
-          </a>
-          .
+        <section className={s.acts} style={{ marginTop: 40, paddingBottom: 0 }}>
+          <div className={s.act}>
+            <span className={s.n}>01 / Registered</span>
+            <div>
+              <h3>Every wallet that has a SAID identity.</h3>
+              <p>An on-chain record under the SAID program, created the moment an Atcha exists. Counted across every surface: the web app, Telegram, X, and partners that register on SAID directly.</p>
+            </div>
+          </div>
+          <div className={s.act}>
+            <span className={s.n}>02 / Verified</span>
+            <div>
+              <h3>Identity proven, badge minted.</h3>
+              <p>The verify step ties the record to a real login and mints the verified badge. <strong>Atcha sponsors it</strong>, so nobody pays SOL to be counted here.</p>
+            </div>
+          </div>
+          <div className={s.act}>
+            <span className={s.n}>03 / Reputation</span>
+            <div>
+              <h3>Built from settled outcomes, not claims.</h3>
+              <p>The rolling share of positive outcomes across everyone with feedback on record. Sends that were claimed, jobs that were delivered. <strong>It is earned by using the thing, never bought.</strong></p>
+            </div>
+          </div>
+        </section>
+
+        <footer className={s.pageFoot}>
+          Want to be counted? <Link href="/">Get your funded Atcha</Link>.
         </footer>
       </main>
-    </>
+    </div>
   );
 }

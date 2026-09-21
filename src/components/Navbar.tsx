@@ -11,21 +11,16 @@ function shortAddr(a: string | null | undefined): string {
   return `${a.slice(0, 4)}…${a.slice(-4)}`;
 }
 
-const NAV_LINK =
-  "px-3 py-1.5 text-sm text-zinc-400 hover:text-white transition rounded-full hover:bg-zinc-800/50 whitespace-nowrap";
+const LINK = "text-[15px] text-zinc-400 transition hover:text-ink whitespace-nowrap";
+const CTA =
+  "inline-flex items-center rounded-full px-[18px] py-[9px] text-[15px] text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream hover:shadow-none whitespace-nowrap";
 
 export default function Navbar() {
   const { ready, authenticated, user, login } = usePrivy();
   const agent = useAgent();
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  // Only fetch while the menu is open — no balance call on every page load.
-  const bal = useSendableBalance(
-    agent.status === "ready" ? agent.walletAddress : null,
-    menuOpen,
-  );
-  // Which login the user is actually signed in with — shown in the dropdown so
-  // it's obvious whether they're on Telegram / X / email / wallet.
+  const bal = useSendableBalance(agent.status === "ready" ? agent.walletAddress : null, menuOpen);
   const signedIn = user
     ? user.telegram?.username
       ? { platform: "Telegram", handle: `@${user.telegram.username}` }
@@ -41,95 +36,53 @@ export default function Navbar() {
   useEffect(() => {
     if (!menuOpen) return;
     const onClick = (e: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
     };
-    // pointerdown covers touch + mouse; mousedown alone left the menu stuck
-    // open on a tap-outside on mobile.
     document.addEventListener("pointerdown", onClick);
     return () => document.removeEventListener("pointerdown", onClick);
   }, [menuOpen]);
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 z-50 flex justify-center px-4"
-      // max(1rem, safe-area): in a PWA (no status bar) this drops the pill
-      // below the notch/Dynamic Island instead of riding up under the speaker.
-      style={{ paddingTop: "max(1rem, env(safe-area-inset-top))" }}
+      className="fixed inset-x-0 top-0 z-50 bg-cream/85 backdrop-blur-md"
+      style={{ paddingTop: "env(safe-area-inset-top)" }}
     >
-      <nav
-        className="
-          flex items-center gap-1 rounded-full
-          border border-zinc-800/60
-          transition-all duration-500 ease-in-out
-          px-3 py-2 bg-zinc-950/50 backdrop-blur-md
-          max-w-full
-        "
-      >
-        {/* Brand */}
-        <Link href="/" className="flex items-center gap-2 px-2">
-          {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
-              logo isn't distorted (and Next doesn't warn about it). */}
-          <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-[7px] bg-coral text-[13px] font-semibold leading-none text-cream">@</span>
-          <span className="text-[17px] font-medium tracking-[-0.02em]">atcha</span>
+      <nav className="mx-auto flex h-[68px] max-w-[1140px] items-center justify-between gap-4 px-5 md:px-8">
+        <Link href="/" className="flex items-center gap-2">
+          <span aria-hidden className="inline-flex h-[24px] w-[24px] items-center justify-center rounded-[8px] bg-coral text-[14px] font-semibold leading-none text-cream">@</span>
+          <span className="text-[19px] font-medium tracking-[-0.02em]">atcha</span>
         </Link>
 
-        {/* Public links (hidden on mobile) */}
-        <div className="hidden md:flex items-center gap-1">
-          <Link href="/agents" className={NAV_LINK}>
-            Agents
-          </Link>
-          <Link href="/stats" className={NAV_LINK}>
-            Stats
-          </Link>
-          <Link href="/docs" className={NAV_LINK}>
-            Docs
-          </Link>
-          <a
-            href="https://www.saidprotocol.com"
-            target="_blank"
-            rel="noreferrer"
-            className={NAV_LINK}
-          >
-            Protocol
-          </a>
+        <div className="hidden items-center gap-7 md:flex">
+          <Link href="/#funded" className={LINK}>Funded</Link>
+          <Link href="/#how" className={LINK}>How it works</Link>
+          <Link href="/agents" className={LINK}>Agents</Link>
+          <Link href="/stats" className={LINK}>Stats</Link>
+          <Link href="/docs" className={LINK}>Docs</Link>
         </div>
 
-        {/* Right cluster: telegram + auth */}
-        <div className="flex items-center gap-1 ml-1">
-          <a
-            href="https://t.me/saidinfrabot"
-            target="_blank"
-            rel="noreferrer"
-            className={`${NAV_LINK} hidden sm:inline-flex`}
-          >
-            Telegram
-          </a>
-
+        <div className="flex items-center gap-3">
           {!ready ? (
-            <div className="w-8 h-8 rounded-full bg-zinc-900 border border-zinc-800/60 animate-pulse" />
+            <div className="h-9 w-24 animate-pulse rounded-full bg-card" />
           ) : !authenticated ? (
-            <button
-              onClick={login}
-              className="ml-1 px-4 py-1.5 bg-ink text-cream rounded-full text-sm font-semibold hover:bg-coral-deep transition whitespace-nowrap"
-            >
+            <button type="button" onClick={login} className={CTA}>
               Log in
             </button>
           ) : (
             <div className="relative" ref={menuRef}>
               <button
+                type="button"
                 onClick={() => setMenuOpen((o) => !o)}
-                className="ml-1 flex items-center gap-2 pl-1 pr-3 py-1 border border-zinc-800/60 hover:border-zinc-700 rounded-full text-sm transition"
+                className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:shadow-[inset_0_0_0_1px_#171613]"
               >
-                <span className="w-6 h-6 rounded-full bg-zinc-800 flex items-center justify-center text-xs font-semibold">
-                  {(user?.email?.address?.[0] ?? user?.wallet?.address?.[0] ?? "•").toUpperCase()}
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-coral text-xs font-semibold text-cream">
+                  {(agent.status === "ready" ? agent.agentName?.[0] : null) ?? user?.email?.address?.[0] ?? "•"}
                 </span>
-                <span className="hidden sm:inline text-zinc-300">
+                <span className="hidden text-zinc-300 sm:inline">
                   {agent.status === "ready"
                     ? agent.agentName ?? shortAddr(agent.walletAddress)
                     : agent.status === "linking"
-                      ? "linking…"
+                      ? "opening…"
                       : agent.status === "error"
                         ? "error"
                         : "—"}
@@ -137,77 +90,53 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-12 w-64 bg-zinc-900/95 backdrop-blur-md border border-zinc-800 rounded-2xl shadow-xl overflow-hidden z-50">
-                  <div className="px-4 py-3 border-b border-zinc-800">
-                    <div className="flex items-center gap-2 mb-0.5">
-                      <span className="text-xs text-zinc-500">signed in with</span>
+                <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
+                  <div className="border-b border-line px-4 py-3">
+                    <div className="mb-0.5 flex items-center gap-2">
+                      <span className="text-xs text-grey">signed in with</span>
                       {signedIn.platform && (
-                        <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-300">
-                          {signedIn.platform}
-                        </span>
+                        <span className="rounded bg-card px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-zinc-300">{signedIn.platform}</span>
                       )}
                     </div>
-                    <div className="text-sm text-zinc-200 truncate">
-                      {signedIn.handle}
-                    </div>
+                    <div className="truncate text-sm text-ink">{signedIn.handle}</div>
                   </div>
                   {agent.status === "ready" && (
-                    <div className="px-4 py-3 border-b border-zinc-800">
-                      <div className="text-xs text-zinc-500">agent wallet</div>
-                      <code className="text-xs text-zinc-300 font-mono">
-                        {shortAddr(agent.walletAddress)}
-                      </code>
+                    <div className="border-b border-line px-4 py-3">
+                      <div className="text-xs text-grey">wallet</div>
+                      <code className="font-mono text-xs text-zinc-300">{shortAddr(agent.walletAddress)}</code>
                       {agent.walletAddress && (
                         <div className="mt-1.5 text-xs">
                           {bal.error ? (
-                            <span className="text-yellow-600">balance unavailable</span>
+                            <span className="text-amber-400">balance unavailable</span>
                           ) : bal.loading ? (
-                            <span className="text-zinc-600">loading…</span>
+                            <span className="text-grey">loading…</span>
                           ) : (
                             <span className="text-zinc-400">
-                              {bal.sol.toFixed(4)} SOL
-                              <span className="text-zinc-600"> · </span>
-                              {bal.usdc.toFixed(2)} USDC
+                              {bal.sol.toFixed(4)} SOL<span className="text-grey"> · </span>{bal.usdc.toFixed(2)} USDC
                             </span>
                           )}
                         </div>
                       )}
                     </div>
                   )}
-                  <Link
-                    href="/chat"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
-                  >
-                    Chat
-                  </Link>
-                  <Link
-                    href="/send"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
-                  >
-                    Send
-                  </Link>
-                  <Link
-                    href="/portfolio"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
-                  >
-                    Portfolio
-                  </Link>
-                  <Link
-                    href="/activity"
-                    onClick={() => setMenuOpen(false)}
-                    className="block px-4 py-3 text-sm hover:bg-zinc-800 transition"
-                  >
-                    Activity
-                  </Link>
+                  {[
+                    ["/home", "Open your Atcha"],
+                    ["/chat", "Chat"],
+                    ["/send", "Send"],
+                    ["/portfolio", "Wallet"],
+                    ["/activity", "Activity"],
+                  ].map(([href, label]) => (
+                    <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-sm transition hover:bg-card">
+                      {label}
+                    </Link>
+                  ))}
                   <button
+                    type="button"
                     onClick={() => {
                       agent.logout();
                       setMenuOpen(false);
                     }}
-                    className="block w-full text-left px-4 py-3 text-sm text-red-400 hover:bg-zinc-800 transition border-t border-zinc-800"
+                    className="block w-full border-t border-line px-4 py-3 text-left text-sm text-coral-text transition hover:bg-card"
                   >
                     Log out
                   </button>
