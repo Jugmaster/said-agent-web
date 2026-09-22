@@ -1,11 +1,11 @@
 {
-  "name": "SAID Agent",
-  "short_name": "SAID",
-  "description": "Your AI butler on Solana",
+  "name": "Atcha",
+  "short_name": "Atcha",
+  "description": "Your AI comes funded. Pay anyone you can name.",
   "start_url": "/chat",
   "display": "standalone",
-  "background_color": "#0a0a0a",
-  "theme_color": "#0a0a0a",
+  "background_color": "#F6F4EE",
+  "theme_color": "#F6F4EE",
   "icons": [
     {
       "src": "/icon-192.png",

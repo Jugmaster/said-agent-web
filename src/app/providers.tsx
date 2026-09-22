@@ -25,11 +25,9 @@ export default function Providers({ children }: { children: ReactNode }) {
         // automatically. Other methods provision a fresh pwa_<privyId> agent.
         loginMethods: ["telegram", "email", "wallet", "google", "twitter"],
         appearance: {
-          theme: "dark",
-          accentColor: "#667eea",
-          // Canonical SAID brand logo — same asset used by saidprotocol.com
-          // and app.saidprotocol.com in their Privy modals.
-          logo: "/logo-dark.png",
+          theme: "light",
+          accentColor: "#E8542E",
+          logo: "/logo.png",
         },
         embeddedWallets: {
           solana: { createOnLogin: "users-without-wallets" },

@@ -37,13 +37,13 @@ export const metadata: Metadata = {
   // a .png extension — Safari rejected it.)
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
+    statusBarStyle: "default",
     title: "Atcha",
   },
 };
 
 export const viewport = {
-  themeColor: "#09090b",
+  themeColor: "#F6F4EE",
   width: "device-width",
   initialScale: 1,
   // NO maximumScale — locking it at 1 disabled pinch-zoom, so iOS's auto
