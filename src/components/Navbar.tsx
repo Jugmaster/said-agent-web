@@ -92,7 +92,7 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-line bg-white shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
+                <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-line bg-[#FFFFFF] shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
                   <div className="border-b border-line px-4 py-3">
                     <div className="mb-0.5 flex items-center gap-2">
                       <span className="text-xs text-grey">signed in with</span>
