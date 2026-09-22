@@ -52,6 +52,7 @@ export default function DocsPage() {
       <Navbar />
       <div className={`${s.docs} ${s.wrap}`}>
         <aside>
+          <div className={s.tocWrap}>
           <nav className={s.toc} aria-label="Sections">
             {SECTIONS.map((x, i) => (
               <a key={x.id} href={`#${x.id}`}><i>{String(i + 1).padStart(2, "0")}</i>{x.title}</a>
@@ -61,6 +62,7 @@ export default function DocsPage() {
             <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot →</a>
             <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent →</a>
             <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">saidprotocol.com →</a>
+          </div>
           </div>
         </aside>
 
