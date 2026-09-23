@@ -34,10 +34,10 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.1 | Ledger, guards, daily tasks, ladder, drawdown pause, limits | `src/credits/{ledger,guards,tasks}.ts` | [x] |
 | 1.2 | Entry rule: settled sends recorded in dollars at claim; distinct identity clusters; recipient activation; rung 1 on five | `src/credits/entry.ts`, claim hooks in `src/social/send.ts` | [x] ba12d23 |
 | 1.3 | Signup no longer funds; first funding on reaching rung 1 | `src/identity/provisioning.ts`, `src/credits/tasks.ts` | [x] |
-| 1.4 | Monthly funding: size table by rung, idempotent per month, pool budget with reserve, funding-day timer | `src/credits/funding.ts` | [~] written; tests next |
-| 1.5 | Trading rules v2: per-token cap, aggregate non-major cap, liquidity and age floors, passport check on xStocks, no whitelist | `src/credits/guards.ts` (replace `isWhitelisted`) | [ ] |
-| 1.6 | Spend guard: pays/buys/hires only from own money (amount ≤ withdrawable) | `src/credits/guards.ts` `canSpend` | [ ] |
-| 1.7 | Guard the five open money tools: `send_to_contact`, `bridge_usdc`, `purch_buy`, DCA/limit fills, launch | `src/agent/butler.ts` | [ ] |
+| 1.4 | Monthly funding: size table by rung, idempotent per month, pool budget with reserve, funding-day timer | `src/credits/funding.ts` | [x] 8cfa5d6 |
+| 1.5 | Trading rules v2: per-token cap, aggregate non-major cap, liquidity and age floors, passport check on xStocks, no whitelist | `src/credits/guards.ts` | [x] (floor is $100K: $CLAW itself sits at ~$190K liquidity, so $250K would exclude the ecosystem token) |
+| 1.6 | Spend guard: pays/buys/hires only from own money (amount ≤ withdrawable) | `src/credits/guards.ts` `canSpend` | [x] wired for transfer_usdc/transfer_sol by handle |
+| 1.7 | Guard the five open money tools: `send_to_contact`, `bridge_usdc`, `purch_buy`, DCA/limit fills, launch | `src/agent/butler.ts` | [~] execute_swap, transfer_usdc, transfer_sol guarded; the five remain |
 | 1.8 | Two-phase funding (pending, then confirm) so a crash never double-funds | `src/credits/funding.ts` | [ ] |
 | 1.9 | Deposit detection wired to `recordDeposit` (on-ramp and wallet snapshot), net of claimed sends and cashback | `src/scheduler/deposit-monitor.ts` | [ ] |
 | 1.10 | Sender funding bonus on recipient activation, capped per month | `src/credits/entry.ts` + funding | [ ] |
@@ -86,7 +86,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 
 - Rung 0 paper account: yes or no (changes 3.4 and 3.5).
 - Exact size table after the first real month (spec §2 proposal: 25 / 75 / by review).
-- Floors and caps (spec §3 proposal: $250K liquidity, 7 days, 25% per token, 25% aggregate non-major).
+- Floors and caps: coded as $100K liquidity, 7 days, 25% per token, 25% aggregate non-major (env-overridable). The spec said $250K; $CLAW would fail that.
 - Profit split and the level-3 threshold (proposal 80/20, 30-day streak).
 - Sender bonus cap (proposal $10 per activated person, five a month).
 - Buy-and-stake threshold (proposal $1,000 or monthly).
