@@ -49,7 +49,10 @@ export default function Preloader() {
   if (pct === null) return null;
   return (
     <div className={`${s.loader} ${away ? s.loaderAway : ""}`} aria-hidden>
-      <div className={s.loaderWord}>atcha<em>.</em></div>
+      <div className={s.loaderWord}>
+        <span className={s.loaderMark} aria-hidden>@</span>
+        atcha
+      </div>
       <div className={s.loaderNum}>{pct}%</div>
     </div>
   );
