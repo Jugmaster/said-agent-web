@@ -832,7 +832,7 @@ export interface PublicCredits {
 /** Public. Null when there is no Atcha for that handle, or the API predates credits. */
 export async function getCreditsByHandle(handle: string, options?: { cache?: RequestCache }): Promise<PublicCredits | null> {
   try {
-    const res = await fetch(`${API_BASE}/api/credits/handle/${encodeURIComponent(handle)}`, { cache: options?.cache ?? "no-store" });
+    const res = await apiFetch(`${API_BASE}/api/credits/handle/${encodeURIComponent(handle)}`, { cache: options?.cache ?? "no-store" });
     if (!res.ok) return null;
     return res.json();
   } catch {
@@ -842,7 +842,7 @@ export async function getCreditsByHandle(handle: string, options?: { cache?: Req
 
 export async function getFleet(options?: { cache?: RequestCache }): Promise<PublicCredits[]> {
   try {
-    const res = await fetch(`${API_BASE}/api/credits/fleet`, { cache: options?.cache ?? "no-store" });
+    const res = await apiFetch(`${API_BASE}/api/credits/fleet`, { cache: options?.cache ?? "no-store" });
     if (!res.ok) return [];
     return ((await res.json()) as { fleet: PublicCredits[] }).fleet ?? [];
   } catch {
