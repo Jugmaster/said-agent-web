@@ -770,6 +770,11 @@ export interface CreditsSummary {
   pnlUsd: number;
   rung: number;
   rungName: string;
+  /** What the user sees: level 1..4 and its name. */
+  level: number;
+  levelName: string;
+  next: { level: number; unlocks: string; have: number; need: number; unit: "people" | "days" } | null;
+  funding: { monthlyUsd: number; fundedThisMonth: boolean; nextLevelUsd: number; fundingDay: number };
   streak: number;
   paused: boolean;
   tier: number;

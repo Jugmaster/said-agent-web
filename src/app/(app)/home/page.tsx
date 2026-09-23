@@ -7,7 +7,7 @@ import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import FundedCard from "@/components/FundedCard";
 import DailyTasks from "@/components/DailyTasks";
-import ReputationCard from "@/components/ReputationCard";
+import CashbackCard from "@/components/CashbackCard";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
 import {
@@ -226,7 +226,7 @@ function Home({ platformId }: { platformId: string }) {
           {credits && credits.funded && (
             <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
           )}
-          <ReputationCard balance={balance} cashback={cashback} rungName={credits?.funded ? credits.rungName : null} />
+          <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
           <AgentIdentity agentName={agentName} walletAddress={walletAddress} balance={balance} />
           <RecentActivity receipts={receipts} />
         </div>
@@ -237,7 +237,7 @@ function Home({ platformId }: { platformId: string }) {
         {credits && credits.funded && (
           <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
         )}
-        <ReputationCard balance={balance} cashback={cashback} rungName={credits?.funded ? credits.rungName : null} />
+        <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
         <AgentIdentity agentName={agentName} walletAddress={walletAddress} balance={balance} />
         <RecentActivity receipts={receipts} />
       </aside>

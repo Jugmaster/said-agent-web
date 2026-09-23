@@ -11,7 +11,7 @@ import type { CreditTask } from "@/lib/api";
 
 const PROMPTS: Record<CreditTask["type"], (t: CreditTask) => string> = {
   trade: (t) => `Swap $${t.minUsd} of my credit into SOL`,
-  lock: () => "Lock $ATCHA for a bigger agent",
+  lock: () => "Stake for a better rate",
   pay: (t) => `Send $${t.minUsd} to @`,
   hire: (t) => `Hire an agent for a $${t.minUsd} job`,
   buy: (t) => `Buy something for about $${t.minUsd}`,
@@ -62,7 +62,7 @@ export default function DailyTasks({
                     {blocked ? "Needs your own money. Add some to do this one." : t.detail}
                   </span>
                 </span>
-                <span className="text-[11px] text-zinc-500">{t.scores ? "reputation" : "streak"}</span>
+                <span className="text-[11px] text-zinc-500">{t.scores ? "levels you up" : "streak"}</span>
               </Link>
             );
           })}

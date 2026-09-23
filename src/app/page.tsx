@@ -17,8 +17,8 @@ const CHIPS: [string, string][] = [
   ["@yourbarber", "got paid $25"],
   ["@the_groupchat", "split $180"],
   ["@renata_paints", "got tipped"],
-  ["@0xanalyst", "reached Trusted"],
-  ["@sol_maxi", "locked $ATCHA, 2× funding"],
+  ["@0xanalyst", "got funded $25"],
+  ["@sol_maxi", "reached level 3"],
   ["@dinner_crew", "settled up"],
   ["@mum", "got flowers money"],
   ["@that_plumber", "got paid"],
@@ -66,9 +66,9 @@ export default function LandingPage() {
           <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
         </h1>
         <p className={s.sub}>
-          It starts with <strong>trading credit in it</strong>: ours, sized by what the chart earned, first-loss so
-          yours never is. Add your own money and pay any <strong>@name</strong> you can type, checked before a cent
-          moves. Hold <strong>$ATCHA</strong> for a bigger one.
+          It starts with <strong>money in it</strong> and it does everything: trades anything on Solana, holds the
+          S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
+          work with, every month.
         </p>
         <div className={s.ctas}>
           <button type="button" className={s.btn} onClick={start} disabled={!ready}>
@@ -90,13 +90,13 @@ export default function LandingPage() {
 
       <section className={`${s.caps} ${s.wrap}`} id="funded">
         <div className={s.capsHead} data-reveal>
-          <p className={s.eyebrow}>Funded</p>
-          <h2 className={s.big}>It comes with credit in it. The chart sets the size.</h2>
+          <p className={s.eyebrow}>What it does</p>
+          <h2 className={s.big}>It comes funded. Then it does everything.</h2>
         </div>
         <div className={s.capGrid} data-stagger>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Trading credit, day one</h3><p>Real credit we put in, not points. Trade the majors with it and watch it move. Real P&amp;L from your first swap.</p></div>
-          <div className={s.cap}><span className={s.n}>02</span><h3>Sized by the chart</h3><p>Today&apos;s funding is set every hour by what $ATCHA earned. Loud chart, bigger accounts. Launch day is the biggest it will ever be.</p></div>
-          <div className={s.cap}><span className={s.n}>03</span><h3>Ours goes first</h3><p>Our credit takes the first loss. Your money sits above it and is always yours to take back. Climb the rungs and the upside becomes yours too.</p></div>
+          <div className={s.cap}><span className={s.n}>01</span><h3>Trades anything</h3><p>SOL, BTC, ETH, $ANSEM, the ClawPump board, the S&amp;P as xStocks. Market, limit, DCA. Real fills, real P&amp;L, from your first swap.</p></div>
+          <div className={s.cap}><span className={s.n}>02</span><h3>Comes funded</h3><p>Pay five people you can name and your agent gets money of its own to trade with, every month, paid by the token. It takes the first loss so your money never does.</p></div>
+          <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Use it and it grows: more funding each month, bigger daily allowances, and at level 3 what it earns is yours to take out.</p></div>
         </div>
       </section>
 
@@ -106,7 +106,7 @@ export default function LandingPage() {
           <div className={s.demoCopy} data-reveal>
             <p className={s.eyebrow}>The send</p>
             <h2 className={s.big}>From said to settled. In seconds.</h2>
-            <p>Add money once and paying anyone is a sentence. Type a name and the rest just happens: the check on SAID, the safe hold, the delivery.</p>
+            <p>Type a name and the rest just happens: the check, the safe hold, the delivery. Pay five people and your agent gets funded.</p>
             <div className={s.mini}>
               <span><b>Screened first.</b> Fakes and lookalikes never receive a cent.</span>
               <span><b>Held safely.</b> Not claimed? It comes back automatically.</span>
@@ -117,11 +117,11 @@ export default function LandingPage() {
             <div className={s.acTop}>
               <div className={s.to}>
                 <div className={s.avatar}>R</div>
-                <div className={s.who}><b>@renata</b><small>found on X · verified on SAID</small></div>
+                <div className={s.who}><b>@renata</b><small>found on X · verified</small></div>
               </div>
               <div className={s.amt} data-amt>$40.00</div>
             </div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Name checked</p><p>Identity resolved, reputation screened</p></div><span className={`${s.pill} ${s.pb}`}>Verified</span></div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Name checked</p><p>Identity resolved, record checked</p></div><span className={`${s.pill} ${s.pb}`}>Verified</span></div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Money committed</p><p>Real funds, not a request</p></div><span className={`${s.pill} ${s.pm}`}>Held</span></div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Renata logs in</p><p>No seed phrase, no wallet homework</p></div><span className={`${s.pill} ${s.pg}`}>Claimed</span></div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Money lands</p><p>Hers to hold, spend, or send on</p></div><span className={`${s.pill} ${s.pg}`}>Settled</span></div>
@@ -132,10 +132,10 @@ export default function LandingPage() {
       </section>
 
       <section className={`${s.acts} ${s.wrap}`} id="steps">
-        <div className={s.act} data-reveal><span className={s.n}>01 / Name</span><div><h3>Names, not addresses.</h3><p>The handle you&apos;d say out loud is the only address you need. No 44-character strings, no copy-paste roulette. <strong>If a name doesn&apos;t check out on SAID, your money never leaves.</strong></p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>01 / Name</span><div><h3>Names, not addresses.</h3><p>The handle you&apos;d say out loud is the only address you need. No 44-character strings, no copy-paste roulette. <strong>If a name doesn&apos;t check out, your money never leaves.</strong></p></div></div>
         <div className={s.act} data-reveal><span className={s.n}>02 / Send</span><div><h3>Held until it&apos;s truly theirs.</h3><p>Every send is committed to the person, not the platform. If they haven&apos;t joined yet, the money waits under their name and <strong>returns to you automatically if they never show.</strong></p></div></div>
         <div className={s.act} data-reveal><span className={s.n}>03 / Claim</span><div><h3>They log in. It&apos;s done.</h3><p>Your person signs in with the account you named, and the money is already sitting there. <strong>That&apos;s the entire onboarding: receiving money.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>04 / One name</span><div><h3>Every handle. One pocket.</h3><p>Link the X and Telegram you already have, and money sent to either lands in the same balance. <strong>Each link is proven by logging in, never by trust</strong>, and your name and reputation are yours, not any platform&apos;s.</p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>04 / One name</span><div><h3>Every handle. One pocket.</h3><p>Link the X and Telegram you already have, and money sent to either lands in the same balance. <strong>Each link is proven by logging in, never by trust</strong>, and your name and your level are yours, not any platform&apos;s.</p></div></div>
       </section>
 
 
@@ -144,7 +144,7 @@ export default function LandingPage() {
           <div className={s.closeIn}>
             <p className={s.eyebrow}>Ready when you are</p>
             <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
-            <p className={s.csub}>Free, funded on day one, no seed phrase. Sign in with X or Telegram and it&apos;s yours in one message.</p>
+            <p className={s.csub}>Free, no seed phrase, funded once you&apos;ve paid five people. Sign in with X or Telegram and it&apos;s yours in one message.</p>
             <div className={s.ctas}>
               <button type="button" className={`${s.btn} ${s.btnCream}`} onClick={start} disabled={!ready}>
                 {ready ? (authenticated ? "Open your Atcha" : "Get your funded Atcha") : "Loading…"}
@@ -222,7 +222,7 @@ function Counter({ today }: { today: CreditsToday | null | undefined }) {
           <span><b data-count>{today.fundedLastHour.toLocaleString()}</b> in the last hour</span>
         </>
       ) : (
-        <span>The first hundred Atchas on launch day get the biggest funding there will ever be.</span>
+        <span>The first hundred to reach level 2 get the biggest month there will ever be.</span>
       )}
     </div>
   );

@@ -16,11 +16,11 @@ const SECTIONS = [
   { id: "what", title: "What Atcha is" },
   { id: "start", title: "Quick start" },
   { id: "funded", title: "Funded: two kinds of money" },
-  { id: "ladder", title: "The ladder" },
-  { id: "token", title: "Holding $ATCHA" },
+  { id: "ladder", title: "Levels" },
+  { id: "token", title: "What $ATCHA does" },
   { id: "send", title: "Pay anyone by @name" },
   { id: "trade", title: "Trade, buy, and more" },
-  { id: "identity", title: "Identity and reputation" },
+  { id: "identity", title: "What's underneath" },
   { id: "fees", title: "Fees and cashback" },
   { id: "money", title: "Adding and taking out money" },
   { id: "surfaces", title: "Where it lives" },
@@ -74,22 +74,22 @@ export default function DocsPage() {
           </header>
 
           <Sec id="what" n={1} title="What Atcha is">
-            <p>Atcha is a personal AI that lives on Solana and comes with money in it. Every Atcha starts with <strong>trading credit we put in</strong>, sized by what the chart earned that hour. Credit trades the majors and takes the first loss. Money you add is yours, always, and is what pays anyone you can name, buys things, and hires.</p>
-            <p>Under it is <strong>SAID</strong>: every Atcha has its own on-chain identity and a reputation that travels with you. Every name you send to is resolved and screened on SAID before money moves.</p>
+            <p>Atcha is a personal AI that lives on Solana and comes with money in it. It trades anything on Solana, holds the S&amp;P as xStocks, pays anyone you can name, buys things, runs your DCA. Pay five people and it gets <strong>credit of its own to trade with</strong>, every month, paid by the token. Credit takes the first loss. Money you add is yours, always.</p>
+            <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>
             <p>You talk to it in plain language. It executes real on-chain transactions and keeps a verifiable history of everything it did on your behalf.</p>
           </Sec>
 
           <Sec id="start" n={2} title="Quick start">
-            <p><strong>On the web:</strong> tap <Link href="/">Get your funded Atcha</Link>, sign in with X or Telegram, and it exists. That login is your identity binding on SAID.</p>
+            <p><strong>On the web:</strong> tap <Link href="/">Get your funded Atcha</Link>, sign in with X or Telegram, and it exists.</p>
             <p><strong>In Telegram:</strong> open <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a> and tap <C>/start</C>.</p>
             <Block label="telegram">{`you  →  /start
 bot  →  hey, welcome to Atcha. your AI comes funded.
         what do you want to name yours?
 
 you  →  Vega
-bot  →  ✓ Vega is being registered on SAID.
-        today's funding: $25 in trading credit
-        profile: agent.saidprotocol.com/agents/Vega`}</Block>
+bot  →  ✓ Vega is ready. Level 1.
+        pay five people by @name and it gets funded.
+        profile: atcha.cash/@Vega`}</Block>
             <p>Already have one from the bot? Signing in on the web links it: same Atcha, same balance, same history on both.</p>
           </Sec>
 
@@ -101,34 +101,33 @@ bot  →  ✓ Vega is being registered on SAID.
                 <tr><td className={s.m}>Where it comes from</td><td>Us, on day one. Sized by the chart.</td><td>You. Card, Apple Pay, or a transfer.</td></tr>
                 <tr><td className={s.m}>What it can do</td><td>Trade the majors.</td><td>Trade anything. Pay anyone. Buy things. Hire.</td></tr>
                 <tr><td className={s.m}>Who loses first</td><td>Credit. Always.</td><td>Only after credit is gone.</td></tr>
-                <tr><td className={s.m}>Taking it out</td><td>Locked until the top rung.</td><td>Any time.</td></tr>
+                <tr><td className={s.m}>Taking it out</td><td>Locked until level 4.</td><td>Any time.</td></tr>
                 <tr><td className={s.m}>Gains on it</td><td>Stay credit.</td><td>Yours.</td></tr>
               </tbody>
             </table>
-            <p><strong>Today&apos;s funding</strong> is recomputed every hour from what the $ATCHA token earned, up to a cap. The number on the landing page is live. Launch day is the biggest it will ever be.</p>
-            <p><strong>First deposit match.</strong> Add money for the first time and we match it in credit, one to one, up to $50.</p>
-            <p><strong>The majors.</strong> Credit trades SOL, BTC, ETH, USDC and a short list of tokens with deep, live liquidity. It never trades anything else, and it never buys $ATCHA. If liquidity can&apos;t be verified at trade time, the trade is refused.</p>
-            <p><strong>Drawdown pause.</strong> If credit falls below half of what you were funded, trading and spending pause. Two of today&apos;s tasks reopen them. A price bounce doesn&apos;t.</p>
+            <p><strong>Funding is monthly.</strong> It lands on funding day, sized by your level, paid by the $ATCHA token. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
+            <p><strong>What credit trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and xStocks. Anything with real liquidity and a week of history. A quarter of your credit can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. Credit never buys $ATCHA and never buys a token you created.</p>
+            <p><strong>A rough day.</strong> If credit falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
             <p><strong>Untouched credit</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
           </Sec>
 
-          <Sec id="ladder" n={4} title="The ladder">
-            <p>Four rungs. Each raises what you can do in a day. The top one is where the upside becomes yours to take out.</p>
+          <Sec id="ladder" n={4} title="Levels">
+            <p>Four levels. Each one gives the agent more: more funding, bigger daily allowances, and at the top, everything in the account is yours.</p>
             <table className={s.table}>
-              <thead><tr><th>Rung</th><th>Pay / day</th><th>Trade / day</th><th>How you get there</th></tr></thead>
+              <thead><tr><th>Level</th><th>Funding / month</th><th>Pays / day</th><th>Trades / day</th><th>How you get there</th></tr></thead>
               <tbody>
-                <tr><td>0 · Funded</td><td>$5</td><td>$10</td><td className={s.m}>Sign up.</td></tr>
-                <tr><td>1 · Proven</td><td>$25</td><td>$50</td><td className={s.m}>Five settled sends to five different real people, from your own money.</td></tr>
-                <tr><td>2 · Trusted</td><td>$100</td><td>$250</td><td className={s.m}>A 30-day streak.</td></tr>
-                <tr><td>3 · Owner</td><td>$500</td><td>$1,000</td><td className={s.m}>By review. Credit and gains unlock.</td></tr>
+                <tr><td>1 · Started</td><td>your cash</td><td>$5</td><td>$10</td><td className={s.m}>Sign up.</td></tr>
+                <tr><td>2 · Proven</td><td>$25</td><td>$25</td><td>$50</td><td className={s.m}>Pay five different people by @name, $1 or more each. They log in, they&apos;re in.</td></tr>
+                <tr><td>3 · Trusted</td><td>$75</td><td>$100</td><td>$250</td><td className={s.m}>A 30-day streak. Your gains become yours to take out.</td></tr>
+                <tr><td>4 · Owner</td><td>by review</td><td>$500</td><td>$1,000</td><td className={s.m}>Everything in the account is yours.</td></tr>
               </tbody>
             </table>
-            <p><strong>Three things a day</strong> keep the streak: a trade with credit, a lock, a send. The ones that settle with a real person build reputation. Only settled outcomes count: a send that was claimed, a job that was delivered, a purchase that shipped. Paying yourself doesn&apos;t count; SAID knows it&apos;s you.</p>
+            <p><strong>Three things a day</strong> keep the streak: a trade, a send, a stake. The ones that settle with a real person level you up. Only settled outcomes count: a send that was claimed, a job that was delivered, a purchase that shipped. Paying yourself doesn&apos;t count; the app knows it&apos;s you.</p>
           </Sec>
 
-          <Sec id="token" n={5} title="Holding $ATCHA">
-            <p>Lock $ATCHA for 30 days and your Atcha gets bigger: funding, first-deposit match, and daily limits scale with it. Two tiers, by share of supply locked. <strong>Size, never a payout</strong>, and never a shortcut up the ladder: your rung and your cashback rate are behavioural only.</p>
-            <p>Hold it in a wallet you already have? Link that wallet to your Atcha on SAID and the lock counts.</p>
+          <Sec id="token" n={5} title="What $ATCHA does">
+            <p>$ATCHA funds the agents. The token&apos;s creator rewards fill the pool; the pool pays every level-2-and-up agent its monthly credit, in SOL. The agents trade; a share of their fees buys $ATCHA back and stakes it, in batches, with a public receipt each time.</p>
+            <p>It never pays holders, never burns, never airdrops, and funding is never paid in the token itself. The token&apos;s job is to fund the agents, and the agents&apos; job is to buy the token.</p>
           </Sec>
 
           <Sec id="send" n={6} title="Pay anyone by @name">
@@ -136,13 +135,13 @@ bot  →  ✓ Vega is being registered on SAID.
             <Block label="examples">{`send 5 USDC to @alex
 pay @that_plumber $120
 split $180 with @the_groupchat`}</Block>
-            <p>Before a cent moves the name is <strong>resolved and screened on SAID</strong>: is this the real account, what is its record. If a name doesn&apos;t check out, your money never leaves.</p>
+            <p>Before a cent moves the name is <strong>checked</strong>: is this the real account, what is its record. If a name doesn&apos;t check out, your money never leaves.</p>
             <p>If they&apos;re not on Atcha yet, the money waits in your balance under their name. They log in with the account you named and it&apos;s already there. Nothing is parked anywhere, and it returns to you if they never show. Cancel any time:</p>
             <Block>{`cancel the send to @joe`}</Block>
           </Sec>
 
           <Sec id="trade" n={7} title="Trade, buy, and more">
-            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. Credit trades the majors; your own money trades anything on Solana, and can bridge to other chains.</p>
+            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. Credit trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
             <Block label="examples">{`swap $5 of my credit into SOL
 buy JUP when it hits $0.40
 DCA $10 into SOL every day
@@ -151,15 +150,15 @@ alert me if SOL drops 5%`}</Block>
             <p><strong>Comms.</strong> It can make calls and send email on your behalf, priced per action and confirmed with you first.</p>
           </Sec>
 
-          <Sec id="identity" n={8} title="Identity and reputation">
-            <p>Every Atcha is a real on-chain record under the SAID program (<C>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</C>): identity, owner, verification, optional stake. <strong>Verification is free and automatic</strong>; Atcha sponsors it when you first sign in.</p>
-            <p>Reputation is built from settled outcomes and anchored on-chain, so it follows you regardless of which surface you used. It sets your cashback rate and it is what other people see when they check your name before paying you.</p>
+          <Sec id="identity" n={8} title="What&apos;s underneath">
+            <p>Your level is a real on-chain record. Every Atcha is registered under the <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID</a> program (<C>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</C>): identity, owner, verification. <strong>Verification is free and automatic</strong>; Atcha sponsors it when you first sign in.</p>
+            <p>The level is built from settled outcomes and anchored on-chain, so it follows you whichever surface you use, and it is what the funding formula reads every month. It is also what other people see when they check your name before paying you. Developers building on SAID can read it directly; that is the whole point of it being on-chain.</p>
             <p>One name, every handle: link X, Telegram and any wallet you already run, and they all resolve to you. Each link is proven by logging in, never by trust.</p>
           </Sec>
 
           <Sec id="fees" n={9} title="Fees and cashback">
             <p>Every action that moves real value takes a <strong>flat 1%</strong>, bundled into the same Solana transaction, so it lands in the treasury (<C>2XfHTeNWTjNwUmgoXaafYuqHcAAXj8F5Kjw2Bnzi4FxH</C>) in the same block as your action or not at all. Adding money, receiving, claiming and cashback payouts are never charged.</p>
-            <p>Reputation earns part of that fee back:</p>
+            <p>Your level earns part of that fee back:</p>
             <table className={s.table}>
               <thead><tr><th>Tier</th><th>Back</th><th>What it takes</th></tr></thead>
               <tbody>
@@ -169,12 +168,12 @@ alert me if SOL drops 5%`}</Block>
                 <tr><td>Platinum</td><td>50%</td><td className={s.m}>100+ interactions, top identity</td></tr>
               </tbody>
             </table>
-            <p>Staking boosts your cashback. It never lowers the fee and it never touches your reputation. Cashback earned on credit stays credit; cashback earned on your money is yours.</p>
+            <p>Staking $SAID boosts your cashback. It never lowers the fee. Cashback earned on credit stays credit; cashback earned on your cash is yours.</p>
           </Sec>
 
           <Sec id="money" n={10} title="Adding and taking out money">
             <p><strong>Add money</strong> with a card or Apple Pay inside the app, or send SOL or USDC to your address from any wallet or exchange. On a phone, the Add money screen shows a Solana Pay code any wallet can scan.</p>
-            <p><strong>Take it out</strong> any time: your own money is withdrawable the moment it lands. Credit, and gains made with credit, unlock at Owner.</p>
+            <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands. Gains made with credit are yours from level 3; the credit itself, at level 4.</p>
           </Sec>
 
           <Sec id="surfaces" n={11} title="Where it lives">
@@ -189,11 +188,11 @@ alert me if SOL drops 5%`}</Block>
             <Q>Do I need a wallet first?</Q>
             <p>No. Your Atcha has its own wallet, secured by Privy, from the moment it exists. Link an external one later if you want.</p>
             <Q>Can I withdraw the credit?</Q>
-            <p>Not until Owner. Credit trades; it doesn&apos;t leave. Your own money leaves whenever you like.</p>
+            <p>Not until level 4. Credit trades; it doesn&apos;t leave. Your cash leaves whenever you like, and from level 3 so do your gains.</p>
             <Q>What if the credit goes to zero?</Q>
-            <p>Then it&apos;s gone and your money was never touched. Trading pauses below half; tasks reopen it.</p>
+            <p>Then it&apos;s gone and your cash was never touched. Next month funds again, if your level holds.</p>
             <Q>Is this a real on-chain identity?</Q>
-            <p>Yes. Anyone can verify your Atcha&apos;s identity, reputation and history on Solana.</p>
+            <p>Yes. Anyone can verify your Atcha&apos;s identity, level and history on Solana.</p>
             <Q>What if I lose my Telegram or X account?</Q>
             <p>Your Atcha persists on-chain. Recovery runs through the other logins you linked.</p>
             <Q>Can I see what it did?</Q>

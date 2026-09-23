@@ -45,7 +45,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.12 | Reclaim untouched credit after 14 days | `src/credits/funding.ts` | [ ] |
 | 1.13 | Batched buy-and-stake of $ATCHA from fees at a threshold, public receipt | `src/scheduler/x-launch-sweep.ts` or new | [ ] |
 | 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.mts` (`npm run test:credits:ring`) | [x] passes; plus the ring that spends real money earns rung 1 and can take out only what it put in |
-| 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] (rename rung→level in payload: [ ]) |
+| 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] level, levelName, next, funding added (9f15064) |
 | 1.16 | Independent review of 1.1–1.14 by someone who did not write it | — | [ ] (C) |
 
 ## 2. Butler: deploy
@@ -62,13 +62,13 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | # | Step | Status |
 | --- | --- | --- |
 | 3.1 | Atcha design system, landing, motion, public pages, dashboard cards, icons | [x] |
-| 3.2 | Vocabulary pass: rung → level, "reputation" off every user surface, every rule as a capability that grows | [ ] |
-| 3.3 | Landing: capabilities-first hero and sections (trade anything, hold the S&P, pay anyone by name, buy things, DCA); "comes funded" as the promise; the counter | [ ] |
-| 3.4 | Home: the level card (funding this month, allowance today, what the next level unlocks), the five-people progress at level 1 | [ ] |
+| 3.2 | Vocabulary pass: rung → level, "reputation" off every user surface, every rule as a capability that grows | [x] level card, cashback card, tasks, landing, Docs. Stats and link-agent (network/developer pages) still say reputation on purpose |
+| 3.3 | Landing: capabilities-first hero and sections (trade anything, hold the S&P, pay anyone by name, buy things, DCA); "comes funded" as the promise; the counter | [x] |
+| 3.4 | Home: the level card (funding this month, allowance today, what the next level unlocks), the five-people progress at level 1 | [x] reads `level`, `next`, `funding` from the API (butler 9f15064) |
 | 3.5 | Recipient's first screen: "@name paid you $1. This is your Atcha. Pay five people and it gets funded." | [ ] |
 | 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, who they've paid; the share card | [ ] |
 | 3.7 | Fleet page: five house agents, leaderboard, live P&L | [ ] |
-| 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [ ] |
+| 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
 | 3.9 | Mobile nav menu; remaining SAID references (`sw.js`, manifest start_url) | [ ] |
 | 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.3 is live | [ ] (C) |
 
