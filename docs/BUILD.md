@@ -37,7 +37,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.4 | Monthly funding: size table by rung, idempotent per month, pool budget with reserve, funding-day timer | `src/credits/funding.ts` | [x] 8cfa5d6 |
 | 1.5 | Trading rules v2: per-token cap, aggregate non-major cap, liquidity and age floors, passport check on xStocks, no whitelist | `src/credits/guards.ts` | [x] (floor is $100K: $CLAW itself sits at ~$190K liquidity, so $250K would exclude the ecosystem token) |
 | 1.6 | Spend guard: pays/buys/hires only from own money (amount ≤ withdrawable) | `src/credits/guards.ts` `canSpend` | [x] wired for transfer_usdc/transfer_sol by handle |
-| 1.7 | Guard the five open money tools: `send_to_contact`, `bridge_usdc`, `purch_buy`, DCA/limit fills, launch | `src/agent/butler.ts` | [~] execute_swap, transfer_usdc, transfer_sol guarded; the five remain |
+| 1.7 | One gate for every money path: swaps (chat, DCA fills, limit fills, staking), sends by handle, contacts, bridges, AgentCash, cross-chain, purchases | `src/credits/gate.ts`, `src/agent/butler.ts`, `src/dca/executor.ts`, `src/limit/executor.ts` | [x] (no launch tool exists in the chat agent; purchases are gated on having own money, since the price is only known after checkout: quote-before-buy is a follow-up) |
 | 1.8 | Two-phase funding (pending, then confirm) so a crash never double-funds | `src/credits/funding.ts` | [ ] |
 | 1.9 | Deposit detection wired to `recordDeposit` (on-ramp and wallet snapshot), net of claimed sends and cashback | `src/scheduler/deposit-monitor.ts` | [ ] |
 | 1.10 | Sender funding bonus on recipient activation, capped per month | `src/credits/entry.ts` + funding | [ ] |
