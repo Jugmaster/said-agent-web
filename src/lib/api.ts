@@ -807,3 +807,45 @@ export async function getCredits(platformId: string): Promise<CreditsSummary | n
   }
   return res.json();
 }
+
+
+// ─── Public: the agent page and the Fleet ──────────────────────────────────
+
+export interface PublicCredits {
+  platformId: string;
+  displayName: string | null;
+  funded: boolean;
+  level: number;
+  levelName: string;
+  streak: number;
+  peoplePaid: number;
+  monthsFunded: number;
+  fundedTotalUsd: number;
+  lastFundingAt: string | null;
+  fundedThisMonth: boolean;
+  balanceUsd: number | null;
+  pnlUsd: number | null;
+  verified: boolean;
+  fundings: Array<{ amountUsd: number; at: string; tx: string | null }>;
+}
+
+/** Public. Null when there is no Atcha for that handle, or the API predates credits. */
+export async function getCreditsByHandle(handle: string, options?: { cache?: RequestCache }): Promise<PublicCredits | null> {
+  try {
+    const res = await fetch(`${API_BASE}/api/credits/handle/${encodeURIComponent(handle)}`, { cache: options?.cache ?? "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function getFleet(options?: { cache?: RequestCache }): Promise<PublicCredits[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/credits/fleet`, { cache: options?.cache ?? "no-store" });
+    if (!res.ok) return [];
+    return ((await res.json()) as { fleet: PublicCredits[] }).fleet ?? [];
+  } catch {
+    return [];
+  }
+}

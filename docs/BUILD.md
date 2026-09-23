@@ -66,8 +66,8 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.3 | Landing: capabilities-first hero and sections (trade anything, hold the S&P, pay anyone by name, buy things, DCA); "comes funded" as the promise; the counter | [x] |
 | 3.4 | Home: the level card (funding this month, allowance today, what the next level unlocks), the five-people progress at level 1 | [x] reads `level`, `next`, `funding` from the API (butler 9f15064) |
 | 3.5 | Recipient's first screen: "@name paid you $1. This is your Atcha. Pay five people and it gets funded." | [x] the invite claim page |
-| 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, who they've paid; the share card | [ ] |
-| 3.7 | Fleet page: five house agents, leaderboard, live P&L | [ ] |
+| 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, people paid, funding record; `/@name` rewrites to `/u/[handle]`; OG tags = the share card | [x] |
+| 3.7 | Fleet page `/fleet`: leaderboard by result since funded, 30s refresh, Nav link (reads `CREDIT_FLEET_IDS` on the box) | [x] |
 | 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
 | 3.9 | Mobile nav menu; remaining SAID references (`sw.js`, manifest start_url) | [ ] |
 | 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.3 is live | [ ] (C) |

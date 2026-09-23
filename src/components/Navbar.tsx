@@ -58,6 +58,7 @@ export default function Navbar() {
         <div className="group hidden items-center gap-7 md:flex">
           <Link href="/#funded" className={LINK}>Funded</Link>
           <Link href="/#how" className={LINK}>How it works</Link>
+          <Link href="/fleet" className={LINK}>Fleet</Link>
           <Link href="/agents" className={LINK}>Agents</Link>
           <Link href="/stats" className={LINK}>Stats</Link>
           <Link href="/docs" className={LINK}>Docs</Link>
