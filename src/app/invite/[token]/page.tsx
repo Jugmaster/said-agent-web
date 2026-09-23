@@ -201,7 +201,7 @@ export default async function InvitePage({ params }: PageProps) {
 
       <section className="mb-8">
         <p className="text-sm text-zinc-500 mb-2">
-          {senderName} sent you crypto.
+          {senderName} paid you.
         </p>
         <h1 className="text-3xl font-semibold mb-1">
           {invite.amount} {invite.asset}
@@ -212,11 +212,12 @@ export default async function InvitePage({ params }: PageProps) {
       </section>
 
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5 mb-6">
-        <h2 className="text-sm font-medium mb-3">Claim your crypto</h2>
+        <h2 className="text-sm font-medium mb-1">This is your Atcha.</h2>
         <p className="text-sm text-zinc-500 mb-4">
           Sign in with the same {platformLabel(invite.recipient.platform)} account
-          (@{invite.recipient.handle}) and your funds drop in automatically — no
-          need to leave the web.
+          (@{invite.recipient.handle}) and the money is yours. Then it&apos;s an AI with a
+          balance: it trades anything on Solana, pays anyone you can name, buys things.
+          Pay five people yourself and it gets funded every month.
         </p>
 
         <div className="flex flex-col gap-2">
