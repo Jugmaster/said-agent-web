@@ -44,7 +44,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.11 | Profit withdrawal at rung 2: realised gains above funded, split, monthly | `src/credits/guards.ts` `canWithdraw` | [ ] |
 | 1.12 | Reclaim untouched credit after 14 days | `src/credits/funding.ts` | [ ] |
 | 1.13 | Batched buy-and-stake of $ATCHA from fees at a threshold, public receipt | `src/scheduler/x-launch-sweep.ts` or new | [ ] |
-| 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.ts` | [ ] |
+| 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.mts` (`npm run test:credits:ring`) | [x] passes; plus the ring that spends real money earns rung 1 and can take out only what it put in |
 | 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] (rename rung→level in payload: [ ]) |
 | 1.16 | Independent review of 1.1–1.14 by someone who did not write it | — | [ ] (C) |
 
@@ -93,7 +93,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 
 ## 6. Order of work, from here
 
-1. Butler 1.4 tests → 1.5 → 1.6 → 1.7 → 1.14 (the ring must pass before anything moves).
+1. ~~Butler 1.4 → 1.5 → 1.6 → 1.7 → 1.14~~ done 23 Sept.
 2. App 3.2 → 3.3 → 3.4 → 3.5 (the vocabulary and the first screens).
 3. Butler 1.8 → 1.9 → 1.10 → 1.11 → 1.12 → 1.13.
 4. Deploy 2.1 → 2.2 → 2.3; app 3.6 → 3.7 → 3.8.
