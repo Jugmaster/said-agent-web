@@ -38,12 +38,12 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.5 | Trading rules v2: per-token cap, aggregate non-major cap, liquidity and age floors, passport check on xStocks, no whitelist | `src/credits/guards.ts` | [x] (floor is $100K: $CLAW itself sits at ~$190K liquidity, so $250K would exclude the ecosystem token) |
 | 1.6 | Spend guard: pays/buys/hires only from own money (amount ≤ withdrawable) | `src/credits/guards.ts` `canSpend` | [x] wired for transfer_usdc/transfer_sol by handle |
 | 1.7 | One gate for every money path: swaps (chat, DCA fills, limit fills, staking), sends by handle, contacts, bridges, AgentCash, cross-chain, purchases | `src/credits/gate.ts`, `src/agent/butler.ts`, `src/dca/executor.ts`, `src/limit/executor.ts` | [x] (no launch tool exists in the chat agent; purchases are gated on having own money, since the price is only known after checkout: quote-before-buy is a follow-up) |
-| 1.8 | Two-phase funding (pending, then confirm) so a crash never double-funds | `src/credits/funding.ts` | [ ] |
-| 1.9 | Deposit detection wired to `recordDeposit` (on-ramp and wallet snapshot), net of claimed sends and cashback | `src/scheduler/deposit-monitor.ts` | [ ] |
-| 1.10 | Sender funding bonus on recipient activation, capped per month | `src/credits/entry.ts` + funding | [ ] |
-| 1.11 | Profit withdrawal at rung 2: realised gains above funded, split, monthly | `src/credits/guards.ts` `canWithdraw` | [ ] |
-| 1.12 | Reclaim untouched credit after 14 days | `src/credits/funding.ts` | [ ] |
-| 1.13 | Batched buy-and-stake of $ATCHA from fees at a threshold, public receipt | `src/scheduler/x-launch-sweep.ts` or new | [ ] |
+| 1.8 | Two-phase funding (pending, then confirm) so a crash never double-funds | `src/credits/funding.ts` | [x] `pendingFundings()` lists what needs a human |
+| 1.9 | Deposit detection: a claimed send is the recipient's cash; daily snapshot deltas on days with no swap | `src/credits/deposits.ts`, `entry.ts`, `wallet-snapshot.ts` | [x] swap days are skipped, not guessed; on-ramp orders land as the next quiet day's delta |
+| 1.10 | Sender funding bonus on recipient activation, capped per month | `src/credits/funding.ts` `activationBonusUsd` | [x] $10 per activated person, five a month, folded into next month's funding |
+| 1.11 | Profit withdrawal at rung 2: gains above funded, split | `src/credits/ledger.ts` `computePosition(rung)` | [x] 80% of gains withdrawable from level 3; principal at level 4 |
+| 1.12 | Reclaim untouched credit after 14 days | `src/credits/funding.ts` `reclaimUntouched` | [x] daily at 04:00 UTC behind the flag; only the last funding, only what is left, never cash |
+| 1.13 | Batched buy-and-stake of $ATCHA from fees at a threshold, public receipt | new scheduler | [ ] blocked on the $ATCHA mint existing |
 | 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.mts` (`npm run test:credits:ring`) | [x] passes; plus the ring that spends real money earns rung 1 and can take out only what it put in |
 | 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] level, levelName, next, funding added (9f15064) |
 | 1.16 | Independent review of 1.1–1.14 by someone who did not write it | — | [ ] (C) |
@@ -95,6 +95,6 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 
 1. ~~Butler 1.4 → 1.5 → 1.6 → 1.7 → 1.14~~ done 23 Sept.
 2. App 3.2 → 3.3 → 3.4 → 3.5 (the vocabulary and the first screens).
-3. Butler 1.8 → 1.9 → 1.10 → 1.11 → 1.12 → 1.13.
+3. ~~Butler 1.8 → 1.9 → 1.10 → 1.11 → 1.12~~ done 23 Sept; 1.13 waits for the mint.
 4. Deploy 2.1 → 2.2 → 2.3; app 3.6 → 3.7 → 3.8.
 5. Launch 4.x; then 2.4 when cleared.
