@@ -46,7 +46,8 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 1.13 | Batched buy-and-stake of $ATCHA from fees at a threshold, public receipt | new scheduler | [ ] blocked on the $ATCHA mint existing |
 | 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.mts` (`npm run test:credits:ring`) | [x] passes; plus the ring that spends real money earns rung 1 and can take out only what it put in |
 | 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] level, levelName, next, funding added (9f15064) |
-| 1.16 | Independent review of 1.1–1.14 by someone who did not write it | — | [ ] (C) |
+| 1.16 | Independent review of 1.1–1.14 by someone who did not write it, brief in `docs/REVIEW.md` | — | [ ] (C) |
+| 1.17 | One funding day for everyone: entry queues for the next funding day; `forecast()` = what is due, what the pool holds, the top-up in SOL; ops told at T-7/3/1; `GET /api/credits/forecast` | `funding.ts`, `tests/credits.funding.test.ts` | [x] 23 Sept |
 
 ## 2. Butler: deploy
 
@@ -54,8 +55,8 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | --- | --- | --- |
 | 2.1 | Pool wallet (hosting-signable) and team wallet created; env set: `CREDITS_ENABLED`, `CREDIT_POOL_*`, funding sizes | [ ] (C) |
 | 2.2 | Surgical deploy of the credits module and routes to the box, dry-run on | [ ] |
-| 2.3 | Five house accounts (the Fleet) at rung 1, `force`-funded, small, dry-run off for them only | [ ] |
-| 2.4 | Dry-run off for everyone once 1.14 and 1.16 pass and the solicitor has answered | [ ] (C) |
+| 2.3 | Ops wired: `CREDIT_OPS_PLATFORM_IDS` (who gets the T-7/3/1 forecast), `CREDIT_OPS_TOKEN` (for `GET /api/credits/forecast`); first forecast read and the pool topped up to it | [ ] (C) |
+| 2.4 | Dry-run off for everyone once 1.14 and 1.16 pass | [ ] (C) |
 
 ## 3. App
 
@@ -67,16 +68,16 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.4 | Home: the level card (funding this month, allowance today, what the next level unlocks), the five-people progress at level 1 | [x] reads `level`, `next`, `funding` from the API (butler 9f15064) |
 | 3.5 | Recipient's first screen: "@name paid you $1. This is your Atcha. Pay five people and it gets funded." | [x] the invite claim page |
 | 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, people paid, funding record; `/@name` rewrites to `/u/[handle]`; OG tags = the share card | [x] |
-| 3.7 | Fleet page `/fleet`: leaderboard by result since funded, 30s refresh, Nav link (reads `CREDIT_FLEET_IDS` on the box) | [x] |
+| 3.7 | Fleet page `/fleet`: the top funded real accounts (or `CREDIT_FLEET_IDS` if pinned), leaderboard by result, 30s refresh, Nav link | [x] |
 | 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
 | 3.9 | Mobile nav menu; remaining SAID references (`sw.js`, manifest start_url) | [ ] |
-| 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.3 is live | [ ] (C) |
+| 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.4 is live | [ ] (C) |
 
 ## 4. Token and launch
 
 | # | Step | Status |
 | --- | --- | --- |
-| 4.1 | Solicitor paragraph sent (spec §10) | [ ] (C) |
+| 4.1 | Independent review of `src/credits/` against `docs/REVIEW.md` in said-butler, before the token launches | [ ] (C) |
 | 4.2 | X account renamed to Atcha; keys audited; public sends by handle from the timeline through the same rules | [ ] (C) + butler |
 | 4.3 | Stream slot with ClawPump in the judging window | [ ] (C) |
 | 4.4 | Token live on ClawPump by 1 Oct; MM briefed on the mechanic (funds agents; bought by their trading; no lock tier) | [ ] (C) |

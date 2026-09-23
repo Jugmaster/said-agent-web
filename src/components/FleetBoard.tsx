@@ -19,7 +19,7 @@ export default function FleetBoard() {
   }, []);
 
   if (fleet === null) return <div className={s.empty} style={{ marginTop: 44 }}>Loading the board…</div>;
-  if (fleet.length === 0) return <div className={s.empty} style={{ marginTop: 44 }}>The Fleet takes the field on funding day.</div>;
+  if (fleet.length === 0) return <div className={s.empty} style={{ marginTop: 44 }}>The board fills on the first funding day.</div>;
 
   const sorted = [...fleet].sort((a, b) => (b.pnlUsd ?? -Infinity) - (a.pnlUsd ?? -Infinity));
   return (

@@ -109,7 +109,7 @@ export default function FundedCard({
       )}
 
       <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-4">
-        <Stat label="Funded this month" value={usd(s.funding.monthlyUsd)} sub={s.funding.fundedThisMonth ? "landed" : `lands on the ${ordinal(s.funding.fundingDay)}`} />
+        <Stat label="Funded this month" value={usd(s.funding.monthlyUsd)} sub={s.funding.fundedThisMonth ? "landed" : `lands ${fundingDate(s.funding)}`} />
         <Stat label="Trades today" value={`${usd(s.limits.tradeLeft)} left`} sub={`of ${usd(s.limits.trade)} a day at level ${s.level}`} />
         <Stat
           label="Pays out today"
@@ -135,6 +135,14 @@ export default function FundedCard({
   );
 }
 
+/* "1 Oct" from the API's next funding date; falls back to the day of the month. */
+function fundingDate(f: { fundingDay: number; nextFundingAt?: string }): string {
+  if (f.nextFundingAt) {
+    const d = new Date(f.nextFundingAt);
+    if (!Number.isNaN(d.getTime())) return d.toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" });
+  }
+  return `on the ${ordinal(f.fundingDay)}`;
+}
 function ordinal(n: number): string {
   const s = ["th", "st", "nd", "rd"], v = n % 100;
   return n + (s[(v - 20) % 10] || s[v] || s[0]);

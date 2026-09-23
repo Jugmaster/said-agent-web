@@ -105,7 +105,7 @@ bot  →  ✓ Vega is ready. Level 1.
                 <tr><td className={s.m}>Gains on it</td><td>Stay credit.</td><td>Yours.</td></tr>
               </tbody>
             </table>
-            <p><strong>Funding is monthly.</strong> It lands on funding day, sized by your level, paid by the $ATCHA token. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
+            <p><strong>Funding is monthly.</strong> Everyone is funded on the same day of the month, sized by their level, paid by the $ATCHA token. Reach level 1 mid-month and your first funding lands on the next funding day. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
             <p><strong>What credit trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and xStocks. Anything with real liquidity and a week of history. A quarter of your credit can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. Credit never buys $ATCHA and never buys a token you created.</p>
             <p><strong>A rough day.</strong> If credit falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
             <p><strong>Untouched credit</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
