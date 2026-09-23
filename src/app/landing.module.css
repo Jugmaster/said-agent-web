@@ -243,6 +243,7 @@
 /* preloader */
 .loader { position: fixed; inset: 0; z-index: 100; background: var(--color-cream); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; transform: translateY(0); transition: transform 0.8s cubic-bezier(0.76, 0, 0.24, 1); }
 .loaderAway { transform: translateY(-100%); }
+:global([data-seen]) .loader { display: none; }
 .loaderWord { font-size: 1.7rem; letter-spacing: -0.04em; color: var(--color-ink); }
 .loaderWord em { font-style: normal; color: var(--color-coral); }
 .loaderNum { font-size: 0.8rem; color: var(--color-grey); font-variant-numeric: tabular-nums; letter-spacing: 0.08em; }

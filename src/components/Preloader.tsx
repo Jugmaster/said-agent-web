@@ -6,7 +6,9 @@ import s from "@/app/landing.module.css";
 // First visit per tab only: the wordmark and a count to 100, then it slides away
 // and the hero rows are released. Reduced motion and repeat visits skip it.
 export default function Preloader() {
-  const [pct, setPct] = useState<number | null>(null);
+  // Rendered on the server so it is on screen from the first paint; a one-line
+  // inline script in the page hides it before paint on repeat visits.
+  const [pct, setPct] = useState<number | null>(0);
   const [away, setAway] = useState(false);
 
   useEffect(() => {
@@ -18,10 +20,10 @@ export default function Preloader() {
     } catch {}
     const release = () => document.querySelectorAll<HTMLElement>("[data-hero]").forEach((el) => (el.dataset.hero = "go"));
     if (reduced || seen) {
+      setPct(null);
       release();
       return;
     }
-    setPct(0);
     document.body.style.overflow = "hidden";
     const t0 = performance.now();
     const DUR = 700;

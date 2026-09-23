@@ -50,6 +50,12 @@ export default function LandingPage() {
 
   return (
     <div className={s.page}>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('atcha-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.setAttribute('data-seen','1')}catch(e){}",
+        }}
+      />
       <div data-preloader><Preloader /></div>
       <PublicMotion />
       <Navbar />
