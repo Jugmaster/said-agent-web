@@ -22,11 +22,14 @@ export default function PublicMotion() {
 
   useEffect(() => {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (!reduced) document.documentElement.dataset.motion = "1";
     const q = <T extends Element>(sel: string) => Array.from(document.querySelectorAll<T>(sel));
     const cleanups: Array<() => void> = [];
 
-    // Hero rows.
-    requestAnimationFrame(() => q<HTMLElement>("[data-hero]").forEach((el) => (el.dataset.hero = "go")));
+    // Hero rows: released by the preloader when there is one, else now.
+    if (!document.querySelector("[data-preloader]")) {
+      requestAnimationFrame(() => q<HTMLElement>("[data-hero]").forEach((el) => (el.dataset.hero = "go")));
+    }
 
     // Reveals.
     const revealEls = q<HTMLElement>("[data-reveal], [data-stagger]");
@@ -163,7 +166,10 @@ export default function PublicMotion() {
     }
 
     ScrollTrigger.refresh();
-    return () => cleanups.forEach((f) => f());
+    return () => {
+      cleanups.forEach((f) => f());
+      delete document.documentElement.dataset.motion;
+    };
   }, [pathname]);
 
   return null;

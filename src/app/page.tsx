@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
+import Preloader from "@/components/Preloader";
 import { getCreditsToday, type CreditsToday } from "@/lib/api";
 import s from "./landing.module.css";
 
@@ -49,6 +50,7 @@ export default function LandingPage() {
 
   return (
     <div className={s.page}>
+      <div data-preloader><Preloader /></div>
       <PublicMotion />
       <Navbar />
 
