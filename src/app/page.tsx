@@ -132,10 +132,9 @@ export default function LandingPage() {
       </section>
 
       <section className={`${s.acts} ${s.wrap}`} id="steps">
-        <div className={s.act} data-reveal><span className={s.n}>01 / Name</span><div><h3>Names, not addresses.</h3><p>The handle you&apos;d say out loud is the only address you need. No 44-character strings, no copy-paste roulette. <strong>If a name doesn&apos;t check out, your money never leaves.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>02 / Send</span><div><h3>Held until it&apos;s truly theirs.</h3><p>Every send is committed to the person, not the platform. If they haven&apos;t joined yet, the money waits under their name and <strong>returns to you automatically if they never show.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>03 / Claim</span><div><h3>They log in. It&apos;s done.</h3><p>Your person signs in with the account you named, and the money is already sitting there. <strong>That&apos;s the entire onboarding: receiving money.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>04 / One name</span><div><h3>Every handle. One pocket.</h3><p>Link the X and Telegram you already have, and money sent to either lands in the same balance. <strong>Each link is proven by logging in, never by trust</strong>, and your name and your level are yours, not any platform&apos;s.</p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five names. That&apos;s the entry.</h3><p>Pay $1 or more to five people you can name, on X or Telegram. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 1.</strong></p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level, paid by the $ATCHA token. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 2 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
       </section>
 
 
