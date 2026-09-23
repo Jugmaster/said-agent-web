@@ -12,16 +12,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://agent.saidprotocol.com"),
+  metadataBase: new URL("https://atcha.cash"),
   title: "Atcha",
   description:
-    "Your AI comes funded. Trading credit in it on day one, sized by the chart. Pay anyone you can name, checked on SAID before a cent moves.",
+    "Your AI comes funded. Funded every month, sized by its level. Pay anyone you can name.",
   manifest: "/manifest.webmanifest",
   openGraph: {
     title: "Atcha",
     description:
-      "Your AI comes funded. Trading credit in it on day one, sized by the chart. Pay anyone you can name, checked on SAID before a cent moves.",
-    url: "https://agent.saidprotocol.com",
+      "Your AI comes funded. Funded every month, sized by its level. Pay anyone you can name.",
+    url: "https://atcha.cash",
     siteName: "Atcha",
     type: "website",
   },

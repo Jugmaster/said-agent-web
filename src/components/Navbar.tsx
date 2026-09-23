@@ -20,7 +20,9 @@ export default function Navbar() {
   const { ready, authenticated, user, login } = usePrivy();
   const agent = useAgent();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navRef = useRef<HTMLDivElement>(null);
   const bal = useSendableBalance(agent.status === "ready" ? agent.walletAddress : null, menuOpen);
   const signedIn = user
     ? user.telegram?.username
@@ -35,13 +37,23 @@ export default function Navbar() {
     : { platform: "", handle: "" };
 
   useEffect(() => {
-    if (!menuOpen) return;
+    if (!menuOpen && !navOpen) return;
     const onClick = (e: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+      if (navRef.current && !navRef.current.contains(e.target as Node)) setNavOpen(false);
     };
     document.addEventListener("pointerdown", onClick);
     return () => document.removeEventListener("pointerdown", onClick);
-  }, [menuOpen]);
+  }, [menuOpen, navOpen]);
+
+  const NAV: Array<[string, string]> = [
+    ["/#funded", "Funded"],
+    ["/#how", "How it works"],
+    ["/fleet", "Fleet"],
+    ["/agents", "Agents"],
+    ["/stats", "Stats"],
+    ["/docs", "Docs"],
+  ];
 
   return (
     <div
@@ -56,15 +68,37 @@ export default function Navbar() {
         </Link>
 
         <div className="group hidden items-center gap-7 md:flex">
-          <Link href="/#funded" className={LINK}>Funded</Link>
-          <Link href="/#how" className={LINK}>How it works</Link>
-          <Link href="/fleet" className={LINK}>Fleet</Link>
-          <Link href="/agents" className={LINK}>Agents</Link>
-          <Link href="/stats" className={LINK}>Stats</Link>
-          <Link href="/docs" className={LINK}>Docs</Link>
+          {NAV.map(([href, label]) => (
+            <Link key={href} href={href} className={LINK}>{label}</Link>
+          ))}
         </div>
 
         <div className="flex items-center gap-3">
+          {/* Phone: the same links behind one button. */}
+          <div className="relative md:hidden" ref={navRef}>
+            <button
+              type="button"
+              aria-label="Menu"
+              aria-expanded={navOpen}
+              onClick={() => setNavOpen((o) => !o)}
+              className="flex h-9 w-9 items-center justify-center rounded-full shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:shadow-[inset_0_0_0_1px_#171613]"
+            >
+              <span aria-hidden className="flex flex-col gap-[4px]">
+                <span className={`block h-[1.5px] w-4 bg-ink transition ${navOpen ? "translate-y-[5.5px] rotate-45" : ""}`} />
+                <span className={`block h-[1.5px] w-4 bg-ink transition ${navOpen ? "opacity-0" : ""}`} />
+                <span className={`block h-[1.5px] w-4 bg-ink transition ${navOpen ? "-translate-y-[5.5px] -rotate-45" : ""}`} />
+              </span>
+            </button>
+            {navOpen && (
+              <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-line bg-[#FFFFFF] shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
+                {NAV.map(([href, label]) => (
+                  <Link key={href} href={href} onClick={() => setNavOpen(false)} className="block px-4 py-3 text-sm transition hover:bg-card">
+                    {label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           {!ready ? (
             <div className="h-9 w-24 animate-pulse rounded-full bg-card" />
           ) : !authenticated ? (

@@ -58,7 +58,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
             Missing agent identifier. Adopt links should look like:
           </p>
           <code className="text-xs text-zinc-400 block mt-2 break-all">
-            agent.saidprotocol.com/adopt?p=tw_…
+            atcha.cash/adopt?p=tw_…
           </code>
           <Link
             href="/"

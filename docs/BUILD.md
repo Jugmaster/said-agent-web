@@ -70,7 +70,7 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, people paid, funding record; `/@name` rewrites to `/u/[handle]`; OG tags = the share card | [x] |
 | 3.7 | Fleet page `/fleet`: the top funded real accounts (or `CREDIT_FLEET_IDS` if pinned), leaderboard by result, 30s refresh, Nav link | [x] |
 | 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
-| 3.9 | Mobile nav menu; remaining SAID references (`sw.js`, manifest start_url) | [ ] |
+| 3.9 | Phone nav menu (hamburger, same links); metadata and adopt copy on `atcha.cash`; manifest starts at `/home`; no `sw.js` in the tree | [x] |
 | 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.4 is live | [ ] (C) |
 
 ## 4. Token and launch
