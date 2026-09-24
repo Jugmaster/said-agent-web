@@ -88,7 +88,7 @@ bot  →  hey, welcome to Atcha. your AI comes funded.
 
 you  →  Vega
 bot  →  ✓ Vega is ready. Level 1.
-        pay five people by @name and it gets funded.
+        pay five verified X accounts by @name and it gets funded.
         profile: atcha.cash/@Vega`}</Block>
             <p>Already have one from the bot? Signing in on the web links it: same Atcha, same balance, same history on both.</p>
           </Sec>

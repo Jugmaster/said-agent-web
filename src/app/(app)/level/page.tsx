@@ -120,7 +120,7 @@ function Level({ platformId }: { platformId: string }) {
           {credits?.funded && <span className="text-[11px] text-grey">posted in public</span>}
         </div>
         {fundings.length === 0 ? (
-          <p className="text-sm text-grey">{credits?.funded ? "Your first funding lands on funding day." : "Pay five people and the first one lands."}</p>
+          <p className="text-sm text-grey">{credits?.funded ? "Your first funding lands on funding day." : "Pay five verified X accounts and the first one lands."}</p>
         ) : (
           <div className="flex flex-col gap-1.5">
             {fundings.map((f, i) => (
