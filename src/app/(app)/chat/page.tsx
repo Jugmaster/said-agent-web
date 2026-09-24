@@ -17,7 +17,8 @@ import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh, requestRefresh } from "@/lib/refresh";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
-import { getPortfolio, type FullPortfolio } from "@/lib/api";
+import { getPortfolio, getCredits, type FullPortfolio } from "@/lib/api";
+import EntryProgress from "@/components/EntryProgress";
 
 interface UiMessage {
   id: string;
@@ -35,18 +36,12 @@ type AgentStep =
   | "returning_verified";
 
 // Short enough to read on a chip; phrased as things you'd actually ask.
-const MOBILE_PROMPTS = [
-  "What can you do?",
-  "Watch SOL under $150",
-  "Show my holdings",
-];
-
-const QUICK_ACTIONS = [
-  "What can you do?",
-  "Show my portfolio",
-  "Swap 0.01 SOL for USDC",
-  "DCA $1 into SOL daily",
-];
+/* Starter prompts follow the ladder: before funding, the job is paying five
+   people; after, it's using the budget. */
+const ENTRY_PROMPTS = ["Pay @… $1", "Who can I pay?", "What's my level?"];
+const FUNDED_PROMPTS = ["What's my budget?", "Buy $5 of SOL", "What levels me up?"];
+const ENTRY_ACTIONS = ["Pay @… $1", "Who can I pay?", "What's my level?", "What can you do?"];
+const FUNDED_ACTIONS = ["What's my budget?", "Buy $5 of SOL", "Buy $1 of SOL every day", "What levels me up?"];
 
 /**
  * Desktop-only (xl+) context rail beside the conversation: one-click prompts
@@ -56,10 +51,12 @@ const QUICK_ACTIONS = [
 function ChatContextRail({
   platformId,
   sending,
+  funded,
   onQuick,
 }: {
   platformId: string;
   sending: boolean;
+  funded: boolean | null;
   onQuick: (text: string) => void;
 }) {
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
@@ -82,7 +79,7 @@ function ChatContextRail({
           Quick actions
         </h2>
         <div className="flex flex-col gap-1.5">
-          {QUICK_ACTIONS.map((q) => (
+          {(funded ? FUNDED_ACTIONS : ENTRY_ACTIONS).map((q) => (
             <button
               key={q}
               type="button"
@@ -140,13 +137,22 @@ function ChatContextRail({
   );
 }
 
+type Received = NonNullable<import("@/lib/api").ClaimResponse["received"]>;
+
 function ChatScreen({ platformId }: { platformId: string }) {
+  // Funded or not decides which starter prompts show. Null until known (or when the API predates credits).
+  const [funded, setFunded] = useState<boolean | null>(null);
+  useEffect(() => {
+    let alive = true;
+    getCredits(platformId).then((c) => alive && setFunded(c?.funded ?? null)).catch(() => {});
+    return () => { alive = false; };
+  }, [platformId]);
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [agentName, setAgentName] = useState<string>("Your butler");
   const [step, setStep] = useState<AgentStep>("unknown");
-  const [received, setReceived] = useState<{ count: number; lines: string[] } | null>(null);
+  const [received, setReceived] = useState<Received | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -174,7 +180,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
     try {
       const raw = sessionStorage.getItem("said-agent:received");
       if (raw) {
-        setReceived(JSON.parse(raw) as { count: number; lines: string[] });
+        setReceived(JSON.parse(raw) as Received);
         sessionStorage.removeItem("said-agent:received");
       }
     } catch {
@@ -443,8 +449,21 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 !
               </p>
               <p className="text-xs text-emerald-300/70 mt-1">
-                It’s in your wallet. Pass some on — send to a friend by @handle.
+                It&apos;s yours. Pay five people by name and your agent is funded every month.
               </p>
+              {/* The natural first send is to whoever just paid you: one of five. */}
+              {(() => {
+                const s = received.senders?.find((x) => x.handle && x.platform);
+                if (!s) return null;
+                return (
+                  <Link
+                    href={`/send?to=${encodeURIComponent(s.handle!)}&platform=${s.platform}&amount=1&asset=USDC`}
+                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep"
+                  >
+                    Pay @{s.handle} back $1 · 1 of 5
+                  </Link>
+                );
+              })()}
               <div className="mt-3 flex items-center justify-center gap-3">
                 {received.lines
                   .map((l) => l.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0])
@@ -501,6 +520,11 @@ function ChatScreen({ platformId }: { platformId: string }) {
           </div>
         )}
 
+        {/* Phones: the ladder in one line, above the conversation. Desktop has the card on Home. */}
+        <div className="md:hidden">
+          <EntryProgress platformId={platformId} variant="strip" href="/level" />
+        </div>
+
         <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 md:px-6">
           <div className="mx-auto w-full max-w-3xl space-y-4">
             {isFresh && (
@@ -511,7 +535,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   </h2>
                   <p className="text-sm text-zinc-400 mb-5">
                     {step === "unknown"
-                      ? "Your AI, funded on day one. Its own balance, its own identity, yours forever."
+                      ? "Your AI with a budget of its own. Pay five people by name and it's funded every month."
                       : "One step: give it a name. Free, no SOL needed."}
                   </p>
                   {step === "unknown" ? (
@@ -537,7 +561,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 </div>
                 <p className="text-xs text-zinc-600 text-center mt-4">
                   {step === "unknown"
-                    ? 'Or try: "what can you do?", "how much credit do I have?"'
+                    ? 'Or try: "what can you do?", "what\'s my budget?"'
                     : "Or type any name in the box below."}
                 </p>
               </div>
@@ -585,13 +609,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 phone there was nothing tappable at all. These are the jobs, not
                 navigation: two go to typed flows, the rest talk to the agent. */}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <Link
-                href="/calls"
-                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
-              >
-                ☏ Comms
-              </Link>
-              {MOBILE_PROMPTS.map((q) => (
+              {(funded ? FUNDED_PROMPTS : ENTRY_PROMPTS).map((q) => (
                 <button
                   key={q}
                   type="button"
@@ -644,6 +662,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
 
       <ChatContextRail
         platformId={platformId}
+              funded={funded}
         sending={sending}
         onQuick={(q) => void send(q)}
       />

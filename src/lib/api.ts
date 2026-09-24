@@ -400,7 +400,12 @@ export interface ClaimResponse {
   agentName: string | null;
   walletAddress: string | null;
   /** Pending sends settled into this agent at login (drives the receive UX). */
-  received?: { count: number; lines: string[] };
+  received?: {
+    count: number;
+    lines: string[];
+    /** Who paid; the app offers "pay them back $1" as the first of five. */
+    senders?: Array<{ platformId: string; name: string | null; platform: "x" | "telegram" | null; handle: string | null }>;
+  };
 }
 
 export async function claimAgent(input: {

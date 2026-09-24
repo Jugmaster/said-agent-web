@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { chat, agentSend, getSends, type SendRecord } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 import AuthGate from "@/components/AuthGate";
+import EntryProgress from "@/components/EntryProgress";
 import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
@@ -40,12 +41,14 @@ function SendSuccessCard({
   asset,
   recipient,
   message,
+  platformId,
   onSendAnother,
 }: {
   amount: string;
   asset: Asset;
   recipient: string;
   message: string;
+  platformId: string;
   onSendAnother: () => void;
 }) {
   const txUrl = message.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0] ?? null;
@@ -99,10 +102,15 @@ function SendSuccessCard({
         )}
       </div>
 
+      {/* Where this send put them on the ladder. */}
+      <div className="mt-5 text-left">
+        <EntryProgress platformId={platformId} refreshKey={1} />
+      </div>
+
       <button
         type="button"
         onClick={onSendAnother}
-        className="mt-5 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+        className="mt-4 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
       >
         Send another
       </button>
@@ -421,10 +429,13 @@ function SendScreen({ platformId }: { platformId: string }) {
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1">Send</h1>
+          <h1 className="text-2xl font-bold mb-1">Pay</h1>
           <p className="text-sm text-zinc-500">
-            One name. Checked before a cent moves. Your Atcha does the rest.
+            Anyone you can name, $1 or more. Five people and your agent is funded.
           </p>
+          <div className="mt-4 max-w-md">
+            <EntryProgress platformId={platformId} />
+          </div>
         </div>
 
         <div className="flex w-full flex-col">
@@ -662,6 +673,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           {/* Result */}
           {result?.kind === "ok" && (
             <SendSuccessCard
+              platformId={platformId}
               amount={result.amount}
               asset={result.asset}
               recipient={result.recipient}
