@@ -854,3 +854,125 @@ export async function getFleet(options?: { cache?: RequestCache }): Promise<Publ
     return [];
   }
 }
+
+// ─── The trade log, positions, and token data ──────────────────────────────
+
+export interface TradeRow {
+  id: number;
+  side: "buy" | "sell" | "swap";
+  tokenMint: string | null;
+  tokenAmount: number | null;
+  tokenPriceUsd: number | null;
+  notionalUsd: number | null;
+  inputMint: string;
+  outputMint: string;
+  inAmount: number;
+  outAmount: number;
+  tx: string;
+  provider: string | null;
+  source: string;
+  reason: string | null;
+  at: string;
+}
+
+export interface Position {
+  mint: string;
+  qty: number;
+  costUsd: number;
+  avgEntryUsd: number | null;
+  investedUsd: number;
+  realizedUsd: number;
+  buys: number;
+  sells: number;
+  openedAt: string;
+  lastAt: string;
+  openedBy: string | null;
+  closed: boolean;
+}
+
+/** Owner-only. Empty when the API predates the trade log. */
+export async function getTrades(platformId: string, opts: { mint?: string; limit?: number } = {}): Promise<TradeRow[]> {
+  try {
+    const q = new URLSearchParams();
+    if (opts.mint) q.set("mint", opts.mint);
+    if (opts.limit) q.set("limit", String(opts.limit));
+    const res = await apiFetch(`${API_BASE}/api/trades/${encodeURIComponent(platformId)}?${q}`, { headers: await authHeaders() });
+    if (!res.ok) return [];
+    return ((await res.json()) as { trades: TradeRow[] }).trades ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Owner-only. Empty when the API predates the trade log. */
+export async function getPositions(platformId: string): Promise<Position[]> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/positions/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return [];
+    return ((await res.json()) as { positions: Position[] }).positions ?? [];
+  } catch {
+    return [];
+  }
+}
+
+export interface TokenStats {
+  mint: string;
+  symbol: string;
+  name: string;
+  imageUrl: string | null;
+  priceUsd: number | null;
+  marketCapUsd: number | null;
+  fdvUsd: number | null;
+  liquidityUsd: number | null;
+  volume24hUsd: number | null;
+  change: { m5: number | null; h1: number | null; h6: number | null; h24: number | null };
+  txns24h: { buys: number; sells: number };
+  buyers24h: number | null;
+  sellers24h: number | null;
+  supply: number | null;
+  pairAddress: string | null;
+  dex: string | null;
+  poolId: string | null;
+  createdAt: string | null;
+  launchpad: string | null;
+  websites: string[];
+  socials: Array<{ type: string; url: string }>;
+}
+
+/** Public, via our own route (DexScreener + GeckoTerminal behind it). */
+export async function getTokenStats(mint: string): Promise<TokenStats | null> {
+  try {
+    const res = await fetch(`/api/token/${encodeURIComponent(mint)}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export type Candle = [time: number, open: number, high: number, low: number, close: number, volume: number];
+export type Timeframe = "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
+
+export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number } = {}): Promise<{ candles: Candle[]; pool: string | null }> {
+  try {
+    const q = new URLSearchParams({ tf });
+    if (opts.pool) q.set("pool", opts.pool);
+    if (opts.limit) q.set("limit", String(opts.limit));
+    const res = await fetch(`/api/token/${encodeURIComponent(mint)}/ohlcv?${q}`, { cache: "no-store" });
+    if (!res.ok) return { candles: [], pool: opts.pool ?? null };
+    return res.json();
+  } catch {
+    return { candles: [], pool: opts.pool ?? null };
+  }
+}
+
+export interface TokenHit { mint: string; symbol: string; name: string; imageUrl: string | null; priceUsd: number | null; marketCapUsd: number | null; liquidityUsd: number | null; change24h: number | null }
+export async function searchTokens(q: string): Promise<TokenHit[]> {
+  try {
+    const res = await fetch(`/api/token/search?q=${encodeURIComponent(q)}`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return ((await res.json()) as { results: TokenHit[] }).results ?? [];
+  } catch {
+    return [];
+  }
+}

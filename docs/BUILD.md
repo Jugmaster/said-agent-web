@@ -77,6 +77,9 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.13 | `/level` page and tab (Agent / Pay / Level / Settings): funded card, today, your page + share, funding record, the board | [x] 24 Sept |
 | 3.14 | Copy and rules aligned: levels count from 1 (five paid = level 2, gains from level 3), "budget" not "credit", docs money table matches `guards.ts`/`ledger.ts` | [x] 24 Sept |
 | 3.15 | Visual pass of in-app screens (blue/indigo tokens remapped; per-screen sweep of dark-era gradients still to do by eye) | [~] |
+| 3.16 | Token page `/token/[mint]`: own chart (lightweight-charts, GeckoTerminal candles) with the agent's buys/sells and reasons as markers, MC/price axis, stats strip (DexScreener), the trust line (passport + guards), your position (avg entry, P&L, invested, realized, opened-by), the agent's trades here, "Tell your agent" ($10/25/50/100/custom, sell half/all) through chat with the gates | [x] 25 Sept |
+| 3.17 | Wallet = positions (chain qty + value, avg entry and P&L from the trade log, the instruction that opened each, closed positions with realized) + token search (name/symbol/mint) | [x] 25 Sept |
+| 1.18 | Butler trade log `src/defi/trades.ts`: every fill at the swap choke point with side, token, fill price, notional, tx, source (chat/dca/limit/buyback) and reason; `GET /api/trades/:id`, `/api/positions/:id` (owner) via `trades-routes.ts`; one more line in `swap.js` for the box | [x] 25 Sept (butler 794ff7a) |
 
 ## 4. Token and launch
 

@@ -8,10 +8,11 @@ import {
   getActivity,
   type BalanceResponse,
   type FullPortfolio,
-  type ActivityReceipt,
-} from "@/lib/api";
+  type ActivityReceipt, getPositions, type Position } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
+import PositionsList from "@/components/token/PositionsList";
+import TokenSearch from "@/components/token/TokenSearch";
 import { truncMiddle, timeAgo, actionLabel } from "@/lib/format";
 import { requestRefresh } from "@/lib/refresh";
 
@@ -75,6 +76,8 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
+  const [positions, setPositions] = useState<Position[]>([]);
+  useEffect(() => { getPositions(platformId).then(setPositions).catch(() => {}); }, [platformId, main]);
 
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
@@ -147,33 +150,19 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           <div className="mb-6 rounded-xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
         )}
 
-        {/* Holdings */}
+        {/* Positions: what the agent holds, with entry and P&L from the trade log. */}
         <section className="mb-9">
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">Holdings</h2>
-          <div className="overflow-hidden rounded-2xl border border-zinc-800">
-            {main == null && !error ? (
-              <div className="divide-y divide-zinc-800/60">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-16 animate-pulse bg-zinc-900/40" />
-                ))}
-              </div>
-            ) : (
-              <div className="divide-y divide-zinc-800/60">
-                <HoldingRow symbol="SOL" balance={main?.solBalance ?? 0} usd={main?.solUsdValue ?? null} />
-                {holdings.map((t) => (
-                  <HoldingRow key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} />
-                ))}
-                {holdings.length === 0 && (main?.solBalance ?? 0) === 0 && (
-                  <div className="px-4 py-6 text-center text-sm text-zinc-500">
-                    Nothing here yet.{" "}
-                    <button onClick={() => setFunding(true)} className="text-zinc-300 underline underline-offset-2 hover:text-white">
-                      Add funds
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-medium text-zinc-300">Positions</h2>
+            <TokenSearch />
           </div>
+          {main == null && !error ? (
+            <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
+              {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-card" />)}
+            </div>
+          ) : (
+            <PositionsList holdings={main?.tokens ?? []} positions={positions} solBalance={main?.solBalance ?? 0} solUsd={main?.solUsdValue ?? null} showClosed />
+          )}
         </section>
 
         {/* Aside content inline on smaller screens. The identity card carries
