@@ -431,7 +431,7 @@ function SendScreen({ platformId }: { platformId: string }) {
         <div className="mb-6">
           <h1 className="text-2xl font-bold mb-1">Pay</h1>
           <p className="text-sm text-zinc-500">
-            Anyone you can name, $1 or more. Five people and your agent is funded.
+            Anyone you can name, $1 or more. Five verified X accounts and your agent is funded.
           </p>
           <div className="mt-4 max-w-md">
             <EntryProgress platformId={platformId} />

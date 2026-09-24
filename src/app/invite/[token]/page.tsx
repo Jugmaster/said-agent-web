@@ -215,7 +215,7 @@ export default async function InvitePage({ params }: PageProps) {
         <h2 className="text-sm font-medium mb-1">Sign in as @{invite.recipient.handle} and it&apos;s yours.</h2>
         <p className="text-sm text-zinc-500 mb-4">
           Same {platformLabel(invite.recipient.platform)} account, nothing to set up. What you get is an Atcha:
-          an AI with a balance. Pay five people by name and it comes funded every month.
+          an AI with a balance. Pay five verified X accounts by name and it comes funded every month.
         </p>
 
         <div className="flex flex-col gap-2">

@@ -74,7 +74,7 @@ export default function DocsPage() {
           </header>
 
           <Sec id="what" n={1} title="What Atcha is">
-            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five people by name and it gets <strong>a budget of its own to trade with</strong>, every month, paid by the $ATCHA token. The budget takes the first loss. Money you add is yours, always.</p>
+            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five verified X accounts by name and it gets <strong>a budget of its own to trade with</strong>, every month, paid by the $ATCHA token. The budget takes the first loss. Money you add is yours, always.</p>
             <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>
             <p>You talk to it in plain language. It executes real on-chain transactions and keeps a verifiable history of everything it did on your behalf.</p>
           </Sec>
@@ -117,7 +117,7 @@ bot  →  ✓ Vega is ready. Level 1.
               <thead><tr><th>Level</th><th>Funding / month</th><th>Pays / day</th><th>Trades / day</th><th>How you get there</th></tr></thead>
               <tbody>
                 <tr><td>1 · Started</td><td>your cash</td><td>$5</td><td>$10</td><td className={s.m}>Sign up.</td></tr>
-                <tr><td>2 · Proven</td><td>$25</td><td>$25</td><td>$50</td><td className={s.m}>Pay five different people by @name, $1 or more each. They log in, they&apos;re in.</td></tr>
+                <tr><td>2 · Proven</td><td>$25</td><td>$25</td><td>$50</td><td className={s.m}>Pay five different verified X accounts (a blue, business or government tick) by @name, $1 or more each. They log in to claim, and they count. Telegram recipients can be paid but don&apos;t count.</td></tr>
                 <tr><td>3 · Trusted</td><td>$75</td><td>$100</td><td>$250</td><td className={s.m}>A 30-day streak. Your gains become yours to take out.</td></tr>
                 <tr><td>4 · Owner</td><td>by invitation</td><td>$500</td><td>$1,000</td><td className={s.m}>The biggest months. We ask you.</td></tr>
               </tbody>

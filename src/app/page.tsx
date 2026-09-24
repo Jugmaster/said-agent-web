@@ -94,7 +94,7 @@ export default function LandingPage() {
           <h2 className={s.big}>Our money first. All upside.</h2>
         </div>
         <div className={s.capGrid} data-stagger>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five people by name and your agent gets a monthly budget from the $ATCHA token. That budget is what&apos;s at risk, not your money.</p></div>
+          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget from the $ATCHA token. That budget is what&apos;s at risk, not your money.</p></div>
           <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
           <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
         </div>
@@ -105,11 +105,11 @@ export default function LandingPage() {
         <div className={`${s.wrap} ${s.demoCols}`}>
           <div className={s.demoCopy} data-reveal>
             <p className={s.eyebrow}>The entry</p>
-            <h2 className={s.big}>Five names. Then it&apos;s funded.</h2>
-            <p>Pay five people you can name, a dollar or more each. The fifth one lands and your agent has a budget.</p>
+            <h2 className={s.big}>Five blue ticks. Then it&apos;s funded.</h2>
+            <p>Pay five verified X accounts, a dollar or more each. The fifth one lands and your agent has a budget.</p>
             <div className={s.mini}>
-              <span><b>Real sends.</b> Each goes to a real person, checked before it moves.</span>
-              <span><b>Any five.</b> X or Telegram, already on Atcha or not yet.</span>
+              <span><b>Real sends.</b> Each goes to a real, verified person, checked before it moves.</span>
+              <span><b>Any five with a tick.</b> Already on Atcha or not yet; they claim by logging in.</span>
               <span><b>No deposit.</b> The budget is the token&apos;s money, not yours.</span>
             </div>
           </div>
@@ -132,7 +132,7 @@ export default function LandingPage() {
       </section>
 
       <section className={`${s.acts} ${s.wrap}`} id="steps">
-        <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five names. That&apos;s the entry.</h3><p>Pay $1 or more to five people you can name, on X or Telegram. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
         <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level, paid by the $ATCHA token. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
         <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
       </section>
@@ -143,7 +143,7 @@ export default function LandingPage() {
           <div className={s.closeIn}>
             <p className={s.eyebrow}>Ready when you are</p>
             <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
-            <p className={s.csub}>Free, no seed phrase, funded once you&apos;ve paid five people. Sign in with X or Telegram and it&apos;s yours in one message.</p>
+            <p className={s.csub}>Free, no seed phrase, funded once you&apos;ve paid five verified X accounts. Sign in with X or Telegram and it&apos;s yours in one message.</p>
             <div className={s.ctas}>
               <button type="button" className={`${s.btn} ${s.btnCream}`} onClick={start} disabled={!ready}>
                 {ready ? (authenticated ? "Open your Atcha" : "Get your funded Atcha") : "Loading…"}

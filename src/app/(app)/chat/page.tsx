@@ -449,7 +449,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 !
               </p>
               <p className="text-xs text-emerald-300/70 mt-1">
-                It&apos;s yours. Pay five people by name and your agent is funded every month.
+                It&apos;s yours. Pay five verified X accounts by name and your agent is funded every month.
               </p>
               {/* The natural first send is to whoever just paid you: one of five. */}
               {(() => {
@@ -535,7 +535,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   </h2>
                   <p className="text-sm text-zinc-400 mb-5">
                     {step === "unknown"
-                      ? "Your AI with a budget of its own. Pay five people by name and it's funded every month."
+                      ? "Your AI with a budget of its own. Pay five verified X accounts by name and it's funded every month."
                       : "One step: give it a name. Free, no SOL needed."}
                   </p>
                   {step === "unknown" ? (

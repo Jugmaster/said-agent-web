@@ -51,7 +51,7 @@ export default function EntryProgress({
   const left = Math.max(0, need - have);
 
   const headline = !s.funded
-    ? `${have} of ${need} people paid`
+    ? `${have} of ${need} verified accounts paid`
     : `Level ${s.level} · ${s.levelName}`;
   const detail = !s.funded
     ? left === 0

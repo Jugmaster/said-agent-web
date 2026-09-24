@@ -45,9 +45,9 @@ export default function FundedCard({
               <span className="text-xs font-medium uppercase tracking-wider text-zinc-500">Your Atcha</span>
               <Chip>Level 1 · Started</Chip>
             </div>
-            <div className="mt-1 text-lg font-semibold text-white">Pay five people and it gets funded.</div>
+            <div className="mt-1 text-lg font-semibold text-white">Pay five blue ticks and it gets funded.</div>
             <p className="mt-1 max-w-[46ch] text-sm text-zinc-400">
-              Your agent already trades your money, anything on Solana. Pay five people by their @name, $1 or more each,
+              Your agent already trades your money, anything on Solana. Pay five verified X accounts by their @name, $1 or more each,
               and it gets money of its own to trade with every month.
             </p>
             {next && (
