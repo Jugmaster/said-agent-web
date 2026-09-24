@@ -44,7 +44,7 @@ export default function OpengraphImage() {
           <div>comes funded.</div>
         </div>
         <div style={{ fontSize: 32, color: "#63605A" }}>
-          Trading credit on day one, sized by the chart · pay anyone you can name
+          Funded every month, sized by its level · pay anyone you can name
           · checked on SAID before a cent moves
         </div>
       </div>

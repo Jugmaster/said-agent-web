@@ -179,10 +179,10 @@ function Home({ platformId }: { platformId: string }) {
 
         {/* Quick actions */}
         <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
-          <ActionCard href="/send" title="Send" sub="Pay anyone by handle" emoji="↗" />
+          <ActionCard href="/send" title="Pay" sub="Anyone you can name" emoji="↗" />
           <ActionCard href="/chat" title="Ask your Atcha" sub="It handles the rest" emoji="✦" />
+          <ActionCard href="/level" title="Level" sub="Record, page, the board" emoji="▮" />
           <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" emoji="▢" />
-          <ActionCard href="/calls" title="Comms" sub="Calls & email" emoji="☏" />
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
         </div>
 
@@ -214,7 +214,7 @@ function Home({ platformId }: { platformId: string }) {
                   onClick={() => setFunding(true)}
                   className="flex h-[74px] items-center justify-center rounded-2xl border border-dashed border-zinc-800 text-sm text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-300"
                 >
-                  + Add funds to get started
+                  + Add your own money
                 </button>
               )}
             </div>
@@ -311,7 +311,7 @@ function AgentIdentity({
             {verified ? (
               <span className="text-emerald-400">● Verified</span>
             ) : balance ? (
-              <span className="text-zinc-500">○ Unverified</span>
+              <span className="text-zinc-500">○ Not yet verified</span>
             ) : (
               <span className="text-zinc-600">…</span>
             )}
@@ -345,7 +345,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
       {receipts === null ? (
         <p className="text-xs text-zinc-600">Loading…</p>
       ) : receipts.length === 0 ? (
-        <p className="text-xs italic text-zinc-600">Nothing on-chain yet. Try a swap or a send.</p>
+        <p className="text-xs italic text-zinc-600">Nothing yet. Pay someone by name to start.</p>
       ) : (
         <div className="flex flex-col gap-1.5">
           {receipts.map((r) => {

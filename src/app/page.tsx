@@ -164,7 +164,7 @@ export default function LandingPage() {
           </div>
           <div className={s.legal}>
             <div className={s.lrow}><span>© 2026 Atcha, by SAID</span></div>
-            Atcha is a financial technology product. Digital assets are not legal tender, are not backed by the government, and are not subject to FDIC or SIPC protections. Trading credit can lose value. Send only to people you know and trust.
+            Atcha is a financial technology product. Digital assets are not legal tender, are not backed by the government, and are not subject to FDIC or SIPC protections. The budget your agent trades can lose value. Send only to people you know and trust.
           </div>
         </div>
       </footer>

@@ -212,12 +212,10 @@ export default async function InvitePage({ params }: PageProps) {
       </section>
 
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5 mb-6">
-        <h2 className="text-sm font-medium mb-1">This is your Atcha.</h2>
+        <h2 className="text-sm font-medium mb-1">Sign in as @{invite.recipient.handle} and it&apos;s yours.</h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Sign in with the same {platformLabel(invite.recipient.platform)} account
-          (@{invite.recipient.handle}) and the money is yours. Then it&apos;s an AI with a
-          balance: it trades anything on Solana, pays anyone you can name, buys things.
-          Pay five people yourself and it gets funded every month.
+          Same {platformLabel(invite.recipient.platform)} account, nothing to set up. What you get is an Atcha:
+          an AI with a balance. Pay five people by name and it comes funded every month.
         </p>
 
         <div className="flex flex-col gap-2">
@@ -261,8 +259,8 @@ export default async function InvitePage({ params }: PageProps) {
 
       <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
-          The money stays in {senderName}&apos;s balance until you claim it. No escrow,
-          nothing parked anywhere. Your name was resolved and checked on SAID.
+          The money stays in {senderName}&apos;s balance until you claim it. Nothing parked
+          anywhere. Your name was checked before it was committed.
         </p>
       </footer>
     </main>

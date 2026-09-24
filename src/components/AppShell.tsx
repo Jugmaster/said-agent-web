@@ -19,13 +19,13 @@ import {
   PhoneIcon,
   PlusIcon,
   SendIcon,
-  WalletIcon,
-} from "./NavIcons";
+  WalletIcon, LevelIcon } from "./NavIcons";
 
 const NAV = [
   { href: "/home", label: "Home", icon: HomeIcon, key: "h" },
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
-  { href: "/send", label: "Send", icon: SendIcon, key: "s" },
+  { href: "/send", label: "Pay", icon: SendIcon, key: "s" },
+  { href: "/level", label: "Level", icon: LevelIcon, key: "v" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
   { href: "/calls", label: "Comms", icon: PhoneIcon, key: "l" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },

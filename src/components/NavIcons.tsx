@@ -84,3 +84,14 @@ export function LogoutIcon({ className = ICON }: { className?: string }) {
     </svg>
   );
 }
+
+/** The ladder: three rising bars. */
+export function LevelIcon({ className = ICON }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 20V14" />
+      <path d="M12 20V9" />
+      <path d="M20 20V4" />
+    </svg>
+  );
+}
