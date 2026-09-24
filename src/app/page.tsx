@@ -91,7 +91,7 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id="funded">
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>Its money first. Your upside.</h2>
+          <h2 className={s.big}>Our money first. All upside.</h2>
         </div>
         <div className={s.capGrid} data-stagger>
           <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five people by name and your agent gets a monthly budget from the $ATCHA token. That budget is what&apos;s at risk, not your money.</p></div>
