@@ -8,7 +8,7 @@ import s from "@/app/landing.module.css";
 export const metadata: Metadata = {
   title: "Docs · Atcha",
   description:
-    "How Atcha works: the credit it comes with, the two kinds of money, the ladder, paying anyone by @name, fees and cashback, and the SAID identity underneath.",
+    "How Atcha works: the budget it comes with, the two kinds of money, the levels, paying anyone by @name, fees and cashback, and the SAID identity underneath.",
   openGraph: { title: "Docs · Atcha", description: "How Atcha works.", type: "website" },
 };
 
@@ -70,11 +70,11 @@ export default function DocsPage() {
           <header className={s.docHead} data-reveal>
             <p className={s.eyebrow}>Docs</p>
             <h1 className={s.big}>How Atcha works.</h1>
-            <p className={s.pageSub}>Your AI, funded on day one. Its own balance, its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
+            <p className={s.pageSub}>Your AI with a budget of its own, funded every month by the $ATCHA token. Its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
           </header>
 
           <Sec id="what" n={1} title="What Atcha is">
-            <p>Atcha is a personal AI that lives on Solana and comes with money in it. It trades anything on Solana, holds the S&amp;P as xStocks, pays anyone you can name, buys things, runs your DCA. Pay five people and it gets <strong>credit of its own to trade with</strong>, every month, paid by the token. Credit takes the first loss. Money you add is yours, always.</p>
+            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five people by name and it gets <strong>a budget of its own to trade with</strong>, every month, paid by the $ATCHA token. The budget takes the first loss. Money you add is yours, always.</p>
             <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>
             <p>You talk to it in plain language. It executes real on-chain transactions and keeps a verifiable history of everything it did on your behalf.</p>
           </Sec>
@@ -96,37 +96,37 @@ bot  →  ✓ Vega is ready. Level 1.
           <Sec id="funded" n={3} title="Funded: two kinds of money">
             <p>Your balance is one number with two things inside it. The dashboard never hides which is which.</p>
             <table className={s.table}>
-              <thead><tr><th></th><th>Credit</th><th>Your money</th></tr></thead>
+              <thead><tr><th></th><th>The budget</th><th>Your money</th></tr></thead>
               <tbody>
-                <tr><td className={s.m}>Where it comes from</td><td>Us, on day one. Sized by the chart.</td><td>You. Card, Apple Pay, or a transfer.</td></tr>
-                <tr><td className={s.m}>What it can do</td><td>Trade the majors.</td><td>Trade anything. Pay anyone. Buy things. Hire.</td></tr>
-                <tr><td className={s.m}>Who loses first</td><td>Credit. Always.</td><td>Only after credit is gone.</td></tr>
-                <tr><td className={s.m}>Taking it out</td><td>Locked until level 4.</td><td>Any time.</td></tr>
-                <tr><td className={s.m}>Gains on it</td><td>Stay credit.</td><td>Yours.</td></tr>
+                <tr><td className={s.m}>Where it comes from</td><td>The $ATCHA pool, monthly. Sized by your level.</td><td>You. Card, Apple Pay, or a transfer.</td></tr>
+                <tr><td className={s.m}>What it can do</td><td>Trade anything with real liquidity.</td><td>Trade anything. Pay anyone. Buy things. Hire.</td></tr>
+                <tr><td className={s.m}>Who loses first</td><td>The budget. Always.</td><td>Only after the budget is gone.</td></tr>
+                <tr><td className={s.m}>Taking it out</td><td>Never. It trades; it doesn&apos;t leave.</td><td>Any time.</td></tr>
+                <tr><td className={s.m}>Gains on it</td><td>80% yours from level 3.</td><td>Yours.</td></tr>
               </tbody>
             </table>
             <p><strong>Funding is monthly.</strong> Everyone is funded on the same day of the month, sized by their level, paid by the $ATCHA token. Reach level 1 mid-month and your first funding lands on the next funding day. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
-            <p><strong>What credit trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and xStocks. Anything with real liquidity and a week of history. A quarter of your credit can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. Credit never buys $ATCHA and never buys a token you created.</p>
-            <p><strong>A rough day.</strong> If credit falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
-            <p><strong>Untouched credit</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
+            <p><strong>What the budget trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and US stocks as tokens. Anything with real liquidity and a week of history. A quarter of the budget can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. The budget never buys $ATCHA and never buys a token you created.</p>
+            <p><strong>A rough day.</strong> If the budget falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
+            <p><strong>An untouched budget</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
           </Sec>
 
           <Sec id="ladder" n={4} title="Levels">
-            <p>Four levels. Each one gives the agent more: more funding, bigger daily allowances, and at the top, everything in the account is yours.</p>
+            <p>Four levels. Each one gives the agent more: more funding, bigger daily allowances, and from level 3, your share of the gains.</p>
             <table className={s.table}>
               <thead><tr><th>Level</th><th>Funding / month</th><th>Pays / day</th><th>Trades / day</th><th>How you get there</th></tr></thead>
               <tbody>
                 <tr><td>1 · Started</td><td>your cash</td><td>$5</td><td>$10</td><td className={s.m}>Sign up.</td></tr>
                 <tr><td>2 · Proven</td><td>$25</td><td>$25</td><td>$50</td><td className={s.m}>Pay five different people by @name, $1 or more each. They log in, they&apos;re in.</td></tr>
                 <tr><td>3 · Trusted</td><td>$75</td><td>$100</td><td>$250</td><td className={s.m}>A 30-day streak. Your gains become yours to take out.</td></tr>
-                <tr><td>4 · Owner</td><td>by review</td><td>$500</td><td>$1,000</td><td className={s.m}>Everything in the account is yours.</td></tr>
+                <tr><td>4 · Owner</td><td>by invitation</td><td>$500</td><td>$1,000</td><td className={s.m}>The biggest months. We ask you.</td></tr>
               </tbody>
             </table>
             <p><strong>Three things a day</strong> keep the streak: a trade, a send, a stake. The ones that settle with a real person level you up. Only settled outcomes count: a send that was claimed, a job that was delivered, a purchase that shipped. Paying yourself doesn&apos;t count; the app knows it&apos;s you.</p>
           </Sec>
 
           <Sec id="token" n={5} title="What $ATCHA does">
-            <p>$ATCHA funds the agents. The token&apos;s creator rewards fill the pool; the pool pays every level-2-and-up agent its monthly credit, in SOL. The agents trade; a share of their fees buys $ATCHA back and stakes it, in batches, with a public receipt each time.</p>
+            <p>$ATCHA funds the agents. The token&apos;s creator rewards top up the pool each month; the pool pays every level-2-and-up agent its monthly budget, in SOL. The agents trade; a share of their fees buys $ATCHA back and stakes it, in batches, with a public receipt each time.</p>
             <p>It never pays holders, never burns, never airdrops, and funding is never paid in the token itself. The token&apos;s job is to fund the agents, and the agents&apos; job is to buy the token.</p>
           </Sec>
 
@@ -142,7 +142,7 @@ split $180 with @the_groupchat`}</Block>
 
           <Sec id="trade" n={7} title="Trade, buy, and more">
             <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. Credit trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
-            <Block label="examples">{`swap $5 of my credit into SOL
+            <Block label="examples">{`swap $5 of my budget into SOL
 buy JUP when it hits $0.40
 DCA $10 into SOL every day
 alert me if SOL drops 5%`}</Block>
@@ -168,12 +168,12 @@ alert me if SOL drops 5%`}</Block>
                 <tr><td>Platinum</td><td>50%</td><td className={s.m}>100+ interactions, top identity</td></tr>
               </tbody>
             </table>
-            <p>Staking $SAID boosts your cashback. It never lowers the fee. Cashback earned on credit stays credit; cashback earned on your cash is yours.</p>
+            <p>Staking $SAID boosts your cashback. It never lowers the fee. Cashback earned on the budget stays in the budget; cashback earned on your cash is yours.</p>
           </Sec>
 
           <Sec id="money" n={10} title="Adding and taking out money">
             <p><strong>Add money</strong> with a card or Apple Pay inside the app, or send SOL or USDC to your address from any wallet or exchange. On a phone, the Add money screen shows a Solana Pay code any wallet can scan.</p>
-            <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands. Gains made with credit are yours from level 3; the credit itself, at level 4.</p>
+            <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands. From level 3, 80% of the gains made with the budget are yours too. The budget itself never leaves.</p>
           </Sec>
 
           <Sec id="surfaces" n={11} title="Where it lives">
@@ -187,18 +187,18 @@ alert me if SOL drops 5%`}</Block>
           <Sec id="faq" n={12} title="FAQ">
             <Q>Do I need a wallet first?</Q>
             <p>No. Your Atcha has its own wallet, secured by Privy, from the moment it exists. Link an external one later if you want.</p>
-            <Q>Can I withdraw the credit?</Q>
-            <p>Not until level 4. Credit trades; it doesn&apos;t leave. Your cash leaves whenever you like, and from level 3 so do your gains.</p>
-            <Q>What if the credit goes to zero?</Q>
+            <Q>Can I withdraw the budget?</Q>
+            <p>No. It trades; it doesn&apos;t leave. Your cash leaves whenever you like, and from level 3 so does your 80% of the gains.</p>
+            <Q>What if the budget goes to zero?</Q>
             <p>Then it&apos;s gone and your cash was never touched. Next month funds again, if your level holds.</p>
             <Q>Is this a real on-chain identity?</Q>
             <p>Yes. Anyone can verify your Atcha&apos;s identity, level and history on Solana.</p>
             <Q>What if I lose my Telegram or X account?</Q>
             <p>Your Atcha persists on-chain. Recovery runs through the other logins you linked.</p>
             <Q>Can I see what it did?</Q>
-            <p>Every action has a Solana signature. The <Link href="/activity">Activity</Link> tab shows yours; every Atcha has a public page in <Link href="/agents">Agents</Link>.</p>
+            <p>Every action has a Solana signature. The <Link href="/activity">Activity</Link> tab shows yours; every Atcha has a public page at atcha.cash/@name.</p>
             <Q>Where do fees go?</Q>
-            <p>To the SAID treasury, on-chain and auditable, which funds the protocol and the credit pool.</p>
+            <p>To the SAID treasury, on-chain and auditable, which funds the protocol and the funding pool.</p>
           </Sec>
 
           <footer className={s.pageFoot} style={{ marginTop: 40 }}>

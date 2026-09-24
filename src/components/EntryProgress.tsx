@@ -55,7 +55,7 @@ export default function EntryProgress({
     : `Level ${s.level} · ${s.levelName}`;
   const detail = !s.funded
     ? left === 0
-      ? "That's five. Your agent is level 1."
+      ? "That's five. Your agent is level 2."
       : `${left === 1 ? "One more" : `${left} more`} and your agent is funded.`
     : s.funding.monthlyUsd > 0
       ? `${usd(s.funding.monthlyUsd)} ${s.funding.fundedThisMonth ? "landed this month" : `lands ${fundingDate(s.funding)}`}`
