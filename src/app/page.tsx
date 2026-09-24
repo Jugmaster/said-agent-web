@@ -91,12 +91,12 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id="funded">
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>It comes funded. Then it does everything.</h2>
+          <h2 className={s.big}>Its money first. Your upside.</h2>
         </div>
         <div className={s.capGrid} data-stagger>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Trades anything</h3><p>SOL, BTC, ETH, $ANSEM, the ClawPump board, the S&amp;P as xStocks. Market, limit, DCA. Real fills, real P&amp;L, from your first swap.</p></div>
-          <div className={s.cap}><span className={s.n}>02</span><h3>Comes funded</h3><p>Pay five people you can name and your agent gets money of its own to trade with, every month, paid by the token. It takes the first loss so your money never does.</p></div>
-          <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Use it and it grows: more funding each month, bigger daily allowances, and at level 3 what it earns is yours to take out.</p></div>
+          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five people by name and your agent gets a monthly budget from the $ATCHA token. That budget is what&apos;s at risk, not your money.</p></div>
+          <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+          <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 2, 80% of what it makes on top is yours to take out.</p></div>
         </div>
       </section>
 
