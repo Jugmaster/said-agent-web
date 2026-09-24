@@ -45,6 +45,15 @@
   --color-green-300: #157E4E; --color-emerald-300: #157E4E;
   --color-green-200: #126B42; --color-emerald-200: #126B42;
 
+  /* Blue / indigo were never remapped: the activating banner, the on-list card,
+     the identity avatar. One quiet ink-blue tint keeps them in the palette. */
+  --color-blue-950: #DCE6F7; --color-indigo-950: #DCE6F7;
+  --color-blue-900: #C6D6F0; --color-indigo-900: #C6D6F0;
+  --color-blue-800: #C6D6F0; --color-indigo-800: #C6D6F0;
+  --color-blue-500: #2F5497; --color-indigo-500: #2F5497;
+  --color-blue-400: #2F5497; --color-indigo-400: #2F5497;
+  --color-blue-300: #2F5497; --color-indigo-300: #2F5497;
+  --color-blue-200: #274579; --color-indigo-200: #274579;
   --color-amber-950: #FDE097; --color-yellow-950: #FDE097;
   --color-amber-900: #EEDFB3; --color-yellow-900: #EEDFB3;
   --color-amber-600: #8F6A12; --color-yellow-600: #8F6A12;

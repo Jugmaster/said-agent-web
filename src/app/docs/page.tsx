@@ -141,7 +141,7 @@ split $180 with @the_groupchat`}</Block>
           </Sec>
 
           <Sec id="trade" n={7} title="Trade, buy, and more">
-            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. Credit trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
+            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. The budget trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
             <Block label="examples">{`swap $5 of my budget into SOL
 buy JUP when it hits $0.40
 DCA $10 into SOL every day

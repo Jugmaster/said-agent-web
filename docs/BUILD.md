@@ -72,6 +72,11 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
 | 3.9 | Phone nav menu (hamburger, same links); metadata and adopt copy on `atcha.cash`; manifest starts at `/home`; no `sw.js` in the tree | [x] |
 | 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.4 is live | [ ] (C) |
+| 3.11 | The ladder in the app: `EntryProgress` (N of 5 / level + next funding) on Pay and every send receipt; strip above chat on phones; level-aware starter prompts; Comms off the front | [x] 24 Sept |
+| 3.12 | Pay-back after claim: the receive celebration offers "Pay @sender back $1 · 1 of 5" (butler claim returns `received.senders`) | [x] 24 Sept |
+| 3.13 | `/level` page and tab (Agent / Pay / Level / Settings): funded card, today, your page + share, funding record, the board | [x] 24 Sept |
+| 3.14 | Copy and rules aligned: levels count from 1 (five paid = level 2, gains from level 3), "budget" not "credit", docs money table matches `guards.ts`/`ledger.ts` | [x] 24 Sept |
+| 3.15 | Visual pass of in-app screens (blue/indigo tokens remapped; per-screen sweep of dark-era gradients still to do by eye) | [~] |
 
 ## 4. Token and launch
 
