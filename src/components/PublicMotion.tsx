@@ -137,7 +137,8 @@ export default function PublicMotion() {
       const card = stage.querySelector<HTMLElement>("[data-card]");
       const apply = (p: number) => {
         const c = (v: number) => Math.max(0, Math.min(1, v));
-        if (amt) amt.textContent = `$${(c(p / 0.2) * 40).toFixed(2)}`;
+        // The budget counts up as the "Budget lands" row (third step) switches on.
+        if (amt) amt.textContent = `$${(c((p - 0.4) / 0.14) * (Number(amt.dataset.amt) || 25)).toFixed(2)}`;
         steps.forEach((s, i) => { if (p >= 0.24 + i * 0.15) s.dataset.on = ""; else delete s.dataset.on; });
         if (done) { if (p >= 0.88) done.dataset.on = ""; else delete done.dataset.on; }
         if (card) card.style.transform = `translateY(${(0.5 - p) * 26}px)`;

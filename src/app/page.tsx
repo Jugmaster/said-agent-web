@@ -104,28 +104,28 @@ export default function LandingPage() {
         <div className={s.pin}>
         <div className={`${s.wrap} ${s.demoCols}`}>
           <div className={s.demoCopy} data-reveal>
-            <p className={s.eyebrow}>The send</p>
-            <h2 className={s.big}>From said to settled. In seconds.</h2>
-            <p>Type a name and the rest just happens: the check, the safe hold, the delivery. Pay five people and your agent gets funded.</p>
+            <p className={s.eyebrow}>The entry</p>
+            <h2 className={s.big}>Five names. Then it&apos;s funded.</h2>
+            <p>Pay five people you can name, a dollar or more each. The fifth one lands and your agent has a budget.</p>
             <div className={s.mini}>
-              <span><b>Screened first.</b> Fakes and lookalikes never receive a cent.</span>
-              <span><b>Held safely.</b> Not claimed? It comes back automatically.</span>
-              <span><b>No app required.</b> They log in once; the money&apos;s theirs.</span>
+              <span><b>Real sends.</b> Each goes to a real person, checked before it moves.</span>
+              <span><b>Any five.</b> X or Telegram, already on Atcha or not yet.</span>
+              <span><b>No deposit.</b> The budget is the token&apos;s money, not yours.</span>
             </div>
           </div>
-          <div className={s.card} aria-label="Example transfer" data-card>
+          <div className={s.card} aria-label="Example first week" data-card>
             <div className={s.acTop}>
               <div className={s.to}>
-                <div className={s.avatar}>R</div>
-                <div className={s.who}><b>@renata</b><small>found on X · verified</small></div>
+                <div className={s.avatar}>@</div>
+                <div className={s.who}><b>@you</b><small>level 0 → 1</small></div>
               </div>
-              <div className={s.amt} data-amt>$40.00</div>
+              <div className={s.amt} data-amt="25">$25.00</div>
             </div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Name checked</p><p>Identity resolved, record checked</p></div><span className={`${s.pill} ${s.pb}`}>Verified</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Money committed</p><p>Real funds, not a request</p></div><span className={`${s.pill} ${s.pm}`}>Held</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Renata logs in</p><p>No seed phrase, no wallet homework</p></div><span className={`${s.pill} ${s.pg}`}>Claimed</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Money lands</p><p>Hers to hold, spend, or send on</p></div><span className={`${s.pill} ${s.pg}`}>Settled</span></div>
-            <div className={s.done} data-done><span className={s.check}>✓</span> Delivered to @renata · 2m 14s</div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Five people paid</p><p>@renata, @dan, @mo, @ivy, @kai</p></div><span className={`${s.pill} ${s.pb}`}>5 / 5</span></div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 1</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>From the $ATCHA pool, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
+            <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
           </div>
         </div>
         </div>
