@@ -71,7 +71,7 @@ export default function ClaimHandle({ platformId, compact = false, onClaimed }: 
         <button type="submit" disabled={!canClaim} className="rounded-xl bg-ink px-3.5 py-2 text-sm font-semibold text-cream transition hover:bg-coral-deep disabled:opacity-40">{busy ? "…" : info.handle ? "Rename" : "Claim"}</button>
         {info.handle && <button type="button" onClick={() => setEditing(false)} className="rounded-xl px-3 py-2 text-sm text-grey hover:text-ink">Cancel</button>}
       </form>
-      <p className={`mt-1.5 text-xs ${check?.ok === false ? "text-[#B93A16]" : "text-grey"}`}>
+      <p className={`mt-1.5 text-xs ${check?.ok === false ? "text-down" : "text-grey"}`}>
         {v.length < 3 ? "3 to 20 characters: letters, digits, underscore. One change a month." : check == null ? "Checking…" : check.ok ? `@${v} is free.` : (check.reason && HANDLE_REASONS[check.reason as keyof typeof HANDLE_REASONS]) || "Not available."}
       </p>
       {note && <p className="mt-1 text-xs text-ink">{note}</p>}

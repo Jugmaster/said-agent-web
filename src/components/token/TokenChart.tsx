@@ -7,6 +7,10 @@ import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
+/** A theme token's current value, so the canvas matches the page in both themes. */
+const css = (name: string, fallback: string) => (typeof window === "undefined" ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
+const rgba = (hex: string, a: number) => { const m = hex.replace("#", ""); const n = parseInt(m.length === 3 ? m.split("").map((c) => c + c).join("") : m, 16); return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`; };
+
 /**
  * The token's price with the agent's buys and sells drawn on it. MC or price
  * on the axis (memecoins are read in MC); line or candles; the markers carry
@@ -39,6 +43,16 @@ export default function TokenChart({
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  // Re-theme when the page does (toggle or OS).
+  const [themeKey, setThemeKey] = useState(0);
+  useEffect(() => {
+    const bump = () => setThemeKey((k) => k + 1);
+    const mo = new MutationObserver(bump);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", bump);
+    return () => { mo.disconnect(); mq.removeEventListener("change", bump); };
+  }, []);
 
   // Read the candles for the timeframe: once the pool is known, one request,
   // and a short retry when the upstream is rate-limited.
@@ -64,18 +78,20 @@ export default function TokenChart({
   // Build the chart once.
   useEffect(() => {
     if (!host.current) return;
+    const ink = css("--color-ink", "#171613");
+    const grey = css("--color-grey", "#6F6B62");
     const chart = createChart(host.current, {
-      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#8A867B", fontFamily: "inherit", attributionLogo: false },
-      grid: { vertLines: { color: "rgba(23,22,19,0.05)" }, horzLines: { color: "rgba(23,22,19,0.05)" } },
+      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: grey, fontFamily: "inherit", attributionLogo: false },
+      grid: { vertLines: { color: rgba(ink, 0.06) }, horzLines: { color: rgba(ink, 0.06) } },
       rightPriceScale: { borderVisible: false },
       timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
-      crosshair: { horzLine: { labelBackgroundColor: "#171613" }, vertLine: { labelBackgroundColor: "#171613" } },
+      crosshair: { horzLine: { labelBackgroundColor: ink }, vertLine: { labelBackgroundColor: ink } },
       handleScale: { axisPressedMouseMove: true },
       autoSize: true,
     });
     chartRef.current = chart;
     return () => { chart.remove(); chartRef.current = null; seriesRef.current = null; volRef.current = null; };
-  }, []);
+  }, [themeKey]);
 
   // (Re)draw the series when data, mode or axis changes.
   useEffect(() => {
@@ -88,18 +104,19 @@ export default function TokenChart({
     const fmt = (v: number) => (axis === "mc" ? fmtMc(v) : fmtPrice(v));
     const priceFormat = { type: "custom" as const, formatter: fmt, minMove: 1e-12 };
 
-    const vol = chart.addSeries(HistogramSeries, { priceScaleId: "vol", color: "rgba(23,22,19,0.12)", priceFormat: { type: "volume" }, lastValueVisible: false, priceLineVisible: false });
+    const ink = css("--color-ink", "#171613"), up = css("--color-up", "#157E4E"), down = css("--color-down", "#B93A16");
+    const vol = chart.addSeries(HistogramSeries, { priceScaleId: "vol", color: rgba(ink, 0.12), priceFormat: { type: "volume" }, lastValueVisible: false, priceLineVisible: false });
     chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
-    vol.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, value: c[5], color: c[4] >= c[1] ? "rgba(21,126,78,0.18)" : "rgba(185,58,22,0.18)" })));
+    vol.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, value: c[5], color: c[4] >= c[1] ? rgba(up, 0.2) : rgba(down, 0.2) })));
     volRef.current = vol;
 
     let series: ISeriesApi<"Line"> | ISeriesApi<"Candlestick">;
     if (mode === "candles") {
-      const s = chart.addSeries(CandlestickSeries, { upColor: "#157E4E", downColor: "#B93A16", wickUpColor: "#157E4E", wickDownColor: "#B93A16", borderVisible: false, priceFormat });
+      const s = chart.addSeries(CandlestickSeries, { upColor: up, downColor: down, wickUpColor: up, wickDownColor: down, borderVisible: false, priceFormat });
       s.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, open: c[1] * k, high: c[2] * k, low: c[3] * k, close: c[4] * k })));
       series = s;
     } else {
-      const s = chart.addSeries(LineSeries, { color: "#171613", lineWidth: 2, priceFormat, lastValueVisible: true, crosshairMarkerRadius: 4 });
+      const s = chart.addSeries(LineSeries, { color: ink, lineWidth: 2, priceFormat, lastValueVisible: true, crosshairMarkerRadius: 4 });
       s.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, value: c[4] * k })));
       series = s;
     }
@@ -116,7 +133,7 @@ export default function TokenChart({
         return {
           time: snapped as UTCTimestamp,
           position: t.side === "buy" ? "belowBar" : "aboveBar",
-          color: t.side === "buy" ? "#157E4E" : "#E8542E",
+          color: t.side === "buy" ? up : css("--color-coral", "#E8542E"),
           shape: t.side === "buy" ? "arrowUp" : "arrowDown",
           text: `${t.side === "buy" ? "B" : "S"} ${t.notionalUsd != null ? `$${t.notionalUsd.toFixed(0)}` : ""}`.trim(),
         } as SeriesMarker<Time>;
@@ -124,7 +141,7 @@ export default function TokenChart({
       .sort((a, b) => (a.time as number) - (b.time as number));
     createSeriesMarkers(series, markers);
     chart.timeScale().fitContent();
-  }, [candles, mode, axis, supply, trades]);
+  }, [candles, mode, axis, supply, trades, themeKey]);
 
   return (
     <div>

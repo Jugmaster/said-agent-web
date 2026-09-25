@@ -61,10 +61,10 @@ export default function CashbackCard({ balance, cashback, level, onClaimed }: { 
               <div key={cur} className="mt-2">
                 <div className="flex items-baseline justify-between">
                   <span className="tabular-nums">{pend.toFixed(cur === "SOL" ? 4 : 2)} {cur}</span>
-                  <span className={ready ? "text-[#157E4E]" : ""}>{ready ? "ready to claim" : `pays out from ${min} ${cur}`}</span>
+                  <span className={ready ? "text-up" : ""}>{ready ? "ready to claim" : `pays out from ${min} ${cur}`}</span>
                 </div>
                 <div className="mt-1 h-1 overflow-hidden rounded-full bg-line">
-                  <div className={`h-full rounded-full ${ready ? "bg-[#157E4E]" : "bg-coral"}`} style={{ width: `${pct}%` }} />
+                  <div className={`h-full rounded-full ${ready ? "bg-up" : "bg-coral"}`} style={{ width: `${pct}%` }} />
                 </div>
               </div>
             );

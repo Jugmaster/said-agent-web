@@ -80,7 +80,7 @@ export default async function LedgerPage() {
           </p>
           {example && (
             <p className={s.pageSub} style={{ fontSize: "0.95rem", marginTop: 14 }}>
-              <span className={s.okPill} style={{ background: "#FDE097", color: "#8F6A12" }}>Example numbers</span>&nbsp; The real ledger switches on the day the token is live and the pool is funded. Nothing here is a claim.
+              <span className={s.okPill} style={{ background: "var(--color-warn-soft)", color: "var(--color-warn)" }}>Example numbers</span>&nbsp; The real ledger switches on the day the token is live and the pool is funded. Nothing here is a claim.
             </p>
           )}
         </header>
@@ -104,12 +104,12 @@ export default async function LedgerPage() {
             The month fees and the share of gains cover the funding without a top-up is the month the token stops subsidising and starts compounding. This month: <strong style={{ color: "var(--color-ink)" }}>{pct == null ? "no funding yet" : `${pct}% covered`}</strong>.
           </p>
           <div style={{ marginTop: 18, height: 10, borderRadius: 999, background: "var(--color-line)", overflow: "hidden", maxWidth: 640 }}>
-            <div style={{ height: "100%", width: `${Math.min(100, pct ?? 0)}%`, background: (pct ?? 0) >= 100 ? "#157E4E" : "var(--color-coral)", borderRadius: 999 }} />
+            <div style={{ height: "100%", width: `${Math.min(100, pct ?? 0)}%`, background: (pct ?? 0) >= 100 ? "var(--color-up)" : "var(--color-coral)", borderRadius: 999 }} />
           </div>
           <div className={s.list} style={{ marginTop: 28, maxWidth: 640 }}>
             {L.milestones.map((m, i) => (
               <div key={i} className={s.rowItem}>
-                <span className={s.rowAvatar} style={m.done ? { background: "#157E4E" } : undefined}>{m.done ? "✓" : String(i + 1)}</span>
+                <span className={s.rowAvatar} style={m.done ? { background: "var(--color-up)" } : undefined}>{m.done ? "✓" : String(i + 1)}</span>
                 <span style={{ minWidth: 0 }}>
                   <span className={s.rowName}>{m.target.toLocaleString()}{m.label === "a self-funded month" ? "%" : ""} {m.label}</span>
                   <span className={s.rowMeta}>{m.done ? "done" : `${m.have.toLocaleString()}${m.label === "a self-funded month" ? "%" : ""} so far`}</span>

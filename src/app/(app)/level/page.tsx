@@ -111,7 +111,7 @@ function Level({ platformId }: { platformId: string }) {
           </div>
           {publicUrl && (
             <div className="flex shrink-0 items-center gap-2">
-              <Link href={`/@${handle}`} className="rounded-full px-3.5 py-2 text-xs font-medium text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream">View</Link>
+              <Link href={`/@${handle}`} className="rounded-full px-3.5 py-2 text-xs font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream">View</Link>
               <button type="button" onClick={share} className="rounded-full bg-ink px-3.5 py-2 text-xs font-semibold text-cream transition hover:bg-coral-deep">{copied ? "Copied" : "Share"}</button>
             </div>
           )}

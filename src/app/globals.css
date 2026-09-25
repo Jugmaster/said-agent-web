@@ -19,6 +19,14 @@
   --color-coral-soft: #FAE4DC;
   --color-coral-text: #B93A16;
 
+  /* Named roles so no component carries a literal colour. */
+  --color-paper: #FFFFFF;        /* raised surfaces: cards on cream, menus */
+  --color-ring: #D5D1C5;         /* hairline ring on ghost buttons */
+  --color-up: #157E4E;  --color-up-soft: #DDF3E7;
+  --color-down: #B93A16; --color-down-soft: #FBE3D8;
+  --color-warn: #B98A1C; --color-warn-soft: #F8EED4;
+  --color-info: #3D6BB8; --color-info-soft: #DFE9F6;
+
   --color-white: #171613;
   --color-black: #F6F4EE;
 
@@ -83,6 +91,8 @@ html {
 }
 
 :root {
+  --shadow-rgb: 23, 22, 19;
+  color-scheme: light;
   /* Page ground */
   --background: #F6F4EE;
   --foreground: #171613;
@@ -132,3 +142,68 @@ html.lenis, html.lenis body { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto !important; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
+
+/* ─── Dark: the same tokens, second values. System by default; the toggle
+   stamps data-theme. Warm near-black ground, never pure black. ─── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-cream: #121110; --color-card: #1B1A17; --color-btn: #26241F;
+    --color-ink: #F1EEE6; --color-grey: #9A968B; --color-line: #2B2924;
+    --color-coral-deep: #F26A45; --color-coral-soft: #3A1E15; --color-coral-text: #F28A6B;
+    --color-paper: #1F1D19; --color-ring: #34322B;
+    --color-up: #3DBE83; --color-up-soft: #143526;
+    --color-down: #F07A57; --color-down-soft: #3A1E15;
+    --color-warn: #E0B44A; --color-warn-soft: #3A3117;
+    --color-info: #7FA3E8; --color-info-soft: #16233A;
+    --color-white: #F1EEE6; --color-black: #121110;
+    --color-zinc-50: #F1EEE6; --color-zinc-100: #E3E0D6; --color-zinc-200: #C9C5B9; --color-zinc-300: #ABA79B;
+    --color-zinc-400: #9A968B; --color-zinc-500: #8A867B; --color-zinc-600: #5C5950; --color-zinc-700: #3A3831;
+    --color-zinc-800: #2B2924; --color-zinc-900: #1B1A17; --color-zinc-950: #121110;
+    --color-green-950: #143526; --color-emerald-950: #143526; --color-green-900: #1C4A34; --color-emerald-900: #1C4A34;
+    --color-green-500: #3DBE83; --color-emerald-500: #3DBE83; --color-green-400: #3DBE83; --color-emerald-400: #3DBE83;
+    --color-green-300: #3DBE83; --color-emerald-300: #3DBE83; --color-green-200: #5FD19C; --color-emerald-200: #5FD19C;
+    --color-amber-950: #3A3117; --color-yellow-950: #3A3117; --color-amber-900: #4A3F1C; --color-yellow-900: #4A3F1C;
+    --color-amber-600: #E0B44A; --color-yellow-600: #E0B44A; --color-amber-500: #E0B44A; --color-yellow-500: #E0B44A;
+    --color-amber-400: #E0B44A; --color-yellow-400: #E0B44A; --color-amber-300: #E0B44A; --color-yellow-300: #E0B44A;
+    --color-red-950: #3A1E15; --color-rose-950: #3A1E15; --color-red-900: #4E2419; --color-rose-900: #4E2419;
+    --color-red-400: #F07A57; --color-rose-400: #F07A57; --color-red-300: #F07A57; --color-rose-300: #F07A57;
+    --color-red-200: #F59A7E; --color-rose-200: #F59A7E;
+    --color-blue-950: #16233A; --color-indigo-950: #16233A; --color-sky-950: #16233A;
+    --color-blue-900: #1E2F4E; --color-indigo-900: #1E2F4E; --color-blue-800: #1E2F4E; --color-indigo-800: #1E2F4E;
+    --color-blue-500: #7FA3E8; --color-indigo-500: #7FA3E8; --color-blue-400: #7FA3E8; --color-indigo-400: #7FA3E8;
+    --color-blue-300: #7FA3E8; --color-indigo-300: #7FA3E8; --color-sky-300: #7FA3E8; --color-blue-200: #9DB9EE; --color-indigo-200: #9DB9EE;
+    --background: #121110; --foreground: #F1EEE6; --bg-secondary: #1B1A17; --border: #2B2924; --text-secondary: #9A968B;
+    --shadow-rgb: 0, 0, 0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-cream: #121110; --color-card: #1B1A17; --color-btn: #26241F;
+  --color-ink: #F1EEE6; --color-grey: #9A968B; --color-line: #2B2924;
+  --color-coral-deep: #F26A45; --color-coral-soft: #3A1E15; --color-coral-text: #F28A6B;
+  --color-paper: #1F1D19; --color-ring: #34322B;
+  --color-up: #3DBE83; --color-up-soft: #143526;
+  --color-down: #F07A57; --color-down-soft: #3A1E15;
+  --color-warn: #E0B44A; --color-warn-soft: #3A3117;
+  --color-info: #7FA3E8; --color-info-soft: #16233A;
+  --color-white: #F1EEE6; --color-black: #121110;
+  --color-zinc-50: #F1EEE6; --color-zinc-100: #E3E0D6; --color-zinc-200: #C9C5B9; --color-zinc-300: #ABA79B;
+  --color-zinc-400: #9A968B; --color-zinc-500: #8A867B; --color-zinc-600: #5C5950; --color-zinc-700: #3A3831;
+  --color-zinc-800: #2B2924; --color-zinc-900: #1B1A17; --color-zinc-950: #121110;
+  --color-green-950: #143526; --color-emerald-950: #143526; --color-green-900: #1C4A34; --color-emerald-900: #1C4A34;
+  --color-green-500: #3DBE83; --color-emerald-500: #3DBE83; --color-green-400: #3DBE83; --color-emerald-400: #3DBE83;
+  --color-green-300: #3DBE83; --color-emerald-300: #3DBE83; --color-green-200: #5FD19C; --color-emerald-200: #5FD19C;
+  --color-amber-950: #3A3117; --color-yellow-950: #3A3117; --color-amber-900: #4A3F1C; --color-yellow-900: #4A3F1C;
+  --color-amber-600: #E0B44A; --color-yellow-600: #E0B44A; --color-amber-500: #E0B44A; --color-yellow-500: #E0B44A;
+  --color-amber-400: #E0B44A; --color-yellow-400: #E0B44A; --color-amber-300: #E0B44A; --color-yellow-300: #E0B44A;
+  --color-red-950: #3A1E15; --color-rose-950: #3A1E15; --color-red-900: #4E2419; --color-rose-900: #4E2419;
+  --color-red-400: #F07A57; --color-rose-400: #F07A57; --color-red-300: #F07A57; --color-rose-300: #F07A57;
+  --color-red-200: #F59A7E; --color-rose-200: #F59A7E;
+  --color-blue-950: #16233A; --color-indigo-950: #16233A; --color-sky-950: #16233A;
+  --color-blue-900: #1E2F4E; --color-indigo-900: #1E2F4E; --color-blue-800: #1E2F4E; --color-indigo-800: #1E2F4E;
+  --color-blue-500: #7FA3E8; --color-indigo-500: #7FA3E8; --color-blue-400: #7FA3E8; --color-indigo-400: #7FA3E8;
+  --color-blue-300: #7FA3E8; --color-indigo-300: #7FA3E8; --color-sky-300: #7FA3E8; --color-blue-200: #9DB9EE; --color-indigo-200: #9DB9EE;
+  --background: #121110; --foreground: #F1EEE6; --bg-secondary: #1B1A17; --border: #2B2924; --text-secondary: #9A968B;
+  --shadow-rgb: 0, 0, 0;
+  color-scheme: dark;
+}

@@ -14,7 +14,7 @@ function shortAddr(a: string | null | undefined): string {
 const LINK =
   "text-[15px] text-zinc-400 whitespace-nowrap transition-all duration-300 group-has-[a:hover]:opacity-35 group-has-[a:hover]:blur-[1px] hover:!opacity-100 hover:!blur-none hover:text-ink";
 const CTA =
-  "inline-flex items-center rounded-full px-[18px] py-[9px] text-[15px] text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream hover:shadow-none whitespace-nowrap";
+  "inline-flex items-center rounded-full px-[18px] py-[9px] text-[15px] text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream hover:shadow-none whitespace-nowrap";
 
 export default function Navbar() {
   const { ready, authenticated, user, login } = usePrivy();
@@ -82,7 +82,7 @@ export default function Navbar() {
               aria-label="Menu"
               aria-expanded={navOpen}
               onClick={() => setNavOpen((o) => !o)}
-              className="flex h-9 w-9 items-center justify-center rounded-full shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:shadow-[inset_0_0_0_1px_#171613]"
+              className="flex h-9 w-9 items-center justify-center rounded-full shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:shadow-[inset_0_0_0_1px_var(--color-ink)]"
             >
               <span aria-hidden className="flex flex-col gap-[4px]">
                 <span className={`block h-[1.5px] w-4 bg-ink transition ${navOpen ? "translate-y-[5.5px] rotate-45" : ""}`} />
@@ -91,7 +91,7 @@ export default function Navbar() {
               </span>
             </button>
             {navOpen && (
-              <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-line bg-[#FFFFFF] shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
+              <div className="absolute right-0 top-12 z-50 w-52 overflow-hidden rounded-2xl border border-line bg-paper shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
                 {NAV.map(([href, label]) => (
                   <Link key={href} href={href} onClick={() => setNavOpen(false)} className="block px-4 py-3 text-sm transition hover:bg-card">
                     {label}
@@ -111,7 +111,7 @@ export default function Navbar() {
               <button
                 type="button"
                 onClick={() => setMenuOpen((o) => !o)}
-                className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:shadow-[inset_0_0_0_1px_#171613]"
+                className="flex items-center gap-2 rounded-full py-1 pl-1 pr-3 text-sm shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:shadow-[inset_0_0_0_1px_var(--color-ink)]"
               >
                 <span className="flex h-7 w-7 items-center justify-center rounded-full bg-coral text-xs font-semibold text-cream">
                   {(agent.status === "ready" ? agent.agentName?.[0] : null) ?? user?.email?.address?.[0] ?? "•"}
@@ -128,7 +128,7 @@ export default function Navbar() {
               </button>
 
               {menuOpen && (
-                <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-line bg-[#FFFFFF] shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
+                <div className="absolute right-0 top-12 z-50 w-64 overflow-hidden rounded-2xl border border-line bg-paper shadow-[0_18px_50px_-8px_rgba(23,22,19,0.12)]">
                   <div className="border-b border-line px-4 py-3">
                     <div className="mb-0.5 flex items-center gap-2">
                       <span className="text-xs text-grey">signed in with</span>

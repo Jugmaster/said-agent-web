@@ -42,7 +42,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport = {
-  themeColor: "#F6F4EE",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F6F4EE" },
+    { media: "(prefers-color-scheme: dark)", color: "#121110" },
+  ],
   width: "device-width",
   initialScale: 1,
   // NO maximumScale — locking it at 1 disabled pinch-zoom, so iOS's auto
@@ -71,6 +74,12 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Theme before first paint: an explicit choice stamps data-theme; system leaves it off. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("atcha:theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}`,
+          }}
+        />
         {/* Telegram Web App SDK — exposes window.Telegram.WebApp inside Telegram */}
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>

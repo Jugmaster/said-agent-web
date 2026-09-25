@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import ClaimHandle from "@/components/ClaimHandle";
+import ThemeToggle from "@/components/ThemeToggle";
 import { usePrivy } from "@privy-io/react-auth";
 import AuthGate from "@/components/AuthGate";
 import { useAgent } from "@/hooks/useAgent";
@@ -113,6 +114,13 @@ function Settings({ platformId }: { platformId: string }) {
         )}
         <Row label="Public profile" href={`/agents/${encodeURIComponent(platformId)}`} />
         <Row label="Link an agent you already run" href="/settings/link-agent" />
+      </Section>
+
+      <Section title="Appearance">
+        <div className="flex items-center justify-between px-4 py-3">
+          <span className="text-sm text-zinc-200">Theme</span>
+          <ThemeToggle />
+        </div>
       </Section>
 
       <Section title="Account">

@@ -14,7 +14,7 @@ import { requestRefresh } from "@/lib/refresh";
 
 const usd = (v: number | null | undefined, d = 2) => (v == null ? "$—" : `$${v.toLocaleString(undefined, { minimumFractionDigits: d, maximumFractionDigits: d })}`);
 const pct = (v: number | null | undefined) => (v == null ? "—" : `${v >= 0 ? "▲" : "▼"} ${Math.abs(v).toFixed(2)}%`);
-const tone = (v: number | null | undefined) => (v == null ? "text-grey" : v >= 0 ? "text-[#157E4E]" : "text-[#B93A16]");
+const tone = (v: number | null | undefined) => (v == null ? "text-grey" : v >= 0 ? "text-up" : "text-down");
 const SAID_API = process.env.NEXT_PUBLIC_SAID_API ?? "https://api.saidprotocol.com";
 
 interface Passport {
@@ -108,7 +108,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
 
       <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
         <div className="min-w-0">
-          <div className="rounded-2xl border border-line bg-[#FFFFFF] p-3">
+          <div className="rounded-2xl border border-line bg-paper p-3">
             <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} />
           </div>
 
@@ -140,7 +140,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
               <div className="overflow-hidden rounded-2xl border border-line">
                 {trades.map((t) => (
                   <div key={t.id} className="flex items-start gap-3 border-b border-line px-4 py-3 last:border-b-0">
-                    <span className={`mt-0.5 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${t.side === "buy" ? "bg-[#DDF3E7] text-[#157E4E]" : t.side === "sell" ? "bg-[#FBE3D8] text-[#B93A16]" : "bg-card text-grey"}`}>{t.side.toUpperCase()}</span>
+                    <span className={`mt-0.5 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${t.side === "buy" ? "bg-up-soft text-up" : t.side === "sell" ? "bg-down-soft text-down" : "bg-card text-grey"}`}>{t.side.toUpperCase()}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-ink">{t.notionalUsd != null ? usd(t.notionalUsd) : `${t.inAmount} → ${t.outAmount}`}{t.tokenPriceUsd != null ? <span className="text-grey"> at {fmtPrice(t.tokenPriceUsd)}</span> : null}</span>
                       {t.reason && <span className="block truncate text-xs text-grey">&ldquo;{t.reason}&rdquo; · {t.source}</span>}
@@ -185,7 +185,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
             )}
           </div>
 
-          <div className="rounded-2xl border border-line bg-[#FFFFFF] p-4">
+          <div className="rounded-2xl border border-line bg-paper p-4">
             <div className="text-xs font-medium uppercase tracking-wider text-grey">Tell your agent</div>
             <div className="mt-2 grid grid-cols-4 gap-1.5">
               {[10, 25, 50, 100].map((n) => (
@@ -194,12 +194,12 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
             </div>
             <form className="mt-2 flex gap-1.5" onSubmit={(e) => { e.preventDefault(); const n = Number(custom); if (n > 0) tell(`buy $${n} of ${symbol} (${mint})`); }}>
               <input inputMode="decimal" value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Any amount, $" className="min-w-0 flex-1 rounded-xl border border-line bg-cream px-3 py-2 text-sm focus:border-ink focus:outline-none" />
-              <button type="submit" disabled={!!busy || !(Number(custom) > 0)} className="rounded-xl px-3 py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream disabled:opacity-40">Buy</button>
+              <button type="submit" disabled={!!busy || !(Number(custom) > 0)} className="rounded-xl px-3 py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">Buy</button>
             </form>
             {qty != null && qty > 0 && (
               <div className="mt-2 grid grid-cols-2 gap-1.5">
-                <button type="button" disabled={!!busy} onClick={() => tell(`sell half of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-ink hover:text-cream disabled:opacity-40">Sell half</button>
-                <button type="button" disabled={!!busy} onClick={() => tell(`sell all of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-coral-text shadow-[inset_0_0_0_1px_#D5D1C5] transition hover:bg-coral hover:text-cream disabled:opacity-40">Sell all</button>
+                <button type="button" disabled={!!busy} onClick={() => tell(`sell half of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">Sell half</button>
+                <button type="button" disabled={!!busy} onClick={() => tell(`sell all of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-coral-text shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-coral hover:text-cream disabled:opacity-40">Sell all</button>
               </div>
             )}
             <p className="mt-2 text-[11px] text-grey">Goes through your agent: same allowance, same rules as chat. It quotes first; nothing moves until it says so.</p>
@@ -210,9 +210,9 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
 
           {stats && (stats.websites.length > 0 || stats.socials.length > 0) && (
             <div className="flex flex-wrap gap-2 text-xs">
-              {stats.websites.slice(0, 2).map((w) => <a key={w} href={w} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_#D5D1C5] hover:text-ink">site ↗</a>)}
-              {stats.socials.slice(0, 3).map((s) => <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_#D5D1C5] hover:text-ink">{s.type} ↗</a>)}
-              <a href={`https://x.com/search?q=${encodeURIComponent(symbol.startsWith("$") ? symbol : `$${symbol}`)}`} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_#D5D1C5] hover:text-ink">search on X ↗</a>
+              {stats.websites.slice(0, 2).map((w) => <a key={w} href={w} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_var(--color-ring)] hover:text-ink">site ↗</a>)}
+              {stats.socials.slice(0, 3).map((s) => <a key={s.url} href={s.url} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_var(--color-ring)] hover:text-ink">{s.type} ↗</a>)}
+              <a href={`https://x.com/search?q=${encodeURIComponent(symbol.startsWith("$") ? symbol : `$${symbol}`)}`} target="_blank" rel="noreferrer" className="rounded-full px-3 py-1 text-grey shadow-[inset_0_0_0_1px_var(--color-ring)] hover:text-ink">search on X ↗</a>
             </div>
           )}
         </aside>
@@ -234,10 +234,10 @@ function TrustLine({ p, stats }: { p: Passport; stats: TokenStats | null }) {
   if (p.market?.verifiedOnJupiter) bits.push("on Jupiter's verified list");
   const thin = !bad && !backed && p.market?.liquidityUsd != null && p.market.liquidityUsd < 100_000;
   return (
-    <div className={`mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-xs ${bad ? "bg-[#FBE3D8] text-[#B93A16]" : backed ? "bg-[#DDF3E7] text-[#157E4E]" : "bg-card text-grey"}`}>
+    <div className={`mb-4 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl px-3 py-2 text-xs ${bad ? "bg-down-soft text-down" : backed ? "bg-up-soft text-up" : "bg-card text-grey"}`}>
       <span className="font-medium">{bad ? "✕" : backed ? "✓" : "○"} {label}</span>
       {bits.length > 0 && <span>{bits.join(" · ")}</span>}
-      {thin && <span className="text-[#B93A16]">Under $100K liquidity: budget can&apos;t buy this; your own money can.</span>}
+      {thin && <span className="text-down">Under $100K liquidity: budget can&apos;t buy this; your own money can.</span>}
       {!bad && !backed && !thin && <span>Budget can hold up to a quarter here.</span>}
     </div>
   );
@@ -258,8 +258,8 @@ function Bar({ label, a, bLabel, b }: { label: string; a: number; bLabel: string
     <div className="col-span-2 rounded-xl border border-line bg-card px-3 py-2">
       <div className="flex justify-between text-xs"><span><b className="text-ink">{a.toLocaleString()}</b> <span className="text-grey">{label}</span></span><span><b className="text-ink">{b.toLocaleString()}</b> <span className="text-grey">{bLabel}</span></span></div>
       <div className="mt-1.5 flex h-1.5 gap-0.5 overflow-hidden rounded-full">
-        <span className="bg-[#157E4E]" style={{ width: `${(a / tot) * 100}%` }} />
-        <span className="bg-[#E8542E]" style={{ width: `${(b / tot) * 100}%` }} />
+        <span className="bg-up" style={{ width: `${(a / tot) * 100}%` }} />
+        <span className="bg-coral" style={{ width: `${(b / tot) * 100}%` }} />
       </div>
     </div>
   );

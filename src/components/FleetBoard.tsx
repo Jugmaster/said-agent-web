@@ -38,7 +38,7 @@ export default function FleetBoard() {
               <span className={s.rowMeta}>{usd(a.fundedTotalUsd)} funded · {a.peoplePaid} people paid</span>
             </span>
             <span className={s.rowRight}>
-              <b style={{ color: (a.pnlUsd ?? 0) >= 0 ? "#157E4E" : "#B93A16" }}>{a.pnlUsd == null ? "—" : `${a.pnlUsd >= 0 ? "+" : "−"}${usd(Math.abs(a.pnlUsd))}`}</b>
+              <b style={{ color: (a.pnlUsd ?? 0) >= 0 ? "var(--color-up)" : "var(--color-down)" }}>{a.pnlUsd == null ? "—" : `${a.pnlUsd >= 0 ? "+" : "−"}${usd(Math.abs(a.pnlUsd))}`}</b>
               {usd(a.balanceUsd)} balance
             </span>
           </Link>

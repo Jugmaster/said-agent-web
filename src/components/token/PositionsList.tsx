@@ -80,8 +80,8 @@ export default function PositionsList({
 }
 
 function Row({ href, symbol, name, image, qty, value, price, change24h, sub, pnl, pct }: { href: string; symbol: string; name?: string | null; image?: string | null; qty: number; value: number | null; price?: number | null; change24h?: number | null; sub: string; pnl: number | null; pct?: number | null }) {
-  const tone = pnl == null ? "text-grey" : pnl >= 0 ? "text-[#157E4E]" : "text-[#B93A16]";
-  const ctone = change24h == null ? "text-grey" : change24h >= 0 ? "text-[#157E4E]" : "text-[#B93A16]";
+  const tone = pnl == null ? "text-grey" : pnl >= 0 ? "text-up" : "text-down";
+  const ctone = change24h == null ? "text-grey" : change24h >= 0 ? "text-up" : "text-down";
   return (
     <Link href={href} className="flex items-center gap-3 border-b border-line px-4 py-3 transition last:border-b-0 hover:bg-card">
       {image ? (

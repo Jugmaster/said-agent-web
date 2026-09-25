@@ -225,7 +225,7 @@ function SendsPanel({
           <button
             type="button"
             onClick={() => onPick(ATCHA_HANDLE, "atcha")}
-            className="flex items-center gap-2 rounded-full border border-line bg-[#FFFFFF] py-1.5 pl-1.5 pr-3.5 transition hover:border-ink"
+            className="flex items-center gap-2 rounded-full border border-line bg-paper py-1.5 pl-1.5 pr-3.5 transition hover:border-ink"
             title="Pay Atcha"
           >
             <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-coral text-[11px] font-semibold text-cream">@</span>
