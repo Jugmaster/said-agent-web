@@ -83,6 +83,8 @@ The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind
 | 3.19 | The Atcha handle: claim on Level and Settings (`ClaimHandle`), suggestion from X/Telegram, availability as you type; Pay tab "Atcha" resolves it first; `/@name` and the pinned @atcha chip use it | [x] 25 Sept |
 | 1.19 | Butler `identity/handles.ts` + `handle-routes.ts`: unique, reserved list, never another user's verified name, one rename a month; resolver reads a bare name as an Atcha handle first (butler 90bc367) | [x] 25 Sept |
 | 3.20 | Dark mode: second token set (warm near-black ground, same coral), system by default, Light/Dark/System toggle in Settings applied before first paint; every component literal tokenised (`paper/ring/up/down/warn/info` roles); chart re-themes live; Privy modal follows | [x] 25 Sept |
+| 1.20 | Autopilot (butler `src/autopilot/`): exits / SOL trend vs USDC / scout; rules decide, Jev refines (`JEV_API_KEY`, pinned `JEV_MODEL`), gate last; shadow by default per account and via `AUTOPILOT_SHADOW`; `GET/POST /api/autopilot/:id`, `/run`; 10 tests | [x] 25 Sept (e04d8c5) |
+| 3.21 | `AutopilotCard` on Level: switch, risk, strategies, shadow, Run now, the decision log with reasons | [x] 25 Sept |
 | 1.18 | Butler trade log `src/defi/trades.ts`: every fill at the swap choke point with side, token, fill price, notional, tx, source (chat/dca/limit/buyback) and reason; `GET /api/trades/:id`, `/api/positions/:id` (owner) via `trades-routes.ts`; one more line in `swap.js` for the box | [x] 25 Sept (butler 794ff7a) |
 
 ## 4. Token and launch

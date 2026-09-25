@@ -1096,3 +1096,40 @@ export const HANDLE_REASONS: Record<HandleReason, string> = {
   cooldown: "You can change your name once a month.",
   "no-user": "No account found.",
 };
+
+// ─── Autopilot ─────────────────────────────────────────────────────────────
+
+export type AutopilotRisk = "careful" | "normal" | "degen";
+export type AutopilotStrategy = "exit" | "trend" | "scout";
+export interface AutopilotConfig { agentId: string; enabled: boolean; risk: AutopilotRisk; strategies: AutopilotStrategy[]; shadow: boolean; updatedAt: string }
+export interface AutopilotDecision { id: number; strategy: string; mint: string | null; symbol: string | null; action: string; sizeUsd: number | null; reason: string; jev: unknown; executed: boolean; tx: string | null; error: string | null; at: string }
+export interface AutopilotState { config: AutopilotConfig; decisions: AutopilotDecision[]; jev: boolean; globalShadow: boolean; enabled: boolean }
+
+/** Owner-only. Null when the API predates Autopilot. */
+export async function getAutopilot(platformId: string): Promise<AutopilotState | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+export async function setAutopilot(platformId: string, patch: Partial<Pick<AutopilotConfig, "enabled" | "risk" | "strategies" | "shadow">>): Promise<AutopilotConfig | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+    if (!res.ok) return null;
+    return ((await res.json()) as { config: AutopilotConfig }).config;
+  } catch {
+    return null;
+  }
+}
+export async function runAutopilot(platformId: string): Promise<AutopilotDecision[]> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}/run`, { method: "POST", headers: await authHeaders() }, 90_000);
+    if (!res.ok) return [];
+    return ((await res.json()) as { decisions: AutopilotDecision[] }).decisions ?? [];
+  } catch {
+    return [];
+  }
+}

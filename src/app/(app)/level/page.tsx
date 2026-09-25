@@ -10,6 +10,7 @@ import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
 import FleetBoard from "@/components/FleetBoard";
 import ClaimHandle from "@/components/ClaimHandle";
+import AutopilotCard from "@/components/AutopilotCard";
 import { useAgent } from "@/hooks/useAgent";
 import {
   getCredits,
@@ -91,6 +92,13 @@ function Level({ platformId }: { platformId: string }) {
           today={today}
           onAddMoney={() => setFunding(true)}
         />
+      )}
+
+      {/* Autopilot: the agent trades the budget on its own. */}
+      {credits !== null && (
+        <div className="mt-6">
+          <AutopilotCard platformId={platformId} funded={!!credits?.funded} />
+        </div>
       )}
 
       {credits && credits.funded && (
