@@ -11,6 +11,7 @@ import CashbackCard from "@/components/CashbackCard";
 import FleetBoard from "@/components/FleetBoard";
 import ClaimHandle from "@/components/ClaimHandle";
 import AutopilotCard from "@/components/AutopilotCard";
+import LevelUp from "@/components/LevelUp";
 import { useAgent } from "@/hooks/useAgent";
 import {
   getCredits,
@@ -92,6 +93,12 @@ function Level({ platformId }: { platformId: string }) {
           today={today}
           onAddMoney={() => setFunding(true)}
         />
+      )}
+
+      {credits !== null && (
+        <div className="mt-6">
+          <LevelUp platformId={platformId} summary={credits} />
+        </div>
       )}
 
       {/* Autopilot: the agent trades the budget on its own. */}

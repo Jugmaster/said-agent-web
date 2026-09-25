@@ -9,6 +9,7 @@ import FundedCard from "@/components/FundedCard";
 import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
 import PositionsList from "@/components/token/PositionsList";
+import LevelUp from "@/components/LevelUp";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
 import {
@@ -183,6 +184,13 @@ function Home({ platformId }: { platformId: string }) {
           </div>
           )}
         </div>
+
+        {/* The ladder as a to-do list: what unlocks the next level and funding. */}
+        {credits !== null && (
+          <div className="mb-8">
+            <LevelUp platformId={platformId} summary={credits} />
+          </div>
+        )}
 
         {/* Quick actions */}
         <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
