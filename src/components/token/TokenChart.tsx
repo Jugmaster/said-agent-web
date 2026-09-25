@@ -111,7 +111,8 @@ export default function TokenChart({
       layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: grey, fontFamily: "inherit", attributionLogo: false },
       grid: { vertLines: { color: rgba(ink, 0.06) }, horzLines: { color: rgba(ink, 0.06) } },
       rightPriceScale: { borderVisible: false },
-      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false },
+      // No scrolling into the future past the last candle, or into the void before the first.
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixRightEdge: true, fixLeftEdge: true, rightOffset: 0, lockVisibleTimeRangeOnResize: true },
       crosshair: { horzLine: { labelBackgroundColor: ink }, vertLine: { labelBackgroundColor: ink } },
       handleScale: { axisPressedMouseMove: true },
       autoSize: true,
