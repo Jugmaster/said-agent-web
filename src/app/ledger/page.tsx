@@ -6,6 +6,8 @@ import { getLedger, type Ledger } from "@/lib/api";
 import s from "@/app/landing.module.css";
 
 export const metadata: Metadata = {
+  // Unlinked until there is real data: reachable by URL, not indexed, not in the nav.
+  robots: { index: false, follow: false },
   title: "The Ledger · Atcha",
   description: "Where $ATCHA's money goes: creator fees in, agents funded, fees and buybacks back. Every month, in public.",
   openGraph: { title: "The Ledger · Atcha", description: "Where the token's money goes, every month, in public.", type: "website" },

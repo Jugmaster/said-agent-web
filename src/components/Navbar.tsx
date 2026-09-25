@@ -60,7 +60,6 @@ export default function Navbar() {
     ["/#funded", "Funded"],
     ["/#how", "How it works"],
     ["/fleet", "Fleet"],
-    ["/ledger", "Ledger"],
     ["/agents", "Agents"],
     ["/stats", "Stats"],
     ["/docs", "Docs"],
