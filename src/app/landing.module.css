@@ -115,7 +115,8 @@
   .fCols { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 480px) {
-  .wrap { padding: 0 20px; }
+  /* Sides only: the shorthand was zeroing the top padding of every section that is also a .wrap. */
+  .wrap { padding-left: 20px; padding-right: 20px; }
   .h1 { font-size: clamp(2.1rem, 11vw, 3rem); }
   .swatch { padding: 0 0.14em 0.05em; }
   .card { padding: 22px 20px; }
