@@ -41,6 +41,7 @@ export default function TokenChart({
   trades,
   supply,
   defaultTf = "15m",
+  agentName = null,
 }: {
   mint: string;
   /** The top pool once stats are known; null when the token has none. */
@@ -50,6 +51,8 @@ export default function TokenChart({
   trades: TradeRow[];
   supply: number | null;
   defaultTf?: Timeframe;
+  /** Named in the hover card: "Your agent (Rex) bought…". */
+  agentName?: string | null;
 }) {
   const host = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -236,7 +239,7 @@ export default function TokenChart({
         onMouseLeave={() => setHover(null)}
       >
         <div ref={host} className="absolute inset-0" />
-        {hover && <FillCard hit={hover} />}
+        {hover && <FillCard hit={hover} axis={axis} supply={supply} agentName={agentName} />}
         {(loading || err) && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-grey">{err ?? "Loading chart…"}</div>
         )}
@@ -264,23 +267,28 @@ export default function TokenChart({
   );
 }
 
-/** What the agent did there: side, size, price, when, and why. Sits beside the bubble. */
-function FillCard({ hit }: { hit: Hit }) {
+/** One sentence beside the bubble, tail pointing at it: "Your agent (Rex) bought $12.07 at $232K market cap". */
+function FillCard({ hit, axis, supply, agentName }: { hit: Hit; axis: "mc" | "price"; supply: number | null; agentName: string | null }) {
   const m = hit.mark;
-  const left = hit.x + 16;
-  const flip = typeof window !== "undefined" && left > (document.body.clientWidth ?? 9999) - 260;
-  const when = m.at ? new Date(m.at.endsWith("Z") ? m.at : m.at + "Z").toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+  const who = agentName ? `Your agent (${agentName})` : "Your agent";
+  const verb = m.side === "buy" ? "bought" : "sold";
+  const amount = m.notionalUsd != null ? `$${m.notionalUsd.toFixed(2)}` : "";
+  const at = m.tokenPriceUsd != null ? (axis === "mc" && supply ? `${fmtMc(m.tokenPriceUsd * supply)} market cap` : fmtPrice(m.tokenPriceUsd)) : null;
+  // To the left of the bubble when there's room, otherwise to the right; tail points at the bubble.
+  const width = 260;
+  const left = hit.x - 18 - width >= 4;
+  const style = left ? { left: hit.x - 18 - width, top: hit.y } : { left: hit.x + 18, top: hit.y };
   return (
-    <div
-      className="pointer-events-none absolute z-20 w-56 rounded-xl border border-line bg-paper p-3 text-xs shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.25)]"
-      style={{ left: flip ? undefined : left, right: flip ? `calc(100% - ${hit.x - 16}px)` : undefined, top: Math.max(8, hit.y - 44) }}
-    >
-      <div className="flex items-baseline justify-between">
-        <span className={`font-semibold ${m.side === "buy" ? "text-up" : "text-down"}`}>{m.side === "buy" ? "Bought" : "Sold"}{m.notionalUsd != null ? ` $${m.notionalUsd.toFixed(2)}` : ""}</span>
-        <span className="text-grey">{when}</span>
+    <div className="pointer-events-none absolute z-20 -translate-y-1/2" style={{ ...style, width }}>
+      <div className="relative rounded-xl bg-ink px-3.5 py-2.5 text-[13px] leading-snug text-cream shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.35)]">
+        <span>{who} {verb}{amount ? ` ${amount}` : ""}{at ? ` at ${at}` : ""}</span>
+        {m.reason && <span className="mt-1 block text-[12px] text-cream/70">&ldquo;{m.reason.length > 80 ? m.reason.slice(0, 80) + "…" : m.reason}&rdquo;</span>}
+        <span
+          aria-hidden
+          className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 bg-ink"
+          style={left ? { right: -6 } : { left: -6 }}
+        />
       </div>
-      {m.tokenPriceUsd != null && <div className="mt-1 text-ink">at {fmtPrice(m.tokenPriceUsd)}</div>}
-      {m.reason && <div className="mt-1 text-grey">&ldquo;{m.reason.length > 90 ? m.reason.slice(0, 90) + "…" : m.reason}&rdquo;</div>}
     </div>
   );
 }

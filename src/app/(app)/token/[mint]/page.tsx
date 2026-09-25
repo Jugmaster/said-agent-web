@@ -127,7 +127,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
         <div className="min-w-0">
           <div className="rounded-2xl border border-line bg-paper p-3">
-            <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} defaultTf={defaultTf(stats?.createdAt ?? null)} />
+            <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} defaultTf={defaultTf(stats?.createdAt ?? null)} agentName={agent.status === "ready" ? agent.agentName : null} />
           </div>
 
           {/* Stats a trader reads */}
