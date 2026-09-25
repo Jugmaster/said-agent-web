@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { createChart, ColorType, LineSeries, CandlestickSeries, HistogramSeries, createSeriesMarkers, type IChartApi, type ISeriesApi, type SeriesMarker, type Time, type UTCTimestamp } from "lightweight-charts";
+import { createChart, ColorType, LineSeries, CandlestickSeries, HistogramSeries, type IChartApi, type ISeriesApi, type UTCTimestamp } from "lightweight-charts";
 import { getOhlcv, type Candle, type Timeframe, type TradeRow } from "@/lib/api";
+import { TradeMarkers, type FillMark } from "./trade-markers";
 import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
@@ -196,24 +197,24 @@ export default function TokenChart({
     }
     seriesRef.current = series;
 
-    // The agent's fills, snapped to the candle they fell in.
+    // The agent's fills as lettered circles, snapped to the candle they fell in, on that candle's close.
     const first = candles[0][0];
     const step = candles.length > 1 ? candles[1][0] - candles[0][0] : 60;
-    const markers: SeriesMarker<Time>[] = trades
+    const byTime = new Map<number, Candle>(candles.map((c) => [c[0], c]));
+    const marks: FillMark[] = trades
       .filter((t) => t.side === "buy" || t.side === "sell")
       .map((t) => {
         const ts = Math.floor(new Date(t.at.endsWith("Z") ? t.at : t.at + "Z").getTime() / 1000);
         const snapped = Math.max(first, first + Math.floor((ts - first) / step) * step);
-        return {
-          time: snapped as UTCTimestamp,
-          position: t.side === "buy" ? "belowBar" : "aboveBar",
-          color: t.side === "buy" ? up : css("--color-coral", "#E8542E"),
-          shape: t.side === "buy" ? "arrowUp" : "arrowDown",
-          text: `${t.side === "buy" ? "B" : "S"} ${t.notionalUsd != null ? `$${t.notionalUsd.toFixed(0)}` : ""}`.trim(),
-        } as SeriesMarker<Time>;
+        const c = byTime.get(snapped);
+        const price = (t.tokenPriceUsd ?? c?.[4] ?? 0) * k;
+        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", label: t.notionalUsd != null ? `$${t.notionalUsd.toFixed(0)}` : undefined };
       })
-      .sort((a, b) => (a.time as number) - (b.time as number));
-    createSeriesMarkers(series, markers);
+      .filter((m) => m.price > 0);
+    const prim = new TradeMarkers();
+    prim.setColors({ up, down: css("--color-coral", "#E8542E") });
+    series.attachPrimitive(prim);
+    prim.setMarks(marks);
     if (!prependedRef.current) chart.timeScale().fitContent();
     prependedRef.current = false;
   }, [candles, mode, axis, supply, trades, themeKey]);

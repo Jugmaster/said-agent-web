@@ -61,7 +61,14 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
 
   const load = useCallback(() => {
     getTokenStats(mint).then(setStats).catch(() => setStats(null));
-    getTrades(platformId, { mint }).then(setTrades).catch(() => {});
+    getTrades(platformId, { mint }).then((t) => {
+      if (t.length === 0 && typeof window !== "undefined" && new URLSearchParams(window.location.search).has("demo")) {
+        // Review aid only: three made-up fills over the last day. Never shown without ?demo.
+        const now = Date.now();
+        const mk = (h: number, side: "buy" | "sell", usd: number): TradeRow => ({ id: -h, side, tokenMint: mint, tokenAmount: null, tokenPriceUsd: null, notionalUsd: usd, inputMint: "", outputMint: "", inAmount: 0, outAmount: 0, tx: "demo", provider: null, source: "chat", reason: side === "buy" ? "demo: buy $" + usd : "demo: take profit", at: new Date(now - h * 3600e3).toISOString() });
+        setTrades([mk(20, "buy", 25), mk(9, "buy", 10), mk(2, "sell", 20)]);
+      } else setTrades(t);
+    }).catch(() => {});
     getPositions(platformId).then((ps) => setPosition(ps?.find((p) => p.mint === mint) ?? null)).catch(() => {});
     if (wallet) getPortfolio(wallet).then((p) => setQty(mint === "So11111111111111111111111111111111111111112" ? p.solBalance : p.tokens.find((t) => t.mint === mint)?.balance ?? 0)).catch(() => {});
     fetch(`${SAID_API}/api/asset/${mint}`).then((r) => (r.ok ? r.json() : null)).then(setPassport).catch(() => {});
