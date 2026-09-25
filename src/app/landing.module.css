@@ -155,7 +155,7 @@
 .pageFoot a { color: var(--color-ink); text-decoration: underline; text-underline-offset: 3px; }
 
 /* docs */
-.docs { display: grid; grid-template-columns: 220px 1fr; gap: 64px; padding: 130px 0 120px; }
+.docs { display: grid; grid-template-columns: 220px 1fr; gap: 64px; padding-top: 130px; padding-bottom: 120px; } /* top/bottom only: .wrap owns the sides */
 .docs > aside { align-self: stretch; }
 .tocWrap { position: sticky; top: 100px; }
 .toc { display: flex; flex-direction: column; gap: 2px; }
