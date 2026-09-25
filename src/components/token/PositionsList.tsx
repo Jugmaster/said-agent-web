@@ -21,12 +21,14 @@ export default function PositionsList({
   showClosed = false,
 }: {
   holdings: PortfolioToken[];
-  positions: Position[];
+  /** Null until the trade log is live; then every position the agent opened. */
+  positions: Position[] | null;
   solBalance: number;
   solUsd: number | null;
   showClosed?: boolean;
 }) {
-  const byMint = new Map(positions.map((p) => [p.mint, p]));
+  const byMint = new Map((positions ?? []).map((p) => [p.mint, p]));
+  const noLog = positions === null;
   // Name, logo, price and 24h for each held token, one batched call.
   const [briefs, setBriefs] = useState<Record<string, TokenBrief>>({});
   const mintKey = holdings.filter((h) => h.balance > 0).map((h) => h.mint).sort().join(",");
@@ -40,7 +42,7 @@ export default function PositionsList({
     .filter((h) => h.balance > 0)
     .map((h) => ({ h, p: byMint.get(h.mint) ?? null }))
     .sort((a, b) => (b.h.usdValue ?? 0) - (a.h.usdValue ?? 0));
-  const closed = showClosed ? positions.filter((p) => p.closed) : [];
+  const closed = showClosed ? (positions ?? []).filter((p) => p.closed) : [];
 
   return (
     <div className="overflow-hidden rounded-2xl border border-line">
@@ -61,7 +63,7 @@ export default function PositionsList({
             value={value}
             price={b?.priceUsd ?? null}
             change24h={b?.change24h ?? null}
-            sub={p ? `avg ${p.avgEntryUsd != null ? fmtPrice(p.avgEntryUsd) : "—"}${p.openedBy ? ` · "${p.openedBy.slice(0, 48)}${p.openedBy.length > 48 ? "…" : ""}"` : ""}` : "held · not bought by your agent"}
+            sub={p ? `avg ${p.avgEntryUsd != null ? fmtPrice(p.avgEntryUsd) : "—"}${p.openedBy ? ` · "${p.openedBy.slice(0, 48)}${p.openedBy.length > 48 ? "…" : ""}"` : ""}` : noLog ? "entry and P&L arrive with the trade log" : "no trade record for this one"}
             pnl={pnl}
             pct={pct}
           />

@@ -904,14 +904,14 @@ export async function getTrades(platformId: string, opts: { mint?: string; limit
   }
 }
 
-/** Owner-only. Empty when the API predates the trade log. */
-export async function getPositions(platformId: string): Promise<Position[]> {
+/** Owner-only. Null when the API predates the trade log (so the UI never claims "not bought"). */
+export async function getPositions(platformId: string): Promise<Position[] | null> {
   try {
     const res = await apiFetch(`${API_BASE}/api/positions/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
-    if (!res.ok) return [];
+    if (!res.ok) return null;
     return ((await res.json()) as { positions: Position[] }).positions ?? [];
   } catch {
-    return [];
+    return null;
   }
 }
 

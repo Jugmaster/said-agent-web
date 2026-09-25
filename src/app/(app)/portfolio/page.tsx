@@ -76,7 +76,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [positions, setPositions] = useState<Position[] | null>(null);
   useEffect(() => { getPositions(platformId).then(setPositions).catch(() => {}); }, [platformId, main]);
 
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the

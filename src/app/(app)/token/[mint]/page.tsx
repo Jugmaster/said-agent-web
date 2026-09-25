@@ -51,7 +51,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
   const load = useCallback(() => {
     getTokenStats(mint).then(setStats).catch(() => setStats(null));
     getTrades(platformId, { mint }).then(setTrades).catch(() => {});
-    getPositions(platformId).then((ps) => setPosition(ps.find((p) => p.mint === mint) ?? null)).catch(() => {});
+    getPositions(platformId).then((ps) => setPosition(ps?.find((p) => p.mint === mint) ?? null)).catch(() => {});
     if (wallet) getPortfolio(wallet).then((p) => setQty(mint === "So11111111111111111111111111111111111111112" ? p.solBalance : p.tokens.find((t) => t.mint === mint)?.balance ?? 0)).catch(() => {});
     fetch(`${SAID_API}/api/asset/${mint}`).then((r) => (r.ok ? r.json() : null)).then(setPassport).catch(() => {});
   }, [mint, platformId, wallet]);
