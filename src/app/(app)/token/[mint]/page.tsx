@@ -79,7 +79,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-5xl px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-8 md:pb-12">
+    <div className="w-full px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-8 md:pb-12">
       {/* Header */}
       <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
@@ -106,7 +106,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
       {/* Checked: the trust line, where the eye is. */}
       {passport && <TrustLine p={passport} stats={stats ?? null} />}
 
-      <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
+      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
         <div className="min-w-0">
           <div className="rounded-2xl border border-line bg-paper p-3">
             <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} />

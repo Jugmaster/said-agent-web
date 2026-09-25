@@ -79,7 +79,8 @@ function Level({ platformId }: { platformId: string }) {
   };
 
   return (
-    <div className="mx-auto w-full max-w-3xl px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
+    <div className="flex min-h-dvh">
+    <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
       <h1 className="mb-4 text-2xl font-semibold tracking-tight">Level</h1>
 
       {credits === null ? (
@@ -98,8 +99,12 @@ function Level({ platformId }: { platformId: string }) {
         </div>
       )}
 
+
+
+      {/* Narrow screens: the rail's content inline. */}
+      <div className="mt-6 space-y-6 xl:hidden">
       {/* Your name, then your page: the link is the share card. */}
-      <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+      <section className="rounded-2xl border border-line bg-card p-4">
         <div className="mb-3 border-b border-line pb-3">
           <div className="mb-1 text-xs font-medium uppercase tracking-wider text-grey">Your name</div>
           <ClaimHandle platformId={platformId} onClaimed={setAtchaHandle} />
@@ -117,9 +122,9 @@ function Level({ platformId }: { platformId: string }) {
           )}
         </div>
       </section>
-
-      <div className="mt-6">
+      <div>
         <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
+      </div>
       </div>
 
       {/* Funding record: every month, with its receipt. */}
@@ -152,6 +157,34 @@ function Level({ platformId }: { platformId: string }) {
         </div>
         <FleetBoard />
       </section>
+
+    </div>
+
+    {/* Wide screens: your name and page, and cashback, in a rail. */}
+    <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
+      {/* Your name, then your page: the link is the share card. */}
+      <section className="rounded-2xl border border-line bg-card p-4">
+        <div className="mb-3 border-b border-line pb-3">
+          <div className="mb-1 text-xs font-medium uppercase tracking-wider text-grey">Your name</div>
+          <ClaimHandle platformId={platformId} onClaimed={setAtchaHandle} />
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-xs font-medium uppercase tracking-wider text-grey">Your page</div>
+            <div className="mt-1 truncate text-sm text-ink">{publicUrl ? publicUrl.replace("https://", "") : "Link X or Telegram to get a page"}</div>
+          </div>
+          {publicUrl && (
+            <div className="flex shrink-0 items-center gap-2">
+              <Link href={`/@${handle}`} className="rounded-full px-3.5 py-2 text-xs font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream">View</Link>
+              <button type="button" onClick={share} className="rounded-full bg-ink px-3.5 py-2 text-xs font-semibold text-cream transition hover:bg-coral-deep">{copied ? "Copied" : "Share"}</button>
+            </div>
+          )}
+        </div>
+      </section>
+      <div>
+        <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
+      </div>
+    </aside>
 
       {funding && walletAddress && (
         <FundModal

@@ -98,7 +98,7 @@ function Settings({ platformId }: { platformId: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-6 md:pt-10 md:pb-12">
+    <div className="w-full px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12 [&>section]:max-w-3xl">
       <h1 className="mb-6 text-2xl font-bold">Settings</h1>
 
       <Section title="Your Atcha">
