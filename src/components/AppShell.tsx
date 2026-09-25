@@ -19,7 +19,7 @@ import {
   PhoneIcon,
   PlusIcon,
   SendIcon,
-  WalletIcon, LevelIcon } from "./NavIcons";
+  WalletIcon, LevelIcon, SettingsIcon } from "./NavIcons";
 
 const NAV = [
   { href: "/home", label: "Home", icon: HomeIcon, key: "h" },
@@ -29,6 +29,7 @@ const NAV = [
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
   { href: "/calls", label: "Comms", icon: PhoneIcon, key: "l" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },
+  { href: "/settings", label: "Settings", icon: SettingsIcon, key: "," },
 ] as const;
 
 function isEditable(t: EventTarget | null): boolean {

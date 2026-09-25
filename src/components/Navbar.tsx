@@ -163,6 +163,7 @@ export default function Navbar() {
                     ["/send", "Send"],
                     ["/portfolio", "Wallet"],
                     ["/activity", "Activity"],
+                    ["/settings", "Settings"],
                   ].map(([href, label]) => (
                     <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="block px-4 py-3 text-sm transition hover:bg-card">
                       {label}
