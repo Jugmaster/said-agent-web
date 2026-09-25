@@ -270,7 +270,7 @@ export default function TokenChart({
 /** One sentence beside the bubble, tail pointing at it: "Your agent (Rex) bought $12.07 at $232K market cap". */
 function FillCard({ hit, axis, supply, agentName }: { hit: Hit; axis: "mc" | "price"; supply: number | null; agentName: string | null }) {
   const m = hit.mark;
-  const who = agentName ? `Your agent (${agentName})` : "Your agent";
+  const who = "Your agent";
   const verb = m.side === "buy" ? "bought" : "sold";
   const amount = m.notionalUsd != null ? `$${m.notionalUsd.toFixed(2)}` : "";
   const at = m.tokenPriceUsd != null ? (axis === "mc" && supply ? `${fmtMc(m.tokenPriceUsd * supply)} market cap` : fmtPrice(m.tokenPriceUsd)) : null;
