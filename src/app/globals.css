@@ -107,6 +107,19 @@ html {
   --navbar-h: calc(3rem + max(1rem, env(safe-area-inset-top)));
 }
 
+/* No scrollbars anywhere: the app scrolls, it just doesn't draw a track. Chrome
+   and Safari through the pseudo-element, Firefox through scrollbar-width. */
+html, body, * {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 html,
 body {
   background: var(--background);
