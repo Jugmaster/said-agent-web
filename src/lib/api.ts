@@ -152,7 +152,8 @@ export interface SendResult {
 export async function agentSend(input: {
   platformId: string;
   handle: string;
-  platform: "telegram" | "x";
+  /** "atcha": anyone already on Atcha by their X or Telegram name (the butler resolves across both). */
+  platform: "telegram" | "x" | "atcha";
   asset: "SOL" | "USDC";
   amount: number;
 }): Promise<SendResult> {

@@ -15,7 +15,7 @@ import { requestRefresh } from "@/lib/refresh";
 /** Atcha's own X handle: pinned as the first recipient on the Pay page. */
 const ATCHA_HANDLE = process.env.NEXT_PUBLIC_ATCHA_HANDLE ?? "atcha";
 
-type Platform = "telegram" | "x";
+type Platform = "atcha" | "telegram" | "x";
 type Asset = "USDC" | "SOL";
 
 function normalizeHandle(raw: string): string {
@@ -313,7 +313,7 @@ function SendScreen({ platformId }: { platformId: string }) {
     (params.get("to") ?? "").replace(/^@+/, ""),
   );
   const [platform, setPlatform] = useState<Platform>(() =>
-    params.get("platform") === "x" ? "x" : "telegram",
+    params.get("platform") === "x" ? "x" : params.get("platform") === "telegram" ? "telegram" : "atcha",
   );
   const [amount, setAmount] = useState(() => params.get("amount") ?? "");
   const [asset, setAsset] = useState<Asset>(() =>
@@ -482,6 +482,18 @@ function SendScreen({ platformId }: { platformId: string }) {
           <div className="flex gap-2 mb-2">
             <button
               type="button"
+              onClick={() => setPlatform("atcha")}
+              className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
+                platform === "atcha"
+                  ? "border-white bg-white text-black"
+                  : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+              }`}
+              title="Anyone already on Atcha, by their X or Telegram name"
+            >
+              Atcha
+            </button>
+            <button
+              type="button"
               onClick={() => setPlatform("telegram")}
               className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "telegram"
@@ -503,6 +515,13 @@ function SendScreen({ platformId }: { platformId: string }) {
               X
             </button>
           </div>
+          <p className="mb-2 text-xs text-zinc-500">
+            {platform === "atcha"
+              ? "Anyone already on Atcha, by their X or Telegram name. Not on it yet? Pick X or Telegram and they get it when they log in."
+              : platform === "x"
+                ? "Any X account. If they're not on Atcha yet, the money waits under their name."
+                : "Any Telegram username. If they're not on Atcha yet, the money waits under their name."}
+          </p>
           <div className="relative mb-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 select-none">
               @
@@ -511,7 +530,7 @@ function SendScreen({ platformId }: { platformId: string }) {
               type="text"
               value={handle.replace(/^@+/, "")}
               onChange={(e) => setHandle(e.target.value)}
-              placeholder={platform === "telegram" ? "username" : "handle"}
+              placeholder={platform === "telegram" ? "username" : platform === "x" ? "handle" : "name on Atcha"}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
@@ -642,7 +661,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                 </span>{" "}
                 to{" "}
                 <span className="font-semibold text-white break-all">
-                  {addr ? addr : `@${handleNorm} on ${platform === "x" ? "X" : "Telegram"}`}
+                  {addr ? addr : `@${handleNorm}${platform === "x" ? " on X" : platform === "telegram" ? " on Telegram" : " on Atcha"}`}
                 </span>
                 ?
               </p>
