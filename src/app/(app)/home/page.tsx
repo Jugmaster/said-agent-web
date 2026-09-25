@@ -8,6 +8,7 @@ import FundModal from "@/components/FundModal";
 import FundedCard from "@/components/FundedCard";
 import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
+import PositionsList from "@/components/token/PositionsList";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
 import {
@@ -17,6 +18,8 @@ import {
   getCashback,
   getCredits,
   getCreditsToday,
+  getPositions,
+  type Position,
   type CashbackResponse,
   type CreditsSummary,
   type CreditsToday,
@@ -98,6 +101,7 @@ function Home({ platformId }: { platformId: string }) {
   // undefined = loading, null = credits not available on this API
   const [credits, setCredits] = useState<CreditsSummary | null | undefined>(undefined);
   const [creditsToday, setCreditsToday] = useState<CreditsToday | null>(null);
+  const [positions, setPositions] = useState<Position[] | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -120,6 +124,9 @@ function Home({ platformId }: { platformId: string }) {
       .catch(() => !cancelled && setCredits(null));
     getCreditsToday()
       .then((t) => !cancelled && setCreditsToday(t))
+      .catch(() => {});
+    getPositions(platformId)
+      .then((p) => !cancelled && setPositions(p))
       .catch(() => {});
     return () => {
       cancelled = true;
@@ -186,38 +193,20 @@ function Home({ platformId }: { platformId: string }) {
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
         </div>
 
-        {/* Holdings */}
+        {/* Positions: what the agent holds, with entry and P&L once the trade log is live. */}
         <section>
           <div className="mb-3 flex items-baseline justify-between">
-            <h2 className="text-sm font-medium text-zinc-300">Holdings</h2>
+            <h2 className="text-sm font-medium text-zinc-300">Positions</h2>
             <Link href="/portfolio" className="text-xs text-zinc-500 transition hover:text-zinc-300">
               Full wallet →
             </Link>
           </div>
-
           {portfolio == null && !portfolioErr ? (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-              {[0, 1, 2].map((i) => (
-                <div key={i} className="h-[74px] animate-pulse rounded-2xl border border-zinc-800/60 bg-zinc-900/40" />
-              ))}
+            <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
+              {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-card" />)}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
-              {/* SOL always first */}
-              <HoldingCard symbol="SOL" balance={sol ?? 0} usd={portfolio?.solUsdValue ?? null} />
-              {holdings.map((t) => (
-                <HoldingCard key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} />
-              ))}
-              {holdings.length === 0 && (sol ?? 0) === 0 && (
-                <button
-                  type="button"
-                  onClick={() => setFunding(true)}
-                  className="flex h-[74px] items-center justify-center rounded-2xl border border-dashed border-zinc-800 text-sm text-zinc-500 transition hover:border-zinc-600 hover:text-zinc-300"
-                >
-                  + Add your own money
-                </button>
-              )}
-            </div>
+            <PositionsList holdings={portfolio?.tokens ?? []} positions={positions} solBalance={sol ?? 0} solUsd={portfolio?.solUsdValue ?? null} />
           )}
         </section>
 
@@ -272,22 +261,6 @@ function ActionCard({ href, title, sub, emoji }: { href: string; title: string; 
   );
 }
 
-function HoldingCard({ symbol, balance, usd }: { symbol: string; balance: number; usd: number | null }) {
-  return (
-    <div className="flex h-[74px] items-center gap-3 rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-zinc-800 text-xs font-semibold text-zinc-200">
-        {symbol.slice(0, 3).toUpperCase()}
-      </div>
-      <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-semibold text-white">{symbol}</div>
-        <div className="truncate text-xs text-zinc-500">
-          {balance.toLocaleString(undefined, { maximumFractionDigits: balance < 1 ? 6 : 4 })}
-        </div>
-      </div>
-      <div className="text-right text-sm font-medium text-zinc-200">{usd != null ? fmtUsd(usd) : "—"}</div>
-    </div>
-  );
-}
 
 function AgentIdentity({
   agentName,

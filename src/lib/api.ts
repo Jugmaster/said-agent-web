@@ -1035,3 +1035,14 @@ export async function backfillTrades(platformId: string): Promise<{ status: stri
     return null;
   }
 }
+
+/** Owner-only. Pays out claimable cashback (SOL/USDC at or above the floor) from the pool. */
+export async function claimCashback(platformId: string): Promise<{ status: string; paid?: Array<{ currency: string; amount: number; signature: string }>; message?: string } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/cashback/claim`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify({ platformId }) }, 60_000);
+    const body = await res.json().catch(() => ({}));
+    return { status: body.status ?? (res.ok ? "ok" : `error ${res.status}`), ...body };
+  } catch {
+    return null;
+  }
+}
