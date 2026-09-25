@@ -7,7 +7,6 @@ import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
 import Preloader from "@/components/Preloader";
-import { getCreditsToday, type CreditsToday } from "@/lib/api";
 import s from "./landing.module.css";
 
 const NAMES = ["@the_groupchat", "@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@anyone."];
@@ -29,7 +28,6 @@ export default function LandingPage() {
   const { ready, authenticated, login } = usePrivy();
   const router = useRouter();
   const [loginInitiated, setLoginInitiated] = useState(false);
-  const [today, setToday] = useState<CreditsToday | null | undefined>(undefined);
 
   // Into the app only when the login started here, so a signed-in visitor can still browse.
   useEffect(() => {
@@ -37,7 +35,6 @@ export default function LandingPage() {
   }, [ready, authenticated, loginInitiated, router]);
 
   useEffect(() => {
-    getCreditsToday().then(setToday).catch(() => setToday(null));
   }, []);
 
   const start = () => {
@@ -78,7 +75,6 @@ export default function LandingPage() {
             Start in Telegram
           </a>
         </div>
-        <Counter today={today} />
       </header>
       <div className={s.marquee} aria-hidden>
         <div className={s.track} data-marquee>
@@ -207,22 +203,3 @@ function Rotator({ words }: { words: string[] }) {
   );
 }
 
-function Counter({ today }: { today: CreditsToday | null | undefined }) {
-  const off = !today || !today.live;
-  const money = (v: number) => `$${Math.round(v).toLocaleString()}`;
-  return (
-    <div className={`${s.counter} ${off ? s.off : ""}`} aria-live="polite" data-reveal>
-      {today ? (
-        <>
-          <span><b data-count>{today.agentsFunded.toLocaleString()}</b> Atchas funded</span>
-          <span className={s.sep}>·</span>
-          <span>today&apos;s funding <b>{money(today.fundingUsd)}</b></span>
-          <span className={s.sep}>·</span>
-          <span><b data-count>{today.fundedLastHour.toLocaleString()}</b> in the last hour</span>
-        </>
-      ) : (
-        <span>The first hundred to reach level 2 get the biggest month there will ever be.</span>
-      )}
-    </div>
-  );
-}
