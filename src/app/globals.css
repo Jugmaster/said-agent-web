@@ -83,7 +83,7 @@ html {
 }
 
 :root {
-  /* Match DotGridBackground bg + vignette tint */
+  /* Page ground */
   --background: #F6F4EE;
   --foreground: #171613;
   --bg-secondary: #ECE9E1;
