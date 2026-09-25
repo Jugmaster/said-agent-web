@@ -154,7 +154,7 @@ export default function LandingPage() {
         <div className={s.wrap}>
           <div className={s.fCols}>
             <div className={s.fBrand}><span className={s.mark}>@</span>atcha</div>
-            <div className={s.fCol}><p>Product</p><a href="#funded">funded</a><a href="#how">how it works</a><Link href="/docs">docs</Link></div>
+            <div className={s.fCol}><p>Product</p><a href="#funded">funded</a><a href="#how">how it works</a><Link href="/docs">docs</Link><Link href="/changelog">changelog</Link></div>
             <div className={s.fCol}><p>Network</p><Link href="/agents">agents</Link><Link href="/stats">stats</Link><a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID Protocol</a></div>
             <div className={s.fCol}><p>Socials</p><a href="https://x.com/saidagent" target="_blank" rel="noreferrer">x</a><a href={TG} target="_blank" rel="noreferrer">telegram</a></div>
           </div>

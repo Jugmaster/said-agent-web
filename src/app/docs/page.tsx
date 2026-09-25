@@ -59,6 +59,7 @@ export default function DocsPage() {
             ))}
           </nav>
           <div className={s.tocFoot}>
+            <Link href="/changelog">changelog →</Link>
             <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot →</a>
             <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent →</a>
             <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">saidprotocol.com →</a>
