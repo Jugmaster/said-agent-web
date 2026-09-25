@@ -55,8 +55,9 @@ const EXAMPLE: Ledger = {
 
 export default async function LedgerPage() {
   const real = await getLedger();
-  const L = real ?? EXAMPLE;
-  const example = !real;
+  // Example numbers until the pool has actually funded someone; real zeros say nothing.
+  const example = !real || (!real.live && real.agentsFunded === 0);
+  const L = example ? EXAMPLE : real!;
   const flow = [
     { n: "01", label: "Creator fees in", value: L.creatorFeesSol != null ? sol(L.creatorFeesSol) : "—", sub: L.creatorWallet ? `the token's creator wallet · ${short(L.creatorWallet)}` : "read from the creator wallet once the token is live" },
     { n: "02", label: "The pool", value: usd(L.poolUsd), sub: `${sol(L.poolSol)} · topped up on demand · ${short(L.poolWallet)}` },
