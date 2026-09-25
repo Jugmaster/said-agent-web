@@ -10,7 +10,8 @@
 /* hero */
 .hero { padding: 150px 0 80px; }
 .h1 { font-size: clamp(3rem, 8vw, 6.8rem); line-height: 1.05; letter-spacing: -0.05em; font-weight: 400; margin: 0; }
-.row { display: block; overflow: hidden; padding-bottom: 0.1em; margin-bottom: -0.06em; }
+/* The clip box must include the swatch's top and bottom edges, which sit outside the tight line box. */
+.row { display: block; overflow: hidden; padding: 0.16em 0 0.12em; margin: -0.16em 0 -0.08em; }
 .swatch { display: inline-block; background: var(--color-coral); color: var(--color-cream); border-radius: 0.12em; padding: 0 0.18em 0.06em; box-shadow: 0 18px 44px -12px rgba(232, 84, 46, 0.45); }
 .rot { display: inline-grid; text-align: left; overflow: hidden; transition: width 0.55s cubic-bezier(0.22, 1, 0.36, 1); vertical-align: bottom; }
 .rot > span { grid-area: 1 / 1; white-space: nowrap; opacity: 0; transform: translateY(55%); transition: opacity 0.4s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
@@ -103,6 +104,8 @@
 
 @media (max-width: 880px) {
   .hero { padding-top: 120px; }
+  .marquee { padding-bottom: 12px; }
+  .caps { padding-top: 56px; }
   .capGrid { grid-template-columns: 1fr; }
   .demoCols { grid-template-columns: 1fr; gap: 44px; padding-bottom: 120px; }
   .card { max-width: 500px; }

@@ -63,7 +63,7 @@ export default function LandingPage() {
           <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
         </h1>
         <p className={s.sub}>
-          It starts with <strong>money in it</strong> and it does everything: trades anything on Solana, holds the
+          It starts with <strong>money in it</strong>{" "}and it does everything: trades anything on Solana, holds the
           S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
           work with, every month.
         </p>
