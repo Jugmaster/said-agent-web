@@ -781,6 +781,8 @@ export interface CreditsSummary {
   levelName: string;
   next: { level: number; unlocks: string; have: number; need: number; unit: "people" | "days" } | null;
   funding: { monthlyUsd: number; fundedThisMonth: boolean; nextLevelUsd: number; fundingDay: number; nextFundingAt?: string };
+  /** Gains crystallised each morning: what is actually yours. */
+  settlement?: { todayUsd: number; totalUsd: number; lastAt: string | null; fromLevel: number };
   streak: number;
   paused: boolean;
   tier: number;

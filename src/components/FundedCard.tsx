@@ -108,6 +108,12 @@ export default function FundedCard({
         </p>
       )}
 
+      {s.settlement && s.settlement.todayUsd > 0 && (
+        <p className="mt-4 rounded-lg border border-green-900 bg-green-950/30 px-3 py-2 text-sm text-green-300">
+          Settled this morning: <b>{usd(s.settlement.todayUsd)}</b> of your agent&apos;s gains is yours to take out.
+        </p>
+      )}
+
       <div className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 lg:grid-cols-4">
         <Stat label="Funded this month" value={usd(s.funding.monthlyUsd)} sub={s.funding.fundedThisMonth ? "landed" : `lands ${fundingDate(s.funding)}`} />
         <Stat label="Trades today" value={`${usd(s.limits.tradeLeft)} left`} sub={`of ${usd(s.limits.trade)} a day at level ${s.level}`} />
