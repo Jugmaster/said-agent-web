@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createChart, ColorType, LineSeries, CandlestickSeries, HistogramSeries, type IChartApi, type ISeriesApi, type UTCTimestamp } from "lightweight-charts";
 import { getOhlcv, type Candle, type Timeframe, type TradeRow } from "@/lib/api";
-import { TradeMarkers, type FillMark } from "./trade-markers";
+import { TradeMarkers, type FillMark, type Hit } from "./trade-markers";
 import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
@@ -69,6 +69,8 @@ export default function TokenChart({
   const candlesRef = useRef<Candle[]>([]);
   candlesRef.current = candles;
   const prependedRef = useRef(false);
+  const markersRef = useRef<TradeMarkers | null>(null);
+  const [hover, setHover] = useState<Hit | null>(null);
   // Re-theme when the page does (toggle or OS).
   const [themeKey, setThemeKey] = useState(0);
   useEffect(() => {
@@ -208,21 +210,33 @@ export default function TokenChart({
         const snapped = Math.max(first, first + Math.floor((ts - first) / step) * step);
         const c = byTime.get(snapped);
         const price = (t.tokenPriceUsd ?? c?.[4] ?? 0) * k;
-        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", label: t.notionalUsd != null ? `$${t.notionalUsd.toFixed(0)}` : undefined };
+        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx };
       })
       .filter((m) => m.price > 0);
     const prim = new TradeMarkers();
     prim.setColors({ up, down: css("--color-coral", "#E8542E") });
     series.attachPrimitive(prim);
     prim.setMarks(marks);
+    markersRef.current = prim;
+    setHover(null);
     if (!prependedRef.current) chart.timeScale().fitContent();
     prependedRef.current = false;
   }, [candles, mode, axis, supply, trades, themeKey]);
 
   return (
     <div>
-      <div className="relative h-[300px] w-full md:h-[380px]">
+      <div
+        className="relative h-[300px] w-full md:h-[380px]"
+        onMouseMove={(e) => {
+          const el = host.current; const prim = markersRef.current;
+          if (!el || !prim) return;
+          const r = el.getBoundingClientRect();
+          setHover(prim.bubbleAt(e.clientX - r.left, e.clientY - r.top));
+        }}
+        onMouseLeave={() => setHover(null)}
+      >
         <div ref={host} className="absolute inset-0" />
+        {hover && <FillCard hit={hover} />}
         {(loading || err) && (
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-grey">{err ?? "Loading chart…"}</div>
         )}
@@ -246,6 +260,27 @@ export default function TokenChart({
           <button type="button" onClick={() => setMode("candles")} className={`rounded-full px-2.5 py-1 transition ${mode === "candles" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Candles</button>
         </div>
       </div>
+    </div>
+  );
+}
+
+/** What the agent did there: side, size, price, when, and why. Sits beside the bubble. */
+function FillCard({ hit }: { hit: Hit }) {
+  const m = hit.mark;
+  const left = hit.x + 16;
+  const flip = typeof window !== "undefined" && left > (document.body.clientWidth ?? 9999) - 260;
+  const when = m.at ? new Date(m.at.endsWith("Z") ? m.at : m.at + "Z").toLocaleString("en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+  return (
+    <div
+      className="pointer-events-none absolute z-20 w-56 rounded-xl border border-line bg-paper p-3 text-xs shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.25)]"
+      style={{ left: flip ? undefined : left, right: flip ? `calc(100% - ${hit.x - 16}px)` : undefined, top: Math.max(8, hit.y - 44) }}
+    >
+      <div className="flex items-baseline justify-between">
+        <span className={`font-semibold ${m.side === "buy" ? "text-up" : "text-down"}`}>{m.side === "buy" ? "Bought" : "Sold"}{m.notionalUsd != null ? ` $${m.notionalUsd.toFixed(2)}` : ""}</span>
+        <span className="text-grey">{when}</span>
+      </div>
+      {m.tokenPriceUsd != null && <div className="mt-1 text-ink">at {fmtPrice(m.tokenPriceUsd)}</div>}
+      {m.reason && <div className="mt-1 text-grey">&ldquo;{m.reason.length > 90 ? m.reason.slice(0, 90) + "…" : m.reason}&rdquo;</div>}
     </div>
   );
 }
