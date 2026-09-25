@@ -37,7 +37,7 @@ export default function AuthGate({ children }: Props) {
           <div className="inline-block px-3 py-1.5 mb-5 text-xs text-zinc-400 border border-zinc-700 rounded-full">
             Sign in required
           </div>
-          <h2 className="text-2xl font-bold mb-2">Log in to open your Atcha.</h2>
+          <h2 className="text-2xl font-semibold tracking-tight mb-2">Log in to open your Atcha.</h2>
           <p className="text-sm text-zinc-400 mb-6">
             Sign in with Telegram to pick up where you left off with{" "}
             <span className="text-zinc-200">@saidinfrabot</span>: same Atcha,

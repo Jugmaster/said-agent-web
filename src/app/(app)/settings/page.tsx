@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import ClaimHandle from "@/components/ClaimHandle";
+import AppPage from "@/components/AppPage";
 import ThemeToggle from "@/components/ThemeToggle";
 import { usePrivy } from "@privy-io/react-auth";
 import AuthGate from "@/components/AuthGate";
@@ -64,7 +65,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-2 px-1 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
         {title}
       </h2>
-      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+      <div className="overflow-hidden rounded-2xl border border-line bg-card">
         {children}
       </div>
     </section>
@@ -98,8 +99,7 @@ function Settings({ platformId }: { platformId: string }) {
   }
 
   return (
-    <div className="w-full px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12 [&>section]:max-w-3xl">
-      <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+    <AppPage title="Settings" sub="Your Atcha, your name, how it looks, and your account." narrow>
 
       <Section title="Your Atcha">
         <Row label="Agent" value={agentName ?? "—"} />
@@ -142,6 +142,6 @@ function Settings({ platformId }: { platformId: string }) {
       <p className="px-1 pb-2 text-center text-xs text-zinc-600">
         Atcha, by SAID · your keys are secured by Privy
       </p>
-    </div>
+    </AppPage>
   );
 }

@@ -139,7 +139,7 @@ function HowItWorksPanel() {
   ];
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <div className="rounded-2xl border border-line bg-card p-5">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
           How it works
         </h2>
@@ -159,7 +159,7 @@ function HowItWorksPanel() {
           ))}
         </ol>
       </div>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 text-xs leading-relaxed text-zinc-500">
+      <div className="rounded-2xl border border-line bg-card p-5 text-xs leading-relaxed text-zinc-500">
         <span className="text-zinc-300">Prefer typing?</span> Press{" "}
         <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-300">
           ⌘K
@@ -233,7 +233,7 @@ function SendsPanel({
             <span className="text-[10px] uppercase tracking-wider text-grey">Atcha</span>
           </button>
           {sends === null ? (
-            [0, 1].map((i) => <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />)
+            [0, 1].map((i) => <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-line bg-card" />)
           ) : recents.length === 0 ? (
             <span className="self-center text-xs italic text-zinc-600">People you send to appear here for one-tap re-sends.</span>
           ) : (
@@ -242,7 +242,7 @@ function SendsPanel({
                 key={s.recipientHandle}
                 type="button"
                 onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : "telegram")}
-                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
+                className="flex items-center gap-2 rounded-full border border-line bg-card py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-zinc-200">
                   {s.recipientHandle.slice(0, 1).toUpperCase()}
@@ -260,7 +260,7 @@ function SendsPanel({
           Your sends
         </h2>
         {sends === null ? (
-          <div className="h-32 animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/40" />
+          <div className="h-32 animate-pulse rounded-2xl border border-line bg-card" />
         ) : sends.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
             No sends yet. Your first one shows up here — with live claim status
@@ -437,7 +437,7 @@ function SendScreen({ platformId }: { platformId: string }) {
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1">Pay</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-1">Pay</h1>
           <p className="text-sm text-zinc-500">
             Anyone you can name, $1 or more. Five verified X accounts and your agent is funded.
           </p>
@@ -450,7 +450,7 @@ function SendScreen({ platformId }: { platformId: string }) {
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
-            <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-line bg-card px-4 py-3">
               <div>
                 <div className="text-xs text-zinc-500 mb-0.5">Your balance</div>
                 {bal.error ? (
@@ -763,7 +763,7 @@ function SendScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT RAIL — matches the app's context-panel pattern */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
         <HowItWorksPanel />
       </aside>
     </div>

@@ -73,7 +73,7 @@ function ChatContextRail({
   }, [platformId, nonce]);
 
   return (
-    <aside className="hidden xl:flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5">
+    <aside className="hidden xl:flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5">
       <section>
         <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Quick actions
@@ -85,7 +85,7 @@ function ChatContextRail({
               type="button"
               disabled={sending}
               onClick={() => onQuick(q)}
-              className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-left text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-40"
+              className="rounded-lg border border-line bg-card px-3 py-2 text-left text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-40"
             >
               {q}
             </button>
@@ -118,7 +118,7 @@ function ChatContextRail({
               return (
                 <div
                   key={r.seq}
-                  className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2"
+                  className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2"
                 >
                   <span className="text-base leading-none">{label.emoji}</span>
                   <span className={`flex-1 text-sm font-medium ${label.color}`}>

@@ -31,14 +31,14 @@ export default function FundedCard({
   onAddMoney: () => void;
 }) {
   if (summary === undefined) {
-    return <div className="h-[188px] animate-pulse rounded-2xl border border-zinc-800/60 bg-zinc-900/40" />;
+    return <div className="h-[188px] animate-pulse rounded-2xl border border-line bg-card" />;
   }
 
   if (summary === null || !summary.funded) {
     const t = summary?.today ?? today;
     const next = summary?.next ?? null;
     return (
-      <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <section className="rounded-2xl border border-line bg-card p-5">
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-2">
@@ -73,7 +73,7 @@ export default function FundedCard({
   const spendUsed = s.limits.spend - s.limits.spendLeft;
 
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+    <section className="rounded-2xl border border-line bg-card p-5">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">

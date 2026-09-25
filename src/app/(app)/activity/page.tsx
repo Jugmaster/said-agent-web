@@ -9,7 +9,7 @@ import { onRefresh } from "@/lib/refresh";
 
 function StatTile({ label, value }: { label: string; value: string | number }) {
   return (
-    <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 px-4 py-4">
+    <div className="rounded-2xl border border-line bg-card px-4 py-4">
       <div className="text-xs text-zinc-500">{label}</div>
       <div className="mt-1 text-2xl font-semibold tabular-nums text-white">{value}</div>
     </div>
@@ -19,7 +19,7 @@ function StatTile({ label, value }: { label: string; value: string | number }) {
 function ReceiptItem({ r }: { r: ActivityReceipt }) {
   const label = actionLabel(r.type);
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+    <div className="flex items-start gap-3 rounded-xl border border-line bg-card px-4 py-3">
       <span className="mt-0.5 text-xl leading-none">{label.emoji}</span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
@@ -123,7 +123,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
       {/* MAIN */}
       <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         <div className="mb-8">
-          <h1 className="text-2xl font-semibold text-white md:text-3xl">Activity</h1>
+          <h1 className="text-2xl font-semibold tracking-tight text-ink">Activity</h1>
           <p className="mt-1 text-sm text-zinc-400">Every on-chain receipt, verifiable on Solscan.</p>
         </div>
 
@@ -141,7 +141,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
         <section>
           <h2 className="mb-3 text-sm font-medium text-zinc-300">Recent receipts</h2>
           {data == null ? (
-            <div className="h-40 animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/40" />
+            <div className="h-40 animate-pulse rounded-2xl border border-line bg-card" />
           ) : data.receipts.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-12 text-center text-sm text-zinc-500">
               No on-chain activity yet.{" "}
@@ -168,8 +168,8 @@ function ActivityScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT PANEL */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
-        <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
+        <section className="rounded-2xl border border-line bg-card p-4">
           <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">Summary</h2>
           <dl className="space-y-2.5 text-sm">
             <Row label="Transactions" value={data ? String(data.feeStats.txCount) : "—"} />
@@ -201,7 +201,7 @@ function DcaRules({ rules }: { rules: ActivityResponse["dcaRules"] }) {
       <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">DCA rules ({active} active)</h2>
       <div className="flex flex-col gap-2">
         {rules.map((r) => (
-          <div key={r.id} className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2.5">
+          <div key={r.id} className="rounded-lg border border-line bg-card px-3 py-2.5">
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium text-white">
                 {r.amount} {r.fromToken} → {r.toMint.slice(0, 6)}…

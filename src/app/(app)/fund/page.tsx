@@ -5,6 +5,7 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { getBalance, type BalanceResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
+import AppPage from "@/components/AppPage";
 
 
 function FundScreen({ platformId }: { platformId: string }) {
@@ -75,16 +76,12 @@ function FundScreen({ platformId }: { platformId: string }) {
   }
 
   return (
-    <main className="px-4 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">Add money</h1>
-        <Link
-          href="/portfolio"
-          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
-        >
-          Back
-        </Link>
-      </header>
+    <AppPage
+      title="Add money"
+      sub="Card, Apple Pay, or a transfer from any wallet or exchange. It lands in your one balance."
+      actions={<Link href="/portfolio" className="rounded-full px-3.5 py-2 text-xs font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream">Back to Wallet</Link>}
+      narrow
+    >
 
       {loading && <p className="text-sm text-zinc-500">Loading…</p>}
 
@@ -171,7 +168,7 @@ function FundScreen({ platformId }: { platformId: string }) {
           </Link>
         </div>
       )}
-    </main>
+    </AppPage>
   );
 }
 

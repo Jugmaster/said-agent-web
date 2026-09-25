@@ -166,7 +166,7 @@ export default function WithdrawPage() {
     return (
       <div className="min-h-[60vh] px-6 py-12 flex items-center justify-center">
         <div className="max-w-md w-full text-center bg-zinc-900 border border-zinc-800 rounded-xl px-6 py-10">
-          <h2 className="text-2xl font-bold mb-2">Withdraw from your login wallet.</h2>
+          <h2 className="text-2xl font-semibold tracking-tight mb-2">Withdraw from your login wallet.</h2>
           <p className="text-sm text-zinc-400 mb-6">
             Log in with the same account that received the funds — the wallet
             belongs to that login.
@@ -185,7 +185,7 @@ export default function WithdrawPage() {
   return (
     <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Withdraw</h1>
+        <h1 className="text-2xl font-semibold tracking-tight">Withdraw</h1>
         <p className="text-sm text-zinc-400 mt-1">
           Send SOL out of the embedded wallet created by this login. You sign in
           the Privy window — your key never leaves it. No fee; only the network

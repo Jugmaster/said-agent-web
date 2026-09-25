@@ -176,7 +176,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {!authed && <Navbar />}
 
       {authed && (
-        <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-zinc-800/60 bg-zinc-950/70 backdrop-blur-md">
+        <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-line bg-zinc-950/70 backdrop-blur-md">
           <Link
             href="/"
             className="flex h-16 items-center justify-center lg:justify-start gap-2.5 px-3 lg:px-5 shrink-0"
@@ -277,7 +277,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </>
           )}
 
-          <div className="border-t border-zinc-800/60 px-2 lg:px-3 py-3">
+          <div className="border-t border-line px-2 lg:px-3 py-3">
             <div className="flex items-center justify-center lg:justify-start gap-2.5 px-0.5 lg:px-1">
               <span
                 title={agentName ?? undefined}

@@ -45,7 +45,7 @@ export default function DailyTasks({
               <Link
                 key={t.id}
                 href={href}
-                className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2 transition hover:border-zinc-600"
+                className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2 transition hover:border-zinc-600"
               >
                 <span
                   className={`inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border text-[10px] leading-none ${

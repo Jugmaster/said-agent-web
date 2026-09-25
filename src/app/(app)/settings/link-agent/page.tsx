@@ -93,7 +93,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
       <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-300">
         ← Settings
       </Link>
-      <h1 className="mt-4 text-2xl font-bold">Link an existing agent</h1>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Link an existing agent</h1>
       <p className="mt-2 text-sm leading-relaxed text-zinc-400">
         Registered an agent outside this app? Prove you control its wallet and
         your fees here get priced off the reputation it already earned. The
@@ -125,7 +125,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
           </button>
         </div>
       ) : (
-        <div className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <div className="mt-6 space-y-4 rounded-2xl border border-line bg-card p-5">
           <div>
             <label className="mb-2 block text-xs uppercase tracking-wide text-zinc-500">
               Step 1 — your agent&apos;s wallet address

@@ -222,7 +222,7 @@ function Home({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT CONTEXT PANEL — like chat, fills the width on wide screens */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
         {credits && credits.funded && (
           <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
         )}
@@ -250,7 +250,7 @@ function ActionCard({ href, title, sub, emoji }: { href: string; title: string; 
   return (
     <Link
       href={href}
-      className="group rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4 transition hover:border-zinc-600 hover:bg-zinc-900"
+      className="group rounded-2xl border border-line bg-card p-4 transition hover:border-zinc-600 hover:bg-zinc-900"
     >
       <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-base text-zinc-200 transition group-hover:bg-zinc-700">
         {emoji}
@@ -273,7 +273,7 @@ function AgentIdentity({
 }) {
   const verified = balance?.verified;
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <section className="rounded-2xl border border-line bg-card p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
           {(agentName ?? "A").slice(0, 1).toUpperCase()}
@@ -326,7 +326,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
             return (
               <div
                 key={r.seq}
-                className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2"
+                className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2"
               >
                 <span className="text-base leading-none">{label.emoji}</span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>

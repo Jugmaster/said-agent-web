@@ -23,7 +23,7 @@ export default function CashbackCard({ balance, cashback, level, onClaimed }: { 
     setClaiming(false);
   };
   return (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <section className="rounded-2xl border border-line bg-card p-4">
       <div className="flex items-baseline justify-between">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500">Cashback</h2>
         {level && <span className="text-[11px] text-zinc-500">level {level} rate</span>}

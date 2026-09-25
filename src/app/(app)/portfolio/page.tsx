@@ -96,7 +96,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
   const identityCard = (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <section className="rounded-2xl border border-line bg-card p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
           {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
@@ -194,7 +194,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT PANEL */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
 {identityCard}
         <RecentActivity receipts={receipts} />
       </aside>
@@ -246,7 +246,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
           {receipts.map((r) => {
             const label = actionLabel(r.type);
             return (
-              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
+              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2">
                 <span className="text-base leading-none">{label.emoji}</span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
                 <span className="text-[11px] text-zinc-500">{timeAgo(r.occurredAt)}</span>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import AuthGate from "@/components/AuthGate";
+import AppPage from "@/components/AppPage";
 import { commsCall, commsEmail, getComms, type CommsCallRecord } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 
@@ -202,15 +203,7 @@ function CallsInner({ platformId }: { platformId: string }) {
   return (
     // Mobile scrolling happens in AppShell's internal container (body is
     // locked so the fixed tab bar can't drift on iOS/Telegram webviews).
-    <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-[max(1.5rem,env(safe-area-inset-top))] md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Comms</h1>
-        <p className="text-sm text-zinc-400 mt-1">
-          Your agent calls, emails, and (soon) texts on your behalf — paid from
-          your balance, only when it works. Transcripts and recordings land
-          here.
-        </p>
-      </div>
+    <AppPage title="Comms" sub="Your agent calls, emails, and (soon) texts on your behalf, paid from your balance only when it works. Transcripts and recordings land here." narrow>
 
       <div className="flex gap-1 mb-5 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit">
         {(["call", "email", "text"] as const).map((t) => (
@@ -346,6 +339,6 @@ function CallsInner({ platformId }: { platformId: string }) {
           })()
         )}
       </div>
-    </div>
+    </AppPage>
   );
 }
