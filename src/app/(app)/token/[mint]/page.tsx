@@ -17,6 +17,17 @@ const pct = (v: number | null | undefined) => (v == null ? "—" : `${v >= 0 ? "
 const tone = (v: number | null | undefined) => (v == null ? "text-grey" : v >= 0 ? "text-up" : "text-down");
 const SAID_API = process.env.NEXT_PUBLIC_SAID_API ?? "https://api.saidprotocol.com";
 
+/** A timeframe that shows the token's life at a glance: minutes for a launch, hours for a season, days for a major. */
+function defaultTf(createdAt: string | null): "1m" | "5m" | "15m" | "1h" | "4h" | "1d" {
+  if (!createdAt) return "15m";
+  const days = (Date.now() - new Date(createdAt).getTime()) / 86_400_000;
+  if (days < 1) return "1m";
+  if (days < 7) return "15m";
+  if (days < 60) return "1h";
+  if (days < 365) return "4h";
+  return "1d";
+}
+
 interface Passport {
   verdict: string;
   reasons: string[];
@@ -109,7 +120,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_400px]">
         <div className="min-w-0">
           <div className="rounded-2xl border border-line bg-paper p-3">
-            <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} />
+            <TokenChart mint={mint} pool={stats?.poolId ?? null} ready={stats !== undefined} trades={trades} supply={stats?.supply ?? null} defaultTf={defaultTf(stats?.createdAt ?? null)} />
           </div>
 
           {/* Stats a trader reads */}
@@ -124,7 +135,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
               <Bar label="buys" a={stats.txns24h.buys} bLabel="sells" b={stats.txns24h.sells} />
               {stats.buyers24h != null && stats.sellers24h != null && <Bar label="buyers" a={stats.buyers24h} bLabel="sellers" b={stats.sellers24h} />}
               <Fact label="Volume 24h" value={stats.volume24hUsd != null ? fmtMc(stats.volume24hUsd) : "—"} />
-              <Fact label="Liquidity" value={stats.liquidityUsd != null ? fmtMc(stats.liquidityUsd) : "—"} />
+              <Fact label={stats.pools > 1 ? `Liquidity · ${stats.pools >= 30 ? "30+" : stats.pools} pools` : "Liquidity"} value={stats.liquidityUsd != null ? fmtMc(stats.liquidityUsd) : "—"} />
               <Fact label="Supply" value={stats.supply != null ? fmtMc(stats.supply).replace("$", "") : "—"} />
               <Fact label="Venue" value={stats.dex ?? "—"} />
               {passport?.market?.holders != null && <Fact label="Holders" value={passport.market.holders.toLocaleString()} />}

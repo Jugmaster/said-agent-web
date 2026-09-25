@@ -925,6 +925,8 @@ export interface TokenStats {
   marketCapUsd: number | null;
   fdvUsd: number | null;
   liquidityUsd: number | null;
+  mainPoolLiquidityUsd: number | null;
+  pools: number;
   volume24hUsd: number | null;
   change: { m5: number | null; h1: number | null; h6: number | null; h24: number | null };
   txns24h: { buys: number; sells: number };
@@ -954,11 +956,12 @@ export async function getTokenStats(mint: string): Promise<TokenStats | null> {
 export type Candle = [time: number, open: number, high: number, low: number, close: number, volume: number];
 export type Timeframe = "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
 
-export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number } = {}): Promise<{ candles: Candle[]; pool: string | null; error?: string; retryIn?: number | null }> {
+export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number; before?: number } = {}): Promise<{ candles: Candle[]; pool: string | null; error?: string; retryIn?: number | null }> {
   try {
     const q = new URLSearchParams({ tf });
     if (opts.pool) q.set("pool", opts.pool);
     if (opts.limit) q.set("limit", String(opts.limit));
+    if (opts.before) q.set("before", String(opts.before));
     const res = await fetch(`/api/token/${encodeURIComponent(mint)}/ohlcv?${q}`, { cache: "no-store" });
     if (!res.ok) return { candles: [], pool: opts.pool ?? null };
     return res.json();

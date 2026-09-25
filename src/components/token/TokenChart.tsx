@@ -43,6 +43,12 @@ export default function TokenChart({
   const [candles, setCandles] = useState<Candle[]>([]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
+  // Paging back through history as the user scrolls left.
+  const [hasMore, setHasMore] = useState(true);
+  const loadingMore = useRef(false);
+  const candlesRef = useRef<Candle[]>([]);
+  candlesRef.current = candles;
+  const prependedRef = useRef(false);
   // Re-theme when the page does (toggle or OS).
   const [themeKey, setThemeKey] = useState(0);
   useEffect(() => {
@@ -62,10 +68,11 @@ export default function TokenChart({
     let timer: ReturnType<typeof setTimeout> | null = null;
     setLoading(true); setErr(null);
     const ask = (attempt: number) => {
-      getOhlcv(mint, tf, { pool, limit: 400 })
+      setHasMore(true);
+      getOhlcv(mint, tf, { pool, limit: 1000 })
         .then((r) => {
           if (!alive) return;
-          if (r.candles.length) { setCandles(r.candles); setLoading(false); return; }
+          if (r.candles.length) { setCandles(r.candles); setHasMore(r.candles.length >= 1000); setLoading(false); return; }
           if (r.retryIn && attempt < 3) { setErr("Busy, trying again…"); timer = setTimeout(() => ask(attempt + 1), r.retryIn * 1000); return; }
           setCandles([]); setErr("No chart for this token yet."); setLoading(false);
         })
@@ -92,6 +99,36 @@ export default function TokenChart({
     chartRef.current = chart;
     return () => { chart.remove(); chartRef.current = null; seriesRef.current = null; volRef.current = null; };
   }, [themeKey]);
+
+  // Older candles when the left edge comes into view.
+  const loadOlder = async () => {
+    if (loadingMore.current || !hasMore) return;
+    const first = candlesRef.current[0];
+    if (!first) return;
+    loadingMore.current = true;
+    try {
+      const r = await getOhlcv(mint, tf, { pool, limit: 1000, before: first[0] });
+      const older = r.candles.filter((c) => c[0] < first[0]);
+      if (older.length === 0) { setHasMore(false); return; }
+      const chart = chartRef.current;
+      const range = chart?.timeScale().getVisibleRange();
+      prependedRef.current = true;
+      setCandles((cur) => [...older, ...cur]);
+      if (older.length < 1000) setHasMore(false);
+      // Keep the user where they were; setData would otherwise jump to the end.
+      if (chart && range) requestAnimationFrame(() => { try { chart.timeScale().setVisibleRange(range); } catch {} });
+    } finally {
+      loadingMore.current = false;
+    }
+  };
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const onRange = (r: { from: number; to: number } | null) => { if (r && r.from < 40) void loadOlder(); };
+    chart.timeScale().subscribeVisibleLogicalRangeChange(onRange);
+    return () => chart.timeScale().unsubscribeVisibleLogicalRangeChange(onRange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeKey, tf, pool, hasMore]);
 
   // (Re)draw the series when data, mode or axis changes.
   useEffect(() => {
@@ -140,7 +177,8 @@ export default function TokenChart({
       })
       .sort((a, b) => (a.time as number) - (b.time as number));
     createSeriesMarkers(series, markers);
-    chart.timeScale().fitContent();
+    if (!prependedRef.current) chart.timeScale().fitContent();
+    prependedRef.current = false;
   }, [candles, mode, axis, supply, trades, themeKey]);
 
   return (
@@ -152,7 +190,8 @@ export default function TokenChart({
         )}
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
-        <div className="flex gap-1">
+        <div className="flex items-center gap-1">
+          {hasMore && candles.length > 0 && <span className="mr-1 text-grey">← drag for history</span>}
           {TFS.map((x) => (
             <button key={x} type="button" onClick={() => setTf(x)} className={`rounded-full px-2.5 py-1 transition ${tf === x ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>{x}</button>
           ))}

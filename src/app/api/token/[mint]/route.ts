@@ -18,7 +18,11 @@ export interface TokenStats {
   priceUsd: number | null;
   marketCapUsd: number | null;
   fdvUsd: number | null;
+  /** Across every Solana pool the token sits in, either side. */
   liquidityUsd: number | null;
+  /** The main pool alone (the one the chart reads). */
+  mainPoolLiquidityUsd: number | null;
+  pools: number;
   volume24hUsd: number | null;
   change: { m5: number | null; h1: number | null; h6: number | null; h24: number | null };
   txns24h: { buys: number; sells: number };
@@ -43,9 +47,12 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
       cached(`ds:${mint}`, 30_000, () => fetch(`https://api.dexscreener.com/latest/dex/tokens/${mint}`, { cache: "no-store" }).then((r) => (r.ok ? r.json() : null))).catch(() => null),
       cached(`gtpools:${mint}`, 300_000, () => fetch(`https://api.geckoterminal.com/api/v2/networks/solana/tokens/${mint}/pools?page=1`, { headers: { accept: "application/json" }, cache: "no-store" }).then((r) => { if (r.status === 429) throw new Error("gt 429"); return r.ok ? r.json() : null; })).catch(() => null),
     ]);
-    const pairs: any[] = (ds?.pairs ?? []).filter((p: any) => p.chainId === "solana" && p.baseToken?.address === mint);
+    const all: any[] = (ds?.pairs ?? []).filter((p: any) => p.chainId === "solana" && (p.baseToken?.address === mint || p.quoteToken?.address === mint));
+    const pairs: any[] = all.filter((p: any) => p.baseToken?.address === mint);
     pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
-    const p = pairs[0] ?? null;
+    const p = pairs[0] ?? all.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0))[0] ?? null;
+    const totalLiquidity = all.length ? all.reduce((s: number, x: any) => s + (x.liquidity?.usd ?? 0), 0) : null;
+    const totalVolume = all.length ? all.reduce((s: number, x: any) => s + (x.volume?.h24 ?? 0), 0) : null;
     const pools: any[] = gt?.data ?? [];
     const pool = pools.find((x) => x.attributes?.address === p?.pairAddress) ?? pools[0] ?? null;
     const tx = pool?.attributes?.transactions?.h24 ?? null;
@@ -57,8 +64,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
       priceUsd: p?.priceUsd != null ? Number(p.priceUsd) : pool ? Number(pool.attributes.base_token_price_usd) : null,
       marketCapUsd: p?.marketCap ?? (pool?.attributes?.market_cap_usd != null ? Number(pool.attributes.market_cap_usd) : null),
       fdvUsd: p?.fdv ?? (pool?.attributes?.fdv_usd != null ? Number(pool.attributes.fdv_usd) : null),
-      liquidityUsd: p?.liquidity?.usd ?? (pool?.attributes?.reserve_in_usd != null ? Number(pool.attributes.reserve_in_usd) : null),
-      volume24hUsd: p?.volume?.h24 ?? (pool?.attributes?.volume_usd?.h24 != null ? Number(pool.attributes.volume_usd.h24) : null),
+      liquidityUsd: totalLiquidity ?? (pool?.attributes?.reserve_in_usd != null ? Number(pool.attributes.reserve_in_usd) : null),
+      mainPoolLiquidityUsd: p?.liquidity?.usd ?? (pool?.attributes?.reserve_in_usd != null ? Number(pool.attributes.reserve_in_usd) : null),
+      pools: all.length || (pool ? 1 : 0),
+      volume24hUsd: totalVolume ?? (pool?.attributes?.volume_usd?.h24 != null ? Number(pool.attributes.volume_usd.h24) : null),
       change: { m5: p?.priceChange?.m5 ?? null, h1: p?.priceChange?.h1 ?? null, h6: p?.priceChange?.h6 ?? null, h24: p?.priceChange?.h24 ?? null },
       txns24h: { buys: p?.txns?.h24?.buys ?? tx?.buys ?? 0, sells: p?.txns?.h24?.sells ?? tx?.sells ?? 0 },
       buyers24h: tx?.buyers ?? null,

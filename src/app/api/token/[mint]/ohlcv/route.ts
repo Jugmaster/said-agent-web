@@ -20,6 +20,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ mint: st
   const url = new URL(req.url);
   const tf = TF[url.searchParams.get("tf") ?? "15m"] ?? TF["15m"];
   const limit = Math.min(1000, Number(url.searchParams.get("limit") ?? 300) || 300);
+  const before = Number(url.searchParams.get("before") ?? 0) || 0; // unix seconds: candles strictly older than this
   let pool = url.searchParams.get("pool");
   try {
     if (!pool) {
@@ -27,10 +28,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ mint: st
       pool = gt?.data?.[0]?.attributes?.address ?? null;
     }
     if (!pool) return NextResponse.json({ candles: [], pool: null, error: "no pool" }, { headers: { "Cache-Control": "public, max-age=30" } });
-    const key = `ohlcv:${pool}:${tf.path}:${tf.aggregate}:${limit}`;
+    const key = `ohlcv:${pool}:${tf.path}:${tf.aggregate}:${limit}:${before}`;
     const candles = await cached<number[][]>(key, 25_000, async () => {
       const r = await fetch(
-        `https://api.geckoterminal.com/api/v2/networks/solana/pools/${pool}/ohlcv/${tf.path}?aggregate=${tf.aggregate}&limit=${limit}&currency=usd`,
+        `https://api.geckoterminal.com/api/v2/networks/solana/pools/${pool}/ohlcv/${tf.path}?aggregate=${tf.aggregate}&limit=${limit}&currency=usd${before ? `&before_timestamp=${before}` : ""}`,
         { headers: { accept: "application/json" }, cache: "no-store" },
       );
       if (!r.ok) throw new Error(`upstream ${r.status}`);
