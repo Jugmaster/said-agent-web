@@ -187,7 +187,13 @@
 @media (max-width: 880px) {
   .pageHead { padding-top: 110px; }
   .tiles { grid-template-columns: 1fr; }
-  .docs { grid-template-columns: 1fr; gap: 24px; padding-top: 90px; }
+  /* One column, and nothing inside may set its width: grid children default to
+     min-width auto, so the sidebar's nowrap link row was widening the page. */
+  .docs { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 90px; }
+  .docs > aside, .docs > main { min-width: 0; max-width: 100%; }
+  .toc { max-width: 100%; }
+  .docBody pre, .block { overflow-x: auto; max-width: 100%; }
+  .docBody table { display: block; overflow-x: auto; max-width: 100%; white-space: nowrap; }
   .docs > aside { position: sticky; top: calc(68px + env(safe-area-inset-top)); z-index: 5; background: var(--color-cream); margin: 0 -20px; padding: 8px 20px; }
   .tocWrap { position: static; }
   .toc { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }

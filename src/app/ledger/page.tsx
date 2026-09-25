@@ -89,7 +89,7 @@ export default async function LedgerPage() {
         </header>
 
         {/* The flow, in order. */}
-        <div className={s.tiles} data-stagger style={{ gridTemplateColumns: "repeat(3, 1fr)" }}>
+        <div className={s.tiles} data-stagger>
           {flow.map((f) => (
             <div key={f.n} className={s.tile}>
               <span className={s.eyebrow} style={{ margin: "0 0 10px" }}>{f.n} · {f.label}</span>
