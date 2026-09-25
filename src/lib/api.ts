@@ -1012,3 +1012,15 @@ export async function getLedger(): Promise<Ledger | null> {
     return null;
   }
 }
+
+export interface TokenBrief { symbol: string; name: string; imageUrl: string | null; priceUsd: number | null; marketCapUsd: number | null; change24h: number | null }
+export async function getTokenBriefs(mints: string[]): Promise<Record<string, TokenBrief>> {
+  if (mints.length === 0) return {};
+  try {
+    const res = await fetch(`/api/token/batch?mints=${encodeURIComponent(mints.slice(0, 30).join(","))}`, { cache: "no-store" });
+    if (!res.ok) return {};
+    return ((await res.json()) as { tokens: Record<string, TokenBrief> }).tokens ?? {};
+  } catch {
+    return {};
+  }
+}
