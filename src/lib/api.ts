@@ -976,3 +976,39 @@ export async function searchTokens(q: string): Promise<TokenHit[]> {
     return [];
   }
 }
+
+// ─── The ledger: where the token's money goes ──────────────────────────────
+
+export interface LedgerMonth { month: string; agentsFunded: number; fundedUsd: number; feesUsd: number; buybackSol: number; buybackUsd: number }
+export interface Ledger {
+  live: boolean;
+  asOf: string;
+  creatorFeesSol: number | null;
+  creatorWallet: string | null;
+  poolWallet: string | null;
+  poolSol: number | null;
+  poolUsd: number | null;
+  agentsFunded: number;
+  agentsFundedThisMonth: number;
+  fundedTotalUsd: number;
+  fundedThisMonthUsd: number;
+  tradedByFundedUsd: number;
+  feesFromFundedUsd: number;
+  gainsSettledUsd: number;
+  shareKeptUsd: number;
+  buyback: { enabled: boolean; live: boolean; lockWallet: string | null; buys: number; solSpent: number; usdSpent: number; atchaBought: number; lastAt: string | null };
+  selfFundedPct: number | null;
+  months: LedgerMonth[];
+  milestones: Array<{ label: string; target: number; have: number; done: boolean }>;
+}
+
+/** Public. Null when the API predates the ledger. */
+export async function getLedger(): Promise<Ledger | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/ledger`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
