@@ -12,6 +12,9 @@ import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
 import { requestRefresh } from "@/lib/refresh";
 
+/** Atcha's own X handle: pinned as the first recipient on the Pay page. */
+const ATCHA_HANDLE = process.env.NEXT_PUBLIC_ATCHA_HANDLE ?? "atcha";
+
 type Platform = "telegram" | "x";
 type Asset = "USDC" | "SOL";
 
@@ -217,19 +220,24 @@ function SendsPanel({
         <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Recent recipients
         </h2>
-        {sends === null ? (
-          <div className="flex gap-2">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />
-            ))}
-          </div>
-        ) : recents.length === 0 ? (
-          <p className="text-xs italic text-zinc-600">
-            People you send to appear here for one-tap re-sends.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {recents.map((s) => (
+        <div className="flex flex-wrap gap-2">
+          {/* Atcha itself, always first: the one recipient every user can pay on day one. */}
+          <button
+            type="button"
+            onClick={() => onPick(ATCHA_HANDLE, "x")}
+            className="flex items-center gap-2 rounded-full border border-line bg-[#FFFFFF] py-1.5 pl-1.5 pr-3.5 transition hover:border-ink"
+            title="Pay Atcha"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-coral text-[11px] font-semibold text-cream">@</span>
+            <span className="text-sm text-ink">@{ATCHA_HANDLE}</span>
+            <span className="text-[10px] uppercase tracking-wider text-grey">Atcha</span>
+          </button>
+          {sends === null ? (
+            [0, 1].map((i) => <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />)
+          ) : recents.length === 0 ? (
+            <span className="self-center text-xs italic text-zinc-600">People you send to appear here for one-tap re-sends.</span>
+          ) : (
+            recents.filter((r) => r.recipientHandle.toLowerCase() !== ATCHA_HANDLE.toLowerCase()).map((s) => (
               <button
                 key={s.recipientHandle}
                 type="button"
@@ -241,9 +249,9 @@ function SendsPanel({
                 </span>
                 <span className="text-sm text-zinc-200">@{s.recipientHandle}</span>
               </button>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </section>
 
       {/* Your sends */}
