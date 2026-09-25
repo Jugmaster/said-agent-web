@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -93,7 +94,7 @@ function FundScreen({ platformId }: { platformId: string }) {
 
       {balance && balance.verified && (
         <div className="bg-green-950/30 border border-green-900 rounded-xl px-4 py-6 text-center">
-          <p className="text-2xl mb-2">✅</p>
+          <div className="mb-2 flex justify-center"><Mark name="check" tone="up" /></div>
           <p className="text-sm font-medium text-green-300 mb-1">
             {balance.displayName ?? "Your Atcha"} is verified
           </p>

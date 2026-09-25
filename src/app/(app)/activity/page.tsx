@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { iconFor } from "@/components/ActionIcon";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -20,7 +21,7 @@ function ReceiptItem({ r }: { r: ActivityReceipt }) {
   const label = actionLabel(r.type);
   return (
     <div className="flex items-start gap-3 rounded-xl border border-line bg-card px-4 py-3">
-      <span className="mt-0.5 text-xl leading-none">{label.emoji}</span>
+      <span className="mt-0.5 text-grey"><ActionIcon name={iconFor(r.type)} /></span>
       <div className="min-w-0 flex-1">
         <div className="flex items-center justify-between gap-2">
           <span className={`text-sm font-medium ${label.color}`}>{label.text}</span>
@@ -59,7 +60,7 @@ function ReceiptTable({ receipts }: { receipts: ActivityReceipt[] }) {
             return (
               <tr key={r.seq} className="transition-colors hover:bg-zinc-900/50">
                 <td className="px-4 py-3">
-                  <span className="mr-2">{label.emoji}</span>
+                  <span className="mr-2 inline-flex align-middle text-grey"><ActionIcon name={iconFor(r.type)} className="w-[14px] h-[14px]" /></span>
                   <span className={`font-medium ${label.color}`}>{label.text}</span>
                 </td>
                 <td className="px-4 py-3 text-zinc-400">#{r.seq}</td>

@@ -1,4 +1,5 @@
 "use client";
+import { Mark } from "@/components/ActionIcon";
 
 /**
  * Telegram Mini App funding page.
@@ -192,7 +193,7 @@ export default function FundOnrampPage() {
   if (phase === "error") {
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
-        <p className="text-2xl mb-3">⚠️</p>
+        <div className="mb-3 flex justify-center"><Mark name="warn" tone="warn" /></div>
         <p className="text-sm text-red-300 mb-2">Couldn&apos;t open funding</p>
         <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">{errorMsg}</p>
         <button onClick={close} className="text-sm px-4 py-2 rounded-lg border border-zinc-700 hover:border-zinc-500">
@@ -205,7 +206,7 @@ export default function FundOnrampPage() {
   if (phase === "done") {
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-6 py-8 flex flex-col items-center justify-center">
-        <p className="text-3xl mb-3">✅</p>
+        <div className="mb-3 flex justify-center"><Mark name="check" tone="up" /></div>
         <p className="text-sm font-medium mb-2">Payment window open</p>
         <p className="text-xs text-zinc-400 mb-6 max-w-xs text-center">
           Complete your card payment in the window that just opened. SOL lands

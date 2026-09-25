@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { iconFor, type ActionIconName } from "@/components/ActionIcon";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -194,11 +195,11 @@ function Home({ platformId }: { platformId: string }) {
 
         {/* Quick actions */}
         <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
-          <ActionCard href="/send" title="Pay" sub="Anyone you can name" emoji="↗" />
-          <ActionCard href="/chat" title="Ask your Atcha" sub="It handles the rest" emoji="✦" />
-          <ActionCard href="/level" title="Level" sub="Record, page, the board" emoji="▮" />
-          <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" emoji="▢" />
-          <ActionCard href="/activity" title="Activity" sub="Receipts & history" emoji="≡" />
+          <ActionCard href="/send" title="Pay" sub="Anyone you can name" icon="pay" />
+          <ActionCard href="/chat" title="Ask your Atcha" sub="It handles the rest" icon="ask" />
+          <ActionCard href="/level" title="Level" sub="Record, page, the board" icon="level" />
+          <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" icon="wallet" />
+          <ActionCard href="/activity" title="Activity" sub="Receipts & history" icon="activity" />
         </div>
 
         {/* Positions: what the agent holds, with entry and P&L once the trade log is live. */}
@@ -254,14 +255,14 @@ function Home({ platformId }: { platformId: string }) {
   );
 }
 
-function ActionCard({ href, title, sub, emoji }: { href: string; title: string; sub: string; emoji: string }) {
+function ActionCard({ href, title, sub, icon }: { href: string; title: string; sub: string; icon: ActionIconName }) {
   return (
     <Link
       href={href}
       className="group rounded-2xl border border-line bg-card p-4 transition hover:border-zinc-600 hover:bg-zinc-900"
     >
       <div className="mb-3 flex h-9 w-9 items-center justify-center rounded-lg bg-zinc-800 text-base text-zinc-200 transition group-hover:bg-zinc-700">
-        {emoji}
+        <ActionIcon name={icon} />
       </div>
       <div className="text-sm font-semibold text-white">{title}</div>
       <div className="mt-0.5 text-xs text-zinc-500">{sub}</div>
@@ -336,7 +337,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
                 key={r.seq}
                 className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2"
               >
-                <span className="text-base leading-none">{label.emoji}</span>
+                <span className="text-grey"><ActionIcon name={iconFor(r.type)} /></span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
                 <span className="text-[11px] text-zinc-500">{timeAgo(r.occurredAt)}</span>
               </div>

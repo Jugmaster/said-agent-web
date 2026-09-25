@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
@@ -148,7 +149,7 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
               onMouseEnter={() => setHighlight(matched.length)}
               className={rowClass(highlight === matched.length)}
             >
-              <span className="text-zinc-500">✦</span>
+              <span className="text-zinc-500"><ActionIcon name="ask" className="w-[16px] h-[16px]" /></span>
               <span className="flex-1">
                 Ask your Atcha:{" "}
                 <span className="text-zinc-400">“{query.trim()}”</span>

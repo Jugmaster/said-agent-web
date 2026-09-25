@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { iconFor, Mark } from "@/components/ActionIcon";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -120,7 +121,7 @@ function ChatContextRail({
                   key={r.seq}
                   className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2"
                 >
-                  <span className="text-base leading-none">{label.emoji}</span>
+                  <span className="text-grey"><ActionIcon name={iconFor(r.type)} /></span>
                   <span className={`flex-1 text-sm font-medium ${label.color}`}>
                     {label.text}
                   </span>
@@ -291,7 +292,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
       const errMsg: UiMessage = {
         id: `e-${Date.now()}`,
         role: "agent",
-        text: `⚠️ ${err instanceof Error ? err.message : "request failed"}`,
+        text: `Couldn't do that: ${err instanceof Error ? err.message : "request failed"}`,
       };
       setMessages((prev) => [...prev, errMsg]);
     } finally {
@@ -446,7 +447,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
         {received && (
           <div className="px-4 py-4 bg-gradient-to-b from-emerald-950/50 to-transparent border-b border-emerald-900/50">
             <div className="max-w-md mx-auto text-center">
-              <div className="text-2xl mb-1">🎁</div>
+              <div className="mb-2 flex justify-center"><Mark name="gift" tone="up" /></div>
               <p className="text-base font-semibold text-emerald-200">
                 You received {received.lines
                   .map((l) => l.match(/[\d.]+\s*(?:SOL|USDC)/i)?.[0])
@@ -507,7 +508,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
         {needsFunding && (
           <div className="px-4 py-3 bg-blue-950/30 border-b border-blue-900/50">
             <div className="mx-auto flex w-full max-w-3xl items-start gap-3">
-              <span className="text-lg leading-none">✨</span>
+              <span className="text-info"><ActionIcon name="ask" /></span>
               <div className="flex-1 text-sm">
                 <p className="font-medium text-blue-200">Activating your agent…</p>
                 <p className="text-xs text-blue-300/80 mt-0.5">

@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { iconFor } from "@/components/ActionIcon";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -247,7 +248,7 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
             const label = actionLabel(r.type);
             return (
               <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2">
-                <span className="text-base leading-none">{label.emoji}</span>
+                <span className="text-grey"><ActionIcon name={iconFor(r.type)} /></span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
                 <span className="text-[11px] text-zinc-500">{timeAgo(r.occurredAt)}</span>
               </div>
