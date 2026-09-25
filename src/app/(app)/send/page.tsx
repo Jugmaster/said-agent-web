@@ -224,7 +224,7 @@ function SendsPanel({
           {/* Atcha itself, always first: the one recipient every user can pay on day one. */}
           <button
             type="button"
-            onClick={() => onPick(ATCHA_HANDLE, "x")}
+            onClick={() => onPick(ATCHA_HANDLE, "atcha")}
             className="flex items-center gap-2 rounded-full border border-line bg-[#FFFFFF] py-1.5 pl-1.5 pr-3.5 transition hover:border-ink"
             title="Pay Atcha"
           >

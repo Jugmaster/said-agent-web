@@ -9,10 +9,12 @@ import FundedCard from "@/components/FundedCard";
 import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
 import FleetBoard from "@/components/FleetBoard";
+import ClaimHandle from "@/components/ClaimHandle";
 import { useAgent } from "@/hooks/useAgent";
 import {
   getCredits,
   getCreditsToday,
+  getHandle,
   getCashback,
   getBalance,
   getPortfolio,
@@ -37,7 +39,10 @@ function Level({ platformId }: { platformId: string }) {
   const agent = useAgent();
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
   const { user } = usePrivy();
-  const handle = user?.twitter?.username ?? user?.telegram?.username ?? null;
+  const [atchaHandle, setAtchaHandle] = useState<string | null>(null);
+  useEffect(() => { getHandle(platformId).then((h) => setAtchaHandle(h?.handle ?? null)).catch(() => {}); }, [platformId]);
+  // Your page is your Atcha name; until you have one, your X or Telegram name works too.
+  const handle = atchaHandle ?? user?.twitter?.username ?? user?.telegram?.username ?? null;
 
   const [credits, setCredits] = useState<CreditsSummary | null | undefined>(undefined);
   const [today, setToday] = useState<CreditsToday | null>(null);
@@ -93,8 +98,12 @@ function Level({ platformId }: { platformId: string }) {
         </div>
       )}
 
-      {/* Your page: the link is the share card. */}
+      {/* Your name, then your page: the link is the share card. */}
       <section className="mt-6 rounded-2xl border border-line bg-card p-4">
+        <div className="mb-3 border-b border-line pb-3">
+          <div className="mb-1 text-xs font-medium uppercase tracking-wider text-grey">Your name</div>
+          <ClaimHandle platformId={platformId} onClaimed={setAtchaHandle} />
+        </div>
         <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
             <div className="text-xs font-medium uppercase tracking-wider text-grey">Your page</div>

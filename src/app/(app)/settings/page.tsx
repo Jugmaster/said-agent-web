@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ClaimHandle from "@/components/ClaimHandle";
 import { usePrivy } from "@privy-io/react-auth";
 import AuthGate from "@/components/AuthGate";
 import { useAgent } from "@/hooks/useAgent";
@@ -100,7 +101,8 @@ function Settings({ platformId }: { platformId: string }) {
       <h1 className="mb-6 text-2xl font-bold">Settings</h1>
 
       <Section title="Your Atcha">
-        <Row label="Name" value={agentName ?? "—"} />
+        <Row label="Agent" value={agentName ?? "—"} />
+        <div className="px-4 py-3"><div className="mb-1 text-xs text-grey">Your @name</div><ClaimHandle platformId={platformId} compact /></div>
         <Row
           label="Wallet"
           value={walletAddress ? truncMiddle(walletAddress, 4, 4) : "—"}

@@ -1047,3 +1047,49 @@ export async function claimCashback(platformId: string): Promise<{ status: strin
     return null;
   }
 }
+
+// ─── The Atcha handle ──────────────────────────────────────────────────────
+
+export type HandleReason = "invalid" | "reserved" | "taken" | "someone-elses-name" | "cooldown" | "no-user";
+export interface HandleInfo { platformId: string; handle: string | null; suggestion: string | null; rules: { pattern: string; renameEveryDays: number } }
+
+/** Owner-only. Null when the API predates handles. */
+export async function getHandle(platformId: string): Promise<HandleInfo | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Public. */
+export async function checkHandle(handle: string): Promise<{ ok: boolean; handle: string; reason?: HandleReason } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle/check?h=${encodeURIComponent(handle)}`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-only. Claim or rename. */
+export async function claimHandle(platformId: string, handle: string): Promise<{ ok: boolean; handle: string; renamed?: boolean; reason?: HandleReason } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify({ platformId, handle }) });
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export const HANDLE_REASONS: Record<HandleReason, string> = {
+  invalid: "3 to 20 characters: letters, digits, underscore.",
+  reserved: "That one's reserved.",
+  taken: "Someone has that name.",
+  "someone-elses-name": "That's someone else's verified name on X or Telegram.",
+  cooldown: "You can change your name once a month.",
+  "no-user": "No account found.",
+};
