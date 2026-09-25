@@ -108,13 +108,15 @@ export default function TokenChart({
     loadingMore.current = true;
     try {
       const r = await getOhlcv(mint, tf, { pool, limit: 1000, before: first[0] });
+      if (r.retryIn && r.candles.length === 0) { setTimeout(() => { loadingMore.current = false; void loadOlder(); }, r.retryIn * 1000); return; }
+      // The page is inclusive of `before`, so one candle overlaps; judge "more" by the raw page size.
       const older = r.candles.filter((c) => c[0] < first[0]);
       if (older.length === 0) { setHasMore(false); return; }
       const chart = chartRef.current;
       const range = chart?.timeScale().getVisibleRange();
       prependedRef.current = true;
       setCandles((cur) => [...older, ...cur]);
-      if (older.length < 1000) setHasMore(false);
+      if (r.candles.length < 1000) setHasMore(false);
       // Keep the user where they were; setData would otherwise jump to the end.
       if (chart && range) requestAnimationFrame(() => { try { chart.timeScale().setVisibleRange(range); } catch {} });
     } finally {
