@@ -331,7 +331,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
         key={pathname}
         className={`flex-1 flex flex-col min-w-0 ${
           authed
-            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
+            // flex-none on phones: as a flex item, flex-1 sets basis 0 and grows
+            // to the content, which silently overrode h-dvh — the container was
+            // never a scroller, so the document scrolled and the fixed tab bar
+            // rode along. Pinned to the viewport it scrolls for real.
+            ? "flex-none h-dvh overflow-y-auto overscroll-contain md:flex-1 md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
             : ""
         }`}
       >
