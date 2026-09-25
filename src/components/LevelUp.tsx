@@ -33,7 +33,7 @@ export default function LevelUp({ platformId, summary }: { platformId: string; s
   const quests: Quest[] = [
     { id: "people", title: "Pay five verified X accounts, $1 or more each", reward: `Level 2 · $${level >= 2 ? s?.funding.monthlyUsd ?? 25 : monthly} a month to trade with`, href: "/send", cta: "Pay someone", have: level >= 2 ? 5 : people?.have ?? 0, need: 5, done: level >= 2 },
     { id: "name", title: "Claim your @name", reward: "Your page: atcha.cash/@you", href: "/level", cta: "Claim it", have: handle ? 1 : 0, need: 1, done: !!handle },
-    { id: "trade", title: "Make your first trade", reward: "A bubble on the chart with your reason on it", href: "/portfolio", cta: "Look up a token", have: traded ? 1 : 0, need: 1, done: !!traded },
+    { id: "trade", title: "Make your first trade", reward: "Your first position, and your first bubble on the chart", href: "/portfolio", cta: "Look up a token", have: traded ? 1 : 0, need: 1, done: !!traded },
     { id: "cash", title: "Add your own money", reward: "Trades without a cap, and pays anyone by name", href: "/fund", cta: "Add money", have: (s?.ownUsd ?? 0) > 0 ? 1 : 0, need: 1, done: (s?.ownUsd ?? 0) > 0 },
     { id: "auto", title: "Turn on Autopilot", reward: "It trades the budget for you and tells you why", href: "/level", cta: "Switch it on", have: autopilot ? 1 : 0, need: 1, done: !!autopilot },
     { id: "streak", title: `Keep a ${days?.need ?? 30}-day streak`, reward: `Level 3 · $75 a month, and your gains become yours`, href: "/level", cta: "Today's things", have: level >= 3 ? days?.need ?? 30 : days?.have ?? s?.streak ?? 0, need: days?.need ?? 30, done: level >= 3 },

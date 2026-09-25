@@ -1,6 +1,6 @@
 import type { IChartApi, ISeriesApi, ISeriesPrimitive, IPrimitivePaneRenderer, IPrimitivePaneView, SeriesAttachedParameter, SeriesType, Time, UTCTimestamp } from "lightweight-charts";
 
-export interface FillMark { time: UTCTimestamp; price: number; side: "buy" | "sell"; label?: string; notionalUsd?: number | null; tokenPriceUsd?: number | null; at?: string; reason?: string | null; tx?: string }
+export interface FillMark { time: UTCTimestamp; price: number; side: "buy" | "sell"; label?: string; notionalUsd?: number | null; tokenPriceUsd?: number | null; at?: string; reason?: string | null; tx?: string; agentDecided?: boolean }
 export interface Hit { mark: FillMark; x: number; y: number }
 
 interface MediaSpace { context: CanvasRenderingContext2D; mediaSize: { width: number; height: number } }

@@ -213,7 +213,7 @@ export default function TokenChart({
         const snapped = Math.max(first, first + Math.floor((ts - first) / step) * step);
         const c = byTime.get(snapped);
         const price = (t.tokenPriceUsd ?? c?.[4] ?? 0) * k;
-        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx };
+        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx, agentDecided: t.source === "autopilot" || t.source === "dca" || t.source === "limit" };
       })
       .filter((m) => m.price > 0);
     const prim = new TradeMarkers();
@@ -282,7 +282,7 @@ function FillCard({ hit, axis, supply, agentName }: { hit: Hit; axis: "mc" | "pr
     <div className="pointer-events-none absolute z-20 -translate-y-1/2" style={{ ...style, width }}>
       <div className="relative rounded-xl bg-ink px-3.5 py-2.5 text-[13px] leading-snug text-cream shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.35)]">
         <span>{who} {verb}{amount ? ` ${amount}` : ""}{at ? ` at ${at}` : ""}</span>
-        {m.reason && <span className="mt-1 block text-[12px] text-cream/70">&ldquo;{m.reason.length > 80 ? m.reason.slice(0, 80) + "…" : m.reason}&rdquo;</span>}
+        {m.reason && m.agentDecided && <span className="mt-1 block text-[12px] text-cream/70">{m.reason.length > 80 ? m.reason.slice(0, 80) + "…" : m.reason}</span>}
         <span
           aria-hidden
           className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 bg-ink"

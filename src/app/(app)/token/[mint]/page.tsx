@@ -161,7 +161,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
                     <span className={`mt-0.5 rounded-md px-1.5 py-0.5 text-[11px] font-semibold ${t.side === "buy" ? "bg-up-soft text-up" : t.side === "sell" ? "bg-down-soft text-down" : "bg-card text-grey"}`}>{t.side.toUpperCase()}</span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm text-ink">{t.notionalUsd != null ? usd(t.notionalUsd) : `${t.inAmount} → ${t.outAmount}`}{t.tokenPriceUsd != null ? <span className="text-grey"> at {fmtPrice(t.tokenPriceUsd)}</span> : null}</span>
-                      {t.reason && <span className="block truncate text-xs text-grey">&ldquo;{t.reason}&rdquo; · {t.source}</span>}
+                      {(t.source === "autopilot" || t.source === "dca" || t.source === "limit") && <span className="block truncate text-xs text-grey">{t.source === "autopilot" ? "Autopilot" : t.source === "dca" ? "DCA" : "Limit order"}{t.reason ? `: ${t.reason}` : ""}</span>}
                     </span>
                     <span className="text-right text-xs text-grey">
                       {timeAgo(t.at)}<br />
@@ -196,7 +196,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
                   <dt className="text-grey">Realized</dt><dd className={`text-right ${tone(position?.realizedUsd)}`}>{position ? usd(position.realizedUsd) : "—"}</dd>
                   <dt className="text-grey">Trades</dt><dd className="text-right text-ink">{position ? position.buys + position.sells : 0}</dd>
                 </dl>
-                {position?.openedBy && <p className="mt-3 text-xs text-grey">Opened by: &ldquo;{position.openedBy}&rdquo;</p>}
+
               </>
             ) : (
               <div className="mt-2 text-sm text-grey">You don&apos;t hold any {symbol}.{position?.closed ? ` Closed with ${usd(position.realizedUsd)} realized.` : ""}</div>

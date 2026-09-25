@@ -63,7 +63,7 @@ export default function PositionsList({
             value={value}
             price={b?.priceUsd ?? null}
             change24h={b?.change24h ?? null}
-            sub={p ? `avg ${p.avgEntryUsd != null ? fmtPrice(p.avgEntryUsd) : "—"}${p.openedBy ? ` · "${p.openedBy.slice(0, 48)}${p.openedBy.length > 48 ? "…" : ""}"` : ""}` : noLog ? "entry and P&L arrive with the trade log" : "no trade record for this one"}
+            sub={p ? `avg ${p.avgEntryUsd != null ? fmtPrice(p.avgEntryUsd) : "—"}` : noLog ? "entry and P&L arrive with the trade log" : "no trade record for this one"}
             pnl={pnl}
             pct={pct}
           />
