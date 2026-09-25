@@ -1024,3 +1024,14 @@ export async function getTokenBriefs(mints: string[]): Promise<Record<string, To
     return {};
   }
 }
+
+/** Owner-only. Imports the wallet's swap history from the chain into the trade log. */
+export async function backfillTrades(platformId: string): Promise<{ status: string; added?: number; found?: number; scanned?: number } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/trades/${encodeURIComponent(platformId)}/backfill`, { method: "POST", headers: await authHeaders() }, 120_000);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}

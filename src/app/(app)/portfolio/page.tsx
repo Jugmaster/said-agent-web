@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   getBalance,
@@ -8,7 +8,7 @@ import {
   getActivity,
   type BalanceResponse,
   type FullPortfolio,
-  type ActivityReceipt, getPositions, type Position } from "@/lib/api";
+  type ActivityReceipt, getPositions, type Position, backfillTrades } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import PositionsList from "@/components/token/PositionsList";
@@ -77,7 +77,21 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
   const [positions, setPositions] = useState<Position[] | null>(null);
+  const [importing, setImporting] = useState(false);
+  const importedOnce = useRef(false);
   useEffect(() => { getPositions(platformId).then(setPositions).catch(() => {}); }, [platformId, main]);
+  // The log starts the day it ships; the first time a wallet with holdings has no
+  // positions, pull its swap history from the chain once, then re-read.
+  useEffect(() => {
+    if (importedOnce.current || positions === null || positions.length > 0 || !main || main.tokens.every((t) => t.balance <= 0)) return;
+    importedOnce.current = true;
+    setImporting(true);
+    backfillTrades(platformId).then(() => getPositions(platformId)).then((p) => p && setPositions(p)).catch(() => {}).finally(() => setImporting(false));
+  }, [positions, main, platformId]);
+  const reimport = () => {
+    setImporting(true);
+    backfillTrades(platformId).then(() => getPositions(platformId)).then((p) => p && setPositions(p)).catch(() => {}).finally(() => setImporting(false));
+  };
 
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
@@ -153,8 +167,13 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
         {/* Positions: what the agent holds, with entry and P&L from the trade log. */}
         <section className="mb-9">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <h2 className="text-sm font-medium text-zinc-300">Positions</h2>
-            <TokenSearch />
+            <h2 className="text-sm font-medium text-zinc-300">Positions {importing && <span className="ml-2 text-xs font-normal text-grey">importing history from the chain…</span>}</h2>
+            <div className="flex items-center gap-2">
+              {positions !== null && !importing && (
+                <button type="button" onClick={reimport} className="text-xs text-grey underline underline-offset-2 hover:text-ink" title="Re-read the wallet's swaps from the chain">Import history</button>
+              )}
+              <TokenSearch />
+            </div>
           </div>
           {main == null && !error ? (
             <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
