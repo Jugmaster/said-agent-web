@@ -122,7 +122,7 @@ function ActivityScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="min-w-0 flex-1 md:overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight text-ink">Activity</h1>
           <p className="mt-1 text-sm text-zinc-400">Every on-chain receipt, verifiable on Solscan.</p>

@@ -82,7 +82,7 @@ function Level({ platformId }: { platformId: string }) {
 
   return (
     <div className="flex min-h-dvh">
-    <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
+    <div className="min-w-0 flex-1 md:overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
       <h1 className="mb-4 text-2xl font-semibold tracking-tight">Level</h1>
 
       {credits === null ? (

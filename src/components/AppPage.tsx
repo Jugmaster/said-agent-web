@@ -24,7 +24,7 @@ export default function AppPage({
 }) {
   return (
     <div className="flex min-h-dvh">
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
+      <div className="min-w-0 flex-1 md:overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-8 md:pt-10 md:pb-12">
         <div className={narrow ? "max-w-3xl" : ""}>
           <header className="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
