@@ -214,7 +214,13 @@ function ChatScreen({ platformId }: { platformId: string }) {
           role: m.role === "assistant" ? "agent" : "user",
           text: m.content,
         }));
-        setMessages((prev) => (prev.length ? [...history, ...prev] : history));
+        // Merge by id: React's dev double-mount runs this twice, and a refetch
+        // must never duplicate bubbles.
+        setMessages((prev) => {
+          const seen = new Set(prev.map((m) => m.id));
+          const fresh = history.filter((m) => !seen.has(m.id));
+          return prev.length ? [...fresh, ...prev] : history;
+        });
       })
       .catch(() => {
         // best-effort — empty history is the existing fallback
