@@ -2,6 +2,9 @@
 import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { searchTokens, type TokenHit } from "@/lib/api";
+import { fmtMc } from "@/components/token/format";
 import type { ReactNode } from "react";
 import { useModalA11y } from "@/hooks/useModalA11y";
 
@@ -28,8 +31,30 @@ interface Props {
  * "Ask your agent" row that pipes the raw query into chat — the product is
  * chat-driven, so anything you can say to the agent you can say from here.
  */
+const MINT_RE = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/;
+/** A bare mint, or a mint inside a pump.fun / DexScreener / Solscan / Jupiter link. */
+function mintIn(text: string): string | null {
+  const t = text.trim();
+  if (MINT_RE.test(t)) return t;
+  const m = t.match(/(?:pump\.fun\/(?:coin\/)?|dexscreener\.com\/solana\/|solscan\.io\/token\/|birdeye\.so\/token\/|jup\.ag\/(?:swap\/)?(?:SOL-)?)([1-9A-HJ-NP-Za-km-z]{32,44})/);
+  return m ? m[1] : null;
+}
+
 export default function CommandPalette({ open, onClose, actions, onAsk }: Props) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
+  // Tokens matching what's typed: the fast path, so a pasted mint or a symbol
+  // opens the token page without going to Wallet first.
+  const [hits, setHits] = useState<TokenHit[]>([]);
+  useEffect(() => {
+    const q = query.trim();
+    const mint = mintIn(q);
+    if (mint) { setHits([{ mint, symbol: q.slice(0, 4).toUpperCase(), name: "Open this token", imageUrl: null, priceUsd: null, marketCapUsd: null, liquidityUsd: null, change24h: null }]); return; }
+    if (q.length < 2 || q.includes(" ")) { setHits([]); return; }
+    let alive = true;
+    const t = setTimeout(() => searchTokens(q).then((r) => alive && setHits(r.slice(0, 5))).catch(() => {}), 250);
+    return () => { alive = false; clearTimeout(t); };
+  }, [query]);
   const [highlight, setHighlight] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -39,9 +64,15 @@ export default function CommandPalette({ open, onClose, actions, onAsk }: Props)
 
   const matched = useMemo(() => {
     const q = query.trim().toLowerCase();
+    const tokenRows: PaletteAction[] = hits.map((h) => ({
+      id: `token:${h.mint}`,
+      label: `${h.symbol}${h.name && h.name !== h.symbol ? ` · ${h.name}` : ""}`,
+      hint: h.marketCapUsd != null ? `${fmtMc(h.marketCapUsd)} MC` : "token",
+      run: () => router.push(`/token/${h.mint}`),
+    }));
     if (!q) return actions;
-    return actions.filter((a) => a.label.toLowerCase().includes(q));
-  }, [actions, query]);
+    return [...tokenRows, ...actions.filter((a) => a.label.toLowerCase().includes(q))];
+  }, [actions, query, hits, router]);
 
   // Row model: matched actions first; the ask-row is appended whenever there's
   // a query (even one that also matches an action — "send 5 usdc" should offer

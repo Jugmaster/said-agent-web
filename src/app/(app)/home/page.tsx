@@ -10,6 +10,7 @@ import FundedCard from "@/components/FundedCard";
 import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
 import PositionsList from "@/components/token/PositionsList";
+import TokenSearch from "@/components/token/TokenSearch";
 import LevelUp from "@/components/LevelUp";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
@@ -204,11 +205,15 @@ function Home({ platformId }: { platformId: string }) {
 
         {/* Positions: what the agent holds, with entry and P&L once the trade log is live. */}
         <section>
-          <div className="mb-3 flex items-baseline justify-between">
+          <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
             <h2 className="text-sm font-medium text-zinc-300">Positions</h2>
-            <Link href="/portfolio" className="text-xs text-zinc-500 transition hover:text-zinc-300">
-              Full wallet →
-            </Link>
+            {/* The fast path on the web: paste a mint or a link, or type a symbol. */}
+            <div className="flex items-center gap-3">
+              <TokenSearch />
+              <Link href="/portfolio" className="shrink-0 text-xs text-zinc-500 transition hover:text-zinc-300">
+                Full wallet →
+              </Link>
+            </div>
           </div>
           {portfolio == null && !portfolioErr ? (
             <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
