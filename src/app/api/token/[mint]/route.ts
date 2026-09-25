@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { cached } from "@/lib/server-cache";
 
 /**
  * Token stats for the token page: DexScreener for the live numbers and the
@@ -37,9 +38,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
   const { mint } = await params;
   if (!/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(mint)) return NextResponse.json({ error: "bad mint" }, { status: 400 });
   try {
+    const out = await cached(`stats:${mint}`, 60_000, async () => {
     const [ds, gt] = await Promise.all([
-      fetch(`https://api.dexscreener.com/latest/dex/tokens/${mint}`, { next: { revalidate: 60 } }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
-      fetch(`https://api.geckoterminal.com/api/v2/networks/solana/tokens/${mint}/pools?page=1`, { headers: { accept: "application/json" }, next: { revalidate: 300 } }).then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      cached(`ds:${mint}`, 30_000, () => fetch(`https://api.dexscreener.com/latest/dex/tokens/${mint}`, { cache: "no-store" }).then((r) => (r.ok ? r.json() : null))).catch(() => null),
+      cached(`gtpools:${mint}`, 300_000, () => fetch(`https://api.geckoterminal.com/api/v2/networks/solana/tokens/${mint}/pools?page=1`, { headers: { accept: "application/json" }, cache: "no-store" }).then((r) => { if (r.status === 429) throw new Error("gt 429"); return r.ok ? r.json() : null; })).catch(() => null),
     ]);
     const pairs: any[] = (ds?.pairs ?? []).filter((p: any) => p.chainId === "solana" && p.baseToken?.address === mint);
     pairs.sort((a, b) => (b.liquidity?.usd ?? 0) - (a.liquidity?.usd ?? 0));
@@ -70,6 +72,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ mint: s
       websites: (p?.info?.websites ?? []).map((w: any) => w.url).filter(Boolean),
       socials: (p?.info?.socials ?? []).map((s: any) => ({ type: s.type, url: s.url })).filter((s: any) => s.url),
     };
+    return out;
+    });
     return NextResponse.json(out, { headers: { "Cache-Control": "public, max-age=30, s-maxage=60" } });
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "failed" }, { status: 502 });

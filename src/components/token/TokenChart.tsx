@@ -14,12 +14,16 @@ const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
 export default function TokenChart({
   mint,
   pool,
+  ready,
   trades,
   supply,
   defaultTf = "15m",
 }: {
   mint: string;
+  /** The top pool once stats are known; null when the token has none. */
   pool: string | null;
+  /** False until the stats lookup has finished, so the chart asks once, with the pool. */
+  ready: boolean;
   trades: TradeRow[];
   supply: number | null;
   defaultTf?: Timeframe;
@@ -35,16 +39,26 @@ export default function TokenChart({
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState<string | null>(null);
 
-  // Read the candles for the timeframe.
+  // Read the candles for the timeframe: once the pool is known, one request,
+  // and a short retry when the upstream is rate-limited.
   useEffect(() => {
+    if (!ready) return;
     let alive = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
     setLoading(true); setErr(null);
-    getOhlcv(mint, tf, { pool, limit: 400 })
-      .then((r) => { if (!alive) return; setCandles(r.candles); if (!r.candles.length) setErr("No chart for this token yet."); })
-      .catch(() => alive && setErr("Chart unavailable."))
-      .finally(() => alive && setLoading(false));
-    return () => { alive = false; };
-  }, [mint, tf, pool]);
+    const ask = (attempt: number) => {
+      getOhlcv(mint, tf, { pool, limit: 400 })
+        .then((r) => {
+          if (!alive) return;
+          if (r.candles.length) { setCandles(r.candles); setLoading(false); return; }
+          if (r.retryIn && attempt < 3) { setErr("Busy, trying again…"); timer = setTimeout(() => ask(attempt + 1), r.retryIn * 1000); return; }
+          setCandles([]); setErr("No chart for this token yet."); setLoading(false);
+        })
+        .catch(() => { if (alive) { setErr("Chart unavailable."); setLoading(false); } });
+    };
+    ask(0);
+    return () => { alive = false; if (timer) clearTimeout(timer); };
+  }, [mint, tf, pool, ready]);
 
   // Build the chart once.
   useEffect(() => {

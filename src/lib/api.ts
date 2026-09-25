@@ -953,7 +953,7 @@ export async function getTokenStats(mint: string): Promise<TokenStats | null> {
 export type Candle = [time: number, open: number, high: number, low: number, close: number, volume: number];
 export type Timeframe = "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
 
-export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number } = {}): Promise<{ candles: Candle[]; pool: string | null }> {
+export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number } = {}): Promise<{ candles: Candle[]; pool: string | null; error?: string; retryIn?: number | null }> {
   try {
     const q = new URLSearchParams({ tf });
     if (opts.pool) q.set("pool", opts.pool);
