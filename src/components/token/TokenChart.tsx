@@ -7,6 +7,13 @@ import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
+/** Candles strictly ascending by time, one per timestamp (the feed occasionally repeats one; the chart refuses it). */
+function tidy(list: Candle[]): Candle[] {
+  const by = new Map<number, Candle>();
+  for (const c of list) by.set(c[0], c);
+  return [...by.values()].sort((a, b) => a[0] - b[0]);
+}
+
 /** A theme token's current value, so the canvas matches the page in both themes. */
 const css = (name: string, fallback: string) => (typeof window === "undefined" ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
 const rgba = (hex: string, a: number) => { const m = hex.replace("#", ""); const n = parseInt(m.length === 3 ? m.split("").map((c) => c + c).join("") : m, 16); return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`; };
@@ -72,7 +79,7 @@ export default function TokenChart({
       getOhlcv(mint, tf, { pool, limit: 1000 })
         .then((r) => {
           if (!alive) return;
-          if (r.candles.length) { setCandles(r.candles); setHasMore(r.candles.length >= 1000); setLoading(false); return; }
+          if (r.candles.length) { setCandles(tidy(r.candles)); setHasMore(r.candles.length >= 1000); setLoading(false); return; }
           if (r.retryIn && attempt < 3) { setErr("Busy, trying again…"); timer = setTimeout(() => ask(attempt + 1), r.retryIn * 1000); return; }
           setCandles([]); setErr("No chart for this token yet."); setLoading(false);
         })
@@ -115,7 +122,7 @@ export default function TokenChart({
       const chart = chartRef.current;
       const range = chart?.timeScale().getVisibleRange();
       prependedRef.current = true;
-      setCandles((cur) => [...older, ...cur]);
+      setCandles((cur) => tidy([...older, ...cur]));
       if (r.candles.length < 1000) setHasMore(false);
       // Keep the user where they were; setData would otherwise jump to the end.
       if (chart && range) requestAnimationFrame(() => { try { chart.timeScale().setVisibleRange(range); } catch {} });
