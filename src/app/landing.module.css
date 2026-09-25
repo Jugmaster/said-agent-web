@@ -190,17 +190,13 @@
   /* One column, and nothing inside may set its width: grid children default to
      min-width auto, so the sidebar's nowrap link row was widening the page. */
   .docs { grid-template-columns: minmax(0, 1fr); gap: 24px; padding-top: 90px; }
-  .docs > aside, .docs > main { min-width: 0; max-width: 100%; }
-  .toc { max-width: 100%; }
+  .docs > main { min-width: 0; max-width: 100%; }
   .docBody pre, .block { overflow-x: auto; max-width: 100%; }
   .docBody table { display: block; overflow-x: auto; max-width: 100%; white-space: nowrap; }
   .docBody code { overflow-wrap: anywhere; }
-  .docs > aside { position: sticky; top: calc(68px + env(safe-area-inset-top)); z-index: 5; background: var(--color-cream); margin: 0 -20px; padding: 8px 20px; }
-  .tocWrap { position: static; }
-  .toc { flex-direction: row; flex-wrap: nowrap; overflow-x: auto; gap: 4px; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
-  .toc::-webkit-scrollbar { display: none; }
-  .toc a { white-space: nowrap; font-size: 0.85rem; padding: 6px 10px; }
-  .tocFoot { display: none; }
+  /* No sidebar on a phone: the sections are a scroll away, and a sticky chip
+     row is a desktop pattern wearing a phone's clothes. */
+  .docs > aside { display: none; }
   .rowItem { grid-template-columns: 40px 1fr auto; padding: 12px 8px; }
 }
 
