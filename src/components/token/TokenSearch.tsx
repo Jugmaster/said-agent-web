@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { searchTokens, type TokenHit } from "@/lib/api";
-import { fmtMc } from "./TokenChart";
+import { fmtMc } from "./format";
 
 /** Look up any Solana token by name, symbol or mint; opens its page. */
 export default function TokenSearch() {

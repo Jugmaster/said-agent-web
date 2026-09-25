@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import type { Position, PortfolioToken } from "@/lib/api";
-import { fmtPrice } from "./TokenChart";
+import { fmtPrice } from "./format";
 
 const usd = (v: number | null | undefined) => (v == null ? "$—" : `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 const SOL = "So11111111111111111111111111111111111111112";
