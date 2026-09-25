@@ -29,7 +29,8 @@ export async function GET(req: Request, { params }: { params: Promise<{ mint: st
     }
     if (!pool) return NextResponse.json({ candles: [], pool: null, error: "no pool" }, { headers: { "Cache-Control": "public, max-age=30" } });
     const key = `ohlcv:${pool}:${tf.path}:${tf.aggregate}:${limit}:${before}`;
-    const candles = await cached<number[][]>(key, 25_000, async () => {
+    // The live page moves every candle; a page behind a `before` cursor never changes.
+    const candles = await cached<number[][]>(key, before ? 6 * 3600_000 : 25_000, async () => {
       const r = await fetch(
         `https://api.geckoterminal.com/api/v2/networks/solana/pools/${pool}/ohlcv/${tf.path}?aggregate=${tf.aggregate}&limit=${limit}&currency=usd${before ? `&before_timestamp=${before}` : ""}`,
         { headers: { accept: "application/json" }, cache: "no-store" },

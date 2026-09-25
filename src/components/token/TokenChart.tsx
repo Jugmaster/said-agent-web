@@ -7,6 +7,16 @@ import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
 
+/** "6 weeks", "212 days", for the footer. */
+function spanLabel(c: Candle[]): string {
+  if (c.length < 2) return "";
+  const days = (c[c.length - 1][0] - c[0][0]) / 86_400;
+  if (days < 2) return `${Math.round(days * 24)}h`;
+  if (days < 60) return `${Math.round(days)} days`;
+  if (days < 730) return `${Math.round(days / 30)} months`;
+  return `${(days / 365).toFixed(1)} years`;
+}
+
 /** Candles strictly ascending by time, one per timestamp (the feed occasionally repeats one; the chart refuses it). */
 function tidy(list: Candle[]): Candle[] {
   const by = new Map<number, Candle>();
@@ -53,6 +63,8 @@ export default function TokenChart({
   // Paging back through history as the user scrolls left.
   const [hasMore, setHasMore] = useState(true);
   const loadingMore = useRef(false);
+  const MAX_PAGES = 24;
+  const pagesRef = useRef(0);
   const candlesRef = useRef<Candle[]>([]);
   candlesRef.current = candles;
   const prependedRef = useRef(false);
@@ -76,6 +88,7 @@ export default function TokenChart({
     setLoading(true); setErr(null);
     const ask = (attempt: number) => {
       setHasMore(true);
+      pagesRef.current = 0;
       getOhlcv(mint, tf, { pool, limit: 1000 })
         .then((r) => {
           if (!alive) return;
@@ -123,7 +136,8 @@ export default function TokenChart({
       const range = chart?.timeScale().getVisibleRange();
       prependedRef.current = true;
       setCandles((cur) => tidy([...older, ...cur]));
-      if (r.candles.length < 1000) setHasMore(false);
+      pagesRef.current += 1;
+      if (r.candles.length < 1000 || pagesRef.current >= MAX_PAGES) setHasMore(false);
       // Keep the user where they were; setData would otherwise jump to the end.
       if (chart && range) requestAnimationFrame(() => { try { chart.timeScale().setVisibleRange(range); } catch {} });
     } finally {
@@ -138,6 +152,19 @@ export default function TokenChart({
     return () => chart.timeScale().unsubscribeVisibleLogicalRangeChange(onRange);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [themeKey, tf, pool, hasMore]);
+
+  // History without dragging: once the first page is up, keep pulling older
+  // pages in the background, paced under the feed's limit, up to MAX_PAGES.
+  useEffect(() => {
+    if (loading || !hasMore || candles.length === 0) return;
+    let alive = true;
+    const t = setTimeout(async () => {
+      if (!alive) return;
+      await loadOlder();
+    }, 2200);
+    return () => { alive = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candles, loading, hasMore]);
 
   // (Re)draw the series when data, mode or axis changes.
   useEffect(() => {
@@ -200,7 +227,7 @@ export default function TokenChart({
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-1">
-          {hasMore && candles.length > 0 && <span className="mr-1 text-grey">← drag for history</span>}
+          {candles.length > 0 && <span className="mr-1 text-grey">{hasMore ? `loading history… ${spanLabel(candles)}` : `${spanLabel(candles)} of history`}</span>}
           {TFS.map((x) => (
             <button key={x} type="button" onClick={() => setTf(x)} className={`rounded-full px-2.5 py-1 transition ${tf === x ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>{x}</button>
           ))}
