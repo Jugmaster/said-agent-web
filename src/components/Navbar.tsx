@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
-import { applyTheme, readThemePref, type ThemePref } from "@/components/ThemeToggle";
+import { applyTheme, type ThemePref } from "@/components/ThemeToggle";
 
 function shortAddr(a: string | null | undefined): string {
   if (!a) return "—";
@@ -22,17 +22,14 @@ export default function Navbar() {
   const agent = useAgent();
   const [menuOpen, setMenuOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
-  // Light / dark from the top bar: one tap flips between them (system stays the default until you touch it).
-  const [dark, setDark] = useState<boolean | null>(null);
-  useEffect(() => {
-    const pref = readThemePref();
-    setDark(pref === "dark" || (pref === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches));
-  }, []);
+  // Light / dark from the top bar. The icons are driven by CSS off the html theme
+  // (same switch as saidprotocol.com), so nothing here needs state or hydration.
   const flipTheme = () => {
-    const next: ThemePref = dark ? "light" : "dark";
+    const attr = document.documentElement.getAttribute("data-theme");
+    const showingDark = attr === "dark" || (!attr && window.matchMedia("(prefers-color-scheme: dark)").matches);
+    const next: ThemePref = showingDark ? "light" : "dark";
     try { localStorage.setItem("atcha:theme", next); } catch {}
     applyTheme(next);
-    setDark(next === "dark");
   };
   const menuRef = useRef<HTMLDivElement>(null);
   const navRef = useRef<HTMLDivElement>(null);
@@ -88,18 +85,17 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <button
-            type="button"
-            onClick={flipTheme}
-            aria-label={dark ? "Switch to light" : "Switch to dark"}
-            title={dark ? "Light" : "Dark"}
-            className="flex h-9 w-9 items-center justify-center rounded-full text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:shadow-[inset_0_0_0_1px_var(--color-ink)]"
-          >
-            {dark === null ? null : dark ? (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><circle cx="12" cy="12" r="4" /><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" /></svg>
-            ) : (
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z" /></svg>
-            )}
+          <button type="button" className="themebtn" title="Toggle dark mode" aria-label="Toggle dark mode" onClick={flipTheme}>
+            <svg className="sun" width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" aria-hidden>
+              <circle cx="8" cy="8" r="3.2" />
+              <line x1="8" y1="0.8" x2="8" y2="2.6" /><line x1="8" y1="13.4" x2="8" y2="15.2" />
+              <line x1="0.8" y1="8" x2="2.6" y2="8" /><line x1="13.4" y1="8" x2="15.2" y2="8" />
+              <line x1="2.9" y1="2.9" x2="4.2" y2="4.2" /><line x1="11.8" y1="11.8" x2="13.1" y2="13.1" />
+              <line x1="2.9" y1="13.1" x2="4.2" y2="11.8" /><line x1="11.8" y1="4.2" x2="13.1" y2="2.9" />
+            </svg>
+            <svg className="moon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
+              <path d="M13.5 9.8A6 6 0 0 1 6.2 2.5a6 6 0 1 0 7.3 7.3Z" />
+            </svg>
           </button>
           {/* Phone: the same links behind one button. */}
           <div className="relative md:hidden" ref={navRef}>

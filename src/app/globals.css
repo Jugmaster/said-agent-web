@@ -207,3 +207,21 @@ html.lenis, html.lenis body { height: auto; }
   --shadow-rgb: 0, 0, 0;
   color-scheme: dark;
 }
+
+/* ─── The theme switch, same as saidprotocol.com: a round button whose sun and
+   moon cross-fade and rotate off the html theme, no JS state. Surfaces
+   transition their colours so the flip is a fade, not a cut. ─── */
+body, [data-nav], [data-preloader], .rounded-2xl, .rounded-xl, .rounded-full, input, textarea, select, button, aside, table, th, td {
+  transition: background-color .5s, color .5s, border-color .5s, box-shadow .5s;
+}
+.themebtn { width: 36px; height: 36px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-ring); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; position: relative; color: var(--color-ink); }
+.themebtn:hover { box-shadow: inset 0 0 0 1px var(--color-ink); }
+.themebtn svg { position: absolute; transition: opacity .4s, transform .5s; }
+.themebtn .sun { opacity: 1; transform: rotate(0); }
+.themebtn .moon { opacity: 0; transform: rotate(-60deg); }
+html[data-theme="dark"] .themebtn .sun { opacity: 0; transform: rotate(60deg); }
+html[data-theme="dark"] .themebtn .moon { opacity: 1; transform: rotate(0); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .themebtn .sun { opacity: 0; transform: rotate(60deg); }
+  html:not([data-theme="light"]) .themebtn .moon { opacity: 1; transform: rotate(0); }
+}
