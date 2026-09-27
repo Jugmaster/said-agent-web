@@ -35,7 +35,7 @@ export default function ChangelogPage() {
             </section>
           ))}
         </div>
-        <footer className={s.pageFoot}>Something missing? Tell <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent</a>.</footer>
+        <footer className={s.pageFoot}>Something missing? Tell <a href="https://x.com/atchacash" target="_blank" rel="noreferrer">@atchacash</a>.</footer>
       </main>
     </div>
   );

@@ -190,7 +190,7 @@ export default async function InvitePage({ params }: PageProps) {
 
   // Pending — the meaningful state. Show the claim CTA.
   const tgDeepLink = `https://t.me/saidinfrabot?start=invite_${invite.token}`;
-  const xDeepLink = `https://x.com/saidagent`;
+  const xDeepLink = `https://x.com/atchacash`;
 
   return (
     <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
@@ -237,7 +237,7 @@ export default async function InvitePage({ params }: PageProps) {
               rel="noreferrer"
               className="w-full text-center text-sm px-4 py-3 rounded-lg border border-zinc-700 hover:border-zinc-500"
             >
-              Or reply on X → @saidagent
+              Or reply on X → @atchacash
             </a>
           )}
         </div>

@@ -30,7 +30,7 @@ export async function generateMetadata({
   const name = agent?.displayName ?? p;
   return {
     title: `Claim ${name} · Atcha`,
-    description: `${name} was launched via @saidagent. Sign in to claim it and chat with it on Telegram or here on the web.`,
+    description: `${name} was launched via @atchacash. Sign in to claim it and chat with it on Telegram or here on the web.`,
   };
 }
 
@@ -91,7 +91,7 @@ export default async function AdoptPage({ searchParams }: PageProps) {
         </h1>
         <p className="text-sm text-zinc-400">
           {isXLaunched
-            ? "Launched via @saidagent on X. Claim it to chat with it on Telegram or here on the web."
+            ? "Launched via @atchacash on X. Claim it to chat with it on Telegram or here on the web."
             : "Claim it and chat from any device."}
         </p>
       </section>

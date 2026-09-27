@@ -60,7 +60,7 @@ export default function DocsPage() {
           <div className={s.tocFoot}>
             <Link href="/changelog">changelog →</Link>
             <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot →</a>
-            <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent →</a>
+            <a href="https://x.com/atchacash" target="_blank" rel="noreferrer">@atchacash →</a>
             <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">saidprotocol.com →</a>
           </div>
           </div>
@@ -175,7 +175,7 @@ alert me if SOL drops 5%`}</Block>
             <ul>
               <li><strong>Web.</strong> The full thing: the funded dashboard, chat, send, wallet, activity. Installs to your home screen.</li>
               <li><strong>Telegram.</strong> <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a>, same Atcha, same balance.</li>
-              <li><strong>X.</strong> Send and sign in by handle; tag <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent</a>.</li>
+              <li><strong>X.</strong> Send and sign in by handle; tag <a href="https://x.com/atchacash" target="_blank" rel="noreferrer">@atchacash</a>.</li>
             </ul>
           </Sec>
 
@@ -197,7 +197,7 @@ alert me if SOL drops 5%`}</Block>
           </Sec>
 
           <footer className={s.pageFoot} style={{ marginTop: 40 }}>
-            Questions? Tag <a href="https://x.com/saidagent" target="_blank" rel="noreferrer">@saidagent</a> or message <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a>.
+            Questions? Tag <a href="https://x.com/atchacash" target="_blank" rel="noreferrer">@atchacash</a> or message <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a>.
           </footer>
         </main>
       </div>

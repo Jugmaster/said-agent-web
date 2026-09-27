@@ -8,10 +8,10 @@ export const revalidate = 60;
 export const metadata: Metadata = {
   title: "Launches · Atcha",
   description:
-    "Every token launched via @saidagent on X — creator, fees earned, SAID treasury sweeps. Public ledger.",
+    "Every token launched via @atchacash on X — creator, fees earned, SAID treasury sweeps. Public ledger.",
   openGraph: {
     title: "Launches · Atcha",
-    description: "Every token launched via @saidagent on X. Public ledger.",
+    description: "Every token launched via @atchacash on X. Public ledger.",
     type: "website",
   },
 };
@@ -98,12 +98,12 @@ export default async function LaunchesPage() {
           <p className="text-lg text-zinc-400 max-w-2xl">
             Every token launched via{" "}
             <a
-              href="https://x.com/saidagent"
+              href="https://x.com/atchacash"
               target="_blank"
               rel="noreferrer"
               className="text-zinc-100 hover:text-white"
             >
-              @saidagent
+              @atchacash
             </a>{" "}
             on X. Creators keep 80% of pump.fun fees forever; 20% sweeps to SAID
             treasury. Auditable on-chain.
@@ -116,7 +116,7 @@ export default async function LaunchesPage() {
             <p className="text-sm mt-3">
               Tweet{" "}
               <code className="px-2 py-0.5 rounded bg-zinc-800 text-zinc-200 font-mono">
-                @saidagent launch &lt;name&gt; $TICKER
+                @atchacash launch &lt;name&gt; $TICKER
               </code>{" "}
               to be the first.
             </p>
