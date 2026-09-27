@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   // Unlinked until there is real data: reachable by URL, not indexed, not in the nav.
   robots: { index: false, follow: false },
   title: "The Ledger · Atcha",
-  description: "Where $ATCHA's money goes: creator fees in, agents funded, fees and buybacks back. Every month, in public.",
+  description: "Where the token's money goes: creator fees in, agents funded, fees and buybacks back. Every month, in public.",
   openGraph: { title: "The Ledger · Atcha", description: "Where the token's money goes, every month, in public.", type: "website" },
 };
 export const revalidate = 60;
@@ -66,7 +66,7 @@ export default async function LedgerPage() {
     { n: "03", label: "Agents funded", value: L.agentsFunded.toLocaleString(), sub: `${usd(L.fundedTotalUsd)} in total · ${usd(L.fundedThisMonthUsd)} this month to ${L.agentsFundedThisMonth}` },
     { n: "04", label: "They trade", value: usd(L.tradedByFundedUsd), sub: "volume on funded budgets" },
     { n: "05", label: "Comes back", value: usd(L.feesFromFundedUsd + L.shareKeptUsd), sub: `1% of trades ${usd(L.feesFromFundedUsd)} · 20% of gains ${usd(L.shareKeptUsd)}` },
-    { n: "06", label: "$ATCHA bought & locked", value: `${(L.buyback.atchaBought / 1e6).toFixed(2)}M`, sub: `${L.buyback.buys} buys · ${sol(L.buyback.solSpent)} · never sold · ${short(L.buyback.lockWallet)}` },
+    { n: "06", label: "Bought \u0026 locked", value: `${(L.buyback.atchaBought / 1e6).toFixed(2)}M`, sub: `${L.buyback.buys} buys · ${sol(L.buyback.solSpent)} · never sold · ${short(L.buyback.lockWallet)}` },
   ];
   const pct = L.selfFundedPct;
 
@@ -79,7 +79,7 @@ export default async function LedgerPage() {
           <p className={s.eyebrow}>The ledger · {L.live ? "live" : example ? "example numbers" : "dry run"}</p>
           <h1 className={s.big}>Where the money goes.</h1>
           <p className={s.pageSub}>
-            $ATCHA funds the agents. Nothing else. This page is the account: what the token earned, what the pool paid out, what came back, and what was bought and locked. Every month, every line, in public.
+            The token funds the agents. Nothing else. This page is the account: what the token earned, what the pool paid out, what came back, and what was bought and locked. Every month, every line, in public.
           </p>
           {example && (
             <p className={s.pageSub} style={{ fontSize: "0.95rem", marginTop: 14 }}>
@@ -158,8 +158,8 @@ export default async function LedgerPage() {
           <div className={s.list}>
             {[
               ["Funds agents", "The pool pays every level-2-and-up agent its month, in SOL, on funding day. Sized by level, never by holdings."],
-              ["Buys and locks", "A share of fees buys $ATCHA in batches into a wallet that never sells. Every buy has a receipt."],
-              ["Never pays holders", "No yield, no airdrops, no burn. Nothing is ever paid out in $ATCHA."],
+              ["Buys and locks", "A share of fees buys the token in batches into a wallet that never sells. Every buy has a receipt."],
+              ["Never pays holders", "No yield, no airdrops, no burn. Nothing is ever paid out in the token."],
               ["Never touches your money", "Your cash is yours. The pool's money trades and never leaves."],
             ].map(([t, d]) => (
               <div key={t} className={s.rowItem}>

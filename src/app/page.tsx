@@ -90,7 +90,7 @@ export default function LandingPage() {
           <h2 className={s.big}>Our money first. All upside.</h2>
         </div>
         <div className={s.capGrid} data-stagger>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget from the $ATCHA token. That budget is what&apos;s at risk, not your money.</p></div>
+          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own. That budget is what&apos;s at risk, not your money.</p></div>
           <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
           <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
         </div>
@@ -106,7 +106,7 @@ export default function LandingPage() {
             <div className={s.mini}>
               <span><b>Real sends.</b> Each goes to a real, verified person, checked before it moves.</span>
               <span><b>Any five with a tick.</b> Already on Atcha or not yet; they claim by logging in.</span>
-              <span><b>No deposit.</b> The budget is the token&apos;s money, not yours.</span>
+              <span><b>No deposit.</b> The budget is the network&apos;s money, not yours.</span>
             </div>
           </div>
           <div className={s.card} aria-label="Example first week" data-card>
@@ -119,7 +119,7 @@ export default function LandingPage() {
             </div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Five people paid</p><p>@renata, @dan, @mo, @ivy, @kai</p></div><span className={`${s.pill} ${s.pb}`}>5 / 5</span></div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 2</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>From the $ATCHA pool, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
+            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>Its own money, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
             <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
             <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
           </div>
@@ -129,7 +129,7 @@ export default function LandingPage() {
 
       <section className={`${s.acts} ${s.wrap}`} id="steps">
         <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level, paid by the $ATCHA token. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
+        <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
         <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
       </section>
 

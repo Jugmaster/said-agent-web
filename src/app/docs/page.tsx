@@ -17,7 +17,6 @@ const SECTIONS = [
   { id: "start", title: "Quick start" },
   { id: "funded", title: "Funded: two kinds of money" },
   { id: "ladder", title: "Levels" },
-  { id: "token", title: "What $ATCHA does" },
   { id: "send", title: "Pay anyone by @name" },
   { id: "trade", title: "Trade, buy, and more" },
   { id: "identity", title: "What's underneath" },
@@ -71,11 +70,11 @@ export default function DocsPage() {
           <header className={s.docHead} data-reveal>
             <p className={s.eyebrow}>Docs</p>
             <h1 className={s.big}>How Atcha works.</h1>
-            <p className={s.pageSub}>Your AI with a budget of its own, funded every month by the $ATCHA token. Its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
+            <p className={s.pageSub}>Your AI with a budget of its own, funded every month. Its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
           </header>
 
           <Sec id="what" n={1} title="What Atcha is">
-            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five verified X accounts by name and it gets <strong>a budget of its own to trade with</strong>, every month, paid by the $ATCHA token. The budget takes the first loss. Money you add is yours, always.</p>
+            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five verified X accounts by name and it gets <strong>a budget of its own to trade with</strong>, every month. The budget takes the first loss. Money you add is yours, always.</p>
             <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>
             <p>You talk to it in plain language. It executes real on-chain transactions and keeps a verifiable history of everything it did on your behalf.</p>
           </Sec>
@@ -99,15 +98,15 @@ bot  →  ✓ Vega is ready. Level 1.
             <table className={s.table}>
               <thead><tr><th></th><th>The budget</th><th>Your money</th></tr></thead>
               <tbody>
-                <tr><td className={s.m}>Where it comes from</td><td>The $ATCHA pool, monthly. Sized by your level.</td><td>You. Card, Apple Pay, or a transfer.</td></tr>
+                <tr><td className={s.m}>Where it comes from</td><td>The funding pool, monthly. Sized by your level.</td><td>You. Card, Apple Pay, or a transfer.</td></tr>
                 <tr><td className={s.m}>What it can do</td><td>Trade anything with real liquidity.</td><td>Trade anything. Pay anyone. Buy things. Hire.</td></tr>
                 <tr><td className={s.m}>Who loses first</td><td>The budget. Always.</td><td>Only after the budget is gone.</td></tr>
                 <tr><td className={s.m}>Taking it out</td><td>Never. It trades; it doesn&apos;t leave.</td><td>Any time.</td></tr>
                 <tr><td className={s.m}>Gains on it</td><td>80% yours from level 3.</td><td>Yours.</td></tr>
               </tbody>
             </table>
-            <p><strong>Funding is monthly.</strong> Everyone is funded on the same day of the month, sized by their level, paid by the $ATCHA token. Reach level 1 mid-month and your first funding lands on the next funding day. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
-            <p><strong>What the budget trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and US stocks as tokens. Anything with real liquidity and a week of history. A quarter of the budget can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. The budget never buys $ATCHA and never buys a token you created.</p>
+            <p><strong>Funding is monthly.</strong> Everyone is funded on the same day of the month, sized by their level. Reach level 1 mid-month and your first funding lands on the next funding day. Level 2 starts around $25 a month; level 3 more. Every funding is posted publicly.</p>
+            <p><strong>What the budget trades:</strong> SOL, BTC, ETH, USDC, $ANSEM, $CLAW, the ClawPump ecosystem, and US stocks as tokens. Anything with real liquidity and a week of history. A quarter of the budget can sit in any one memecoin, and a quarter across all of them; your own cash has no cap. The budget never buys a token you created.</p>
             <p><strong>A rough day.</strong> If the budget falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
             <p><strong>An untouched budget</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
           </Sec>
@@ -126,12 +125,7 @@ bot  →  ✓ Vega is ready. Level 1.
             <p><strong>Three things a day</strong> keep the streak: a trade, a send, a stake. The ones that settle with a real person level you up. Only settled outcomes count: a send that was claimed, a job that was delivered, a purchase that shipped. Paying yourself doesn&apos;t count; the app knows it&apos;s you.</p>
           </Sec>
 
-          <Sec id="token" n={5} title="What $ATCHA does">
-            <p>$ATCHA funds the agents. The token&apos;s creator rewards top up the pool each month; the pool pays every level-2-and-up agent its monthly budget, in SOL. The agents trade; a share of their fees buys $ATCHA back and stakes it, in batches, with a public receipt each time.</p>
-            <p>It never pays holders, never burns, never airdrops, and funding is never paid in the token itself. The token&apos;s job is to fund the agents, and the agents&apos; job is to buy the token.</p>
-          </Sec>
-
-          <Sec id="send" n={6} title="Pay anyone by @name">
+          <Sec id="send" n={5} title="Pay anyone by @name">
             <p>Any X or Telegram handle. They don&apos;t need a wallet, or to have heard of Atcha. Paying runs on your own money.</p>
             <Block label="examples">{`send 5 USDC to @alex
 pay @that_plumber $120
@@ -141,7 +135,7 @@ split $180 with @the_groupchat`}</Block>
             <Block>{`cancel the send to @joe`}</Block>
           </Sec>
 
-          <Sec id="trade" n={7} title="Trade, buy, and more">
+          <Sec id="trade" n={6} title="Trade, buy, and more">
             <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. The budget trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
             <Block label="examples">{`swap $5 of my budget into SOL
 buy JUP when it hits $0.40
@@ -151,13 +145,13 @@ alert me if SOL drops 5%`}</Block>
             <p><strong>Comms.</strong> It can make calls and send email on your behalf, priced per action and confirmed with you first.</p>
           </Sec>
 
-          <Sec id="identity" n={8} title="What&apos;s underneath">
+          <Sec id="identity" n={7} title="What&apos;s underneath">
             <p>Your level is a real on-chain record. Every Atcha is registered under the <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID</a> program (<C>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</C>): identity, owner, verification. <strong>Verification is free and automatic</strong>; Atcha sponsors it when you first sign in.</p>
             <p>The level is built from settled outcomes and anchored on-chain, so it follows you whichever surface you use, and it is what the funding formula reads every month. It is also what other people see when they check your name before paying you. Developers building on SAID can read it directly; that is the whole point of it being on-chain.</p>
             <p>One name, every handle: link X, Telegram and any wallet you already run, and they all resolve to you. Each link is proven by logging in, never by trust.</p>
           </Sec>
 
-          <Sec id="fees" n={9} title="Fees and cashback">
+          <Sec id="fees" n={8} title="Fees and cashback">
             <p>Every action that moves real value takes a <strong>flat 1%</strong>, bundled into the same Solana transaction, so it lands in the treasury (<C>2XfHTeNWTjNwUmgoXaafYuqHcAAXj8F5Kjw2Bnzi4FxH</C>) in the same block as your action or not at all. Adding money, receiving, claiming and cashback payouts are never charged.</p>
             <p>Your level earns part of that fee back:</p>
             <table className={s.table}>
@@ -172,12 +166,12 @@ alert me if SOL drops 5%`}</Block>
             <p>Staking $SAID boosts your cashback. It never lowers the fee. Cashback earned on the budget stays in the budget; cashback earned on your cash is yours.</p>
           </Sec>
 
-          <Sec id="money" n={10} title="Adding and taking out money">
+          <Sec id="money" n={9} title="Adding and taking out money">
             <p><strong>Add money</strong> with a card or Apple Pay inside the app, or send SOL or USDC to your address from any wallet or exchange. On a phone, the Add money screen shows a Solana Pay code any wallet can scan.</p>
             <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands. From level 3, 80% of the gains made with the budget are yours too. The budget itself never leaves.</p>
           </Sec>
 
-          <Sec id="surfaces" n={11} title="Where it lives">
+          <Sec id="surfaces" n={10} title="Where it lives">
             <ul>
               <li><strong>Web.</strong> The full thing: the funded dashboard, chat, send, wallet, activity. Installs to your home screen.</li>
               <li><strong>Telegram.</strong> <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a>, same Atcha, same balance.</li>
@@ -185,7 +179,7 @@ alert me if SOL drops 5%`}</Block>
             </ul>
           </Sec>
 
-          <Sec id="faq" n={12} title="FAQ">
+          <Sec id="faq" n={11} title="FAQ">
             <Q>Do I need a wallet first?</Q>
             <p>No. Your Atcha has its own wallet, secured by Privy, from the moment it exists. Link an external one later if you want.</p>
             <Q>Can I withdraw the budget?</Q>
