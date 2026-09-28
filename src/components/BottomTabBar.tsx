@@ -1,5 +1,7 @@
 "use client";
 
+import { useLaunch } from "@/components/LaunchProvider";
+
 import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -39,6 +41,9 @@ const TABS: { href: string; label: string; icon: ComponentType<{ className?: str
 export default function BottomTabBar() {
   const pathname = usePathname();
   const { ready, authenticated } = usePrivy();
+  // Level is the funded product; before the mint exists the tab is not there.
+  const { launched } = useLaunch();
+  const tabs = launched ? TABS : TABS.filter((t) => t.href !== "/level");
 
   const onAppRoute = APP_ROUTES.some(
     (r) => pathname === r || pathname.startsWith(r + "/"),
@@ -50,7 +55,7 @@ export default function BottomTabBar() {
       className="md:hidden fixed bottom-0 left-0 right-0 z-40 flex border-t border-zinc-800 bg-cream/90 backdrop-blur-md"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      {TABS.map(({ href, label, icon: Icon }) => {
+      {tabs.map(({ href, label, icon: Icon }) => {
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
           <Link

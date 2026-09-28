@@ -1,5 +1,7 @@
 "use client";
 
+import { useLaunch } from "@/components/LaunchProvider";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getCredits, type CreditsSummary } from "@/lib/api";
@@ -34,6 +36,7 @@ export default function EntryProgress({
   variant?: "card" | "strip";
   href?: string;
 }) {
+  const { launched } = useLaunch();
   const [s, setS] = useState<CreditsSummary | null | undefined>(undefined);
   useEffect(() => {
     let alive = true;
@@ -43,7 +46,8 @@ export default function EntryProgress({
     return () => { alive = false; clearTimeout(t); };
   }, [platformId, refreshKey]);
 
-  if (!s) return null;
+  // Nothing to count toward before the mint exists.
+  if (!launched || !s) return null;
 
   const have = Math.min(s.next?.have ?? 0, s.next?.need ?? 5);
   const need = s.next?.need ?? 5;

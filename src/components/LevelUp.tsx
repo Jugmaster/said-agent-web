@@ -1,5 +1,7 @@
 "use client";
 
+import { useLaunch } from "@/components/LaunchProvider";
+
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { getAutopilot, getHandle, getTrades, type CreditsSummary } from "@/lib/api";
@@ -12,6 +14,7 @@ interface Quest { id: string; title: string; reward: string; href: string; cta: 
  * day one; the funded card above it is the prize.
  */
 export default function LevelUp({ platformId, summary }: { platformId: string; summary: CreditsSummary | null | undefined }) {
+  const { launched } = useLaunch();
   const [handle, setHandle] = useState<string | null | undefined>(undefined);
   const [traded, setTraded] = useState<number | null>(null);
   const [autopilot, setAutopilot] = useState<boolean | null>(null);
@@ -23,7 +26,7 @@ export default function LevelUp({ platformId, summary }: { platformId: string; s
     return () => { alive = false; };
   }, [platformId]);
 
-  if (summary === null) return null; // API predates levels
+  if (!launched || summary === null) return null; // before launch, or the API predates levels
   const s = summary;
   const level = s?.level ?? 1;
   const people = s?.next?.unit === "people" ? s.next : null;

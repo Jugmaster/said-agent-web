@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
+import { notFound } from "next/navigation";
+import { getLaunch } from "@/lib/launch";
 import { getLedger, type Ledger } from "@/lib/api";
 import s from "@/app/landing.module.css";
 
@@ -56,6 +58,8 @@ const EXAMPLE: Ledger = {
 };
 
 export default async function LedgerPage() {
+  // The Ledger is where the token's money goes. Before the mint exists there is nothing to show.
+  if (!getLaunch().launched) notFound();
   const real = await getLedger();
   // Example numbers until the pool has actually funded someone; real zeros say nothing.
   const example = !real || (!real.live && real.agentsFunded === 0);

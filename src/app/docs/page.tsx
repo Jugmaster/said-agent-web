@@ -4,13 +4,15 @@ import type { ReactNode } from "react";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
 import s from "@/app/landing.module.css";
+import { getLaunch } from "@/lib/launch";
 
-export const metadata: Metadata = {
-  title: "Docs · Atcha",
-  description:
-    "How Atcha works: the budget it comes with, the two kinds of money, the levels, paying anyone by @name, fees and cashback, and the SAID identity underneath.",
-  openGraph: { title: "Docs · Atcha", description: "How Atcha works.", type: "website" },
-};
+export function generateMetadata(): Metadata {
+  const { launched } = getLaunch();
+  const description = launched
+    ? "How Atcha works: the budget it comes with, the two kinds of money, the levels, paying anyone by @name, fees and cashback, and the SAID identity underneath."
+    : "How Atcha works: paying anyone by @name, trading, buying, fees and cashback, and the SAID identity underneath.";
+  return { title: "Docs · Atcha", description, openGraph: { title: "Docs · Atcha", description: "How Atcha works.", type: "website" } };
+}
 
 const SECTIONS = [
   { id: "what", title: "What Atcha is" },
@@ -45,6 +47,11 @@ const Block = ({ label, children }: { label?: string; children: ReactNode }) => 
 const Q = ({ children }: { children: ReactNode }) => <p className={s.faqQ}>{children}</p>;
 
 export default function DocsPage() {
+  // Before the mint exists the docs cannot describe funding or levels, so those
+  // sections and every mention of them sit out, and the numbering closes up.
+  const { launched } = getLaunch();
+  const sections = launched ? SECTIONS : SECTIONS.filter((x) => x.id !== "funded" && x.id !== "ladder");
+  const num = (id: string) => sections.findIndex((x) => x.id === id) + 1;
   return (
     <div className={s.page}>
       <PublicMotion />
@@ -53,7 +60,7 @@ export default function DocsPage() {
         <aside>
           <div className={s.tocWrap}>
           <nav className={s.toc} aria-label="Sections">
-            {SECTIONS.map((x, i) => (
+            {sections.map((x, i) => (
               <a key={x.id} href={`#${x.id}`}><i>{String(i + 1).padStart(2, "0")}</i>{x.title}</a>
             ))}
           </nav>
@@ -70,30 +77,36 @@ export default function DocsPage() {
           <header className={s.docHead} data-reveal>
             <p className={s.eyebrow}>Docs</p>
             <h1 className={s.big}>How Atcha works.</h1>
-            <p className={s.pageSub}>Your AI with a budget of its own, funded every month. Its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
+            <p className={s.pageSub}>{launched ? "Your AI with a budget of its own, funded every month." : "Your own AI on Solana."} Its own SAID identity, yours forever. Live in Telegram and right here on the web.</p>
           </header>
 
-          <Sec id="what" n={1} title="What Atcha is">
-            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA. Pay five verified X accounts by name and it gets <strong>a budget of its own to trade with</strong>, every month. The budget takes the first loss. Money you add is yours, always.</p>
-            <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>
+          <Sec id="what" n={num("what")} title="What Atcha is">
+            <p>Atcha is a personal AI that lives on Solana. It trades anything on Solana, holds US stocks as tokens, pays anyone you can name, buys things, runs your DCA.{launched && <> Pay five verified X accounts by name and it gets <strong>a budget of its own to trade with</strong>, every month. The budget takes the first loss.</>} Money you add is yours, always.</p>
+            {launched && <p>It has a <strong>level</strong>. The level goes up as you use it, and the level sets how much it gets and what it can do.</p>}
             <p>You talk to it in plain language. It executes real on-chain transactions and keeps a verifiable history of everything it did on your behalf.</p>
           </Sec>
 
-          <Sec id="start" n={2} title="Quick start">
-            <p><strong>On the web:</strong> tap <Link href="/">Get your funded Atcha</Link>, sign in with X or Telegram, and it exists.</p>
+          <Sec id="start" n={num("start")} title="Quick start">
+            <p><strong>On the web:</strong> tap <Link href="/">Get your {launched ? "funded " : ""}Atcha</Link>, sign in with X or Telegram, and it exists.</p>
             <p><strong>In Telegram:</strong> open <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a> and tap <C>/start</C>.</p>
-            <Block label="telegram">{`you  →  /start
+            <Block label="telegram">{launched ? `you  →  /start
 bot  →  hey, welcome to Atcha. your AI comes funded.
         what do you want to name yours?
 
 you  →  Vega
 bot  →  ✓ Vega is ready. Level 1.
         pay five verified X accounts by @name and it gets funded.
+        profile: atcha.cash/@Vega` : `you  →  /start
+bot  →  hey, welcome to Atcha. what do you want to name yours?
+
+you  →  Vega
+bot  →  ✓ Vega is ready.
         profile: atcha.cash/@Vega`}</Block>
             <p>Already have one from the bot? Signing in on the web links it: same Atcha, same balance, same history on both.</p>
           </Sec>
 
-          <Sec id="funded" n={3} title="Funded: two kinds of money">
+          {launched && (
+          <Sec id="funded" n={num("funded")} title="Funded: two kinds of money">
             <p>Your balance is one number with two things inside it. The dashboard never hides which is which.</p>
             <table className={s.table}>
               <thead><tr><th></th><th>The budget</th><th>Your money</th></tr></thead>
@@ -110,8 +123,10 @@ bot  →  ✓ Vega is ready. Level 1.
             <p><strong>A rough day.</strong> If the budget falls below half of the month&apos;s funding, the agent sits out. Do two of today&apos;s things and it&apos;s back.</p>
             <p><strong>An untouched budget</strong> is reclaimed after 14 days so it can fund someone who will use it.</p>
           </Sec>
+          )}
 
-          <Sec id="ladder" n={4} title="Levels">
+          {launched && (
+          <Sec id="ladder" n={num("ladder")} title="Levels">
             <p>Four levels. Each one gives the agent more: more funding, bigger daily allowances, and from level 3, your share of the gains.</p>
             <table className={s.table}>
               <thead><tr><th>Level</th><th>Funding / month</th><th>Pays / day</th><th>Trades / day</th><th>How you get there</th></tr></thead>
@@ -124,9 +139,10 @@ bot  →  ✓ Vega is ready. Level 1.
             </table>
             <p><strong>Three things a day</strong> keep the streak: a trade, a send, a stake. The ones that settle with a real person level you up. Only settled outcomes count: a send that was claimed, a job that was delivered, a purchase that shipped. Paying yourself doesn&apos;t count; the app knows it&apos;s you.</p>
           </Sec>
+          )}
 
-          <Sec id="send" n={5} title="Pay anyone by @name">
-            <p>Any X or Telegram handle. They don&apos;t need a wallet, or to have heard of Atcha. Paying runs on your own money.</p>
+          <Sec id="send" n={num("send")} title="Pay anyone by @name">
+            <p>Any X or Telegram handle. They don&apos;t need a wallet, or to have heard of Atcha.{launched && " Paying runs on your own money."}</p>
             <Block label="examples">{`send 5 USDC to @alex
 pay @that_plumber $120
 split $180 with @the_groupchat`}</Block>
@@ -135,9 +151,9 @@ split $180 with @the_groupchat`}</Block>
             <Block>{`cancel the send to @joe`}</Block>
           </Sec>
 
-          <Sec id="trade" n={6} title="Trade, buy, and more">
-            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. The budget trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains.</p>
-            <Block label="examples">{`swap $5 of my budget into SOL
+          <Sec id="trade" n={num("trade")} title="Trade, buy, and more">
+            <p><strong>Trade.</strong> Swaps route through Jupiter across every major Solana venue. You get a quote first; nothing executes until you confirm. {launched ? "The budget trades anything with real liquidity; your own cash trades anything at all, and can bridge to other chains." : "It trades anything with real liquidity, and can bridge to other chains."}</p>
+            <Block label="examples">{`${launched ? "swap $5 of my budget into SOL" : "swap $5 into SOL"}
 buy JUP when it hits $0.40
 DCA $10 into SOL every day
 alert me if SOL drops 5%`}</Block>
@@ -145,15 +161,15 @@ alert me if SOL drops 5%`}</Block>
             <p><strong>Comms.</strong> It can make calls and send email on your behalf, priced per action and confirmed with you first.</p>
           </Sec>
 
-          <Sec id="identity" n={7} title="What&apos;s underneath">
-            <p>Your level is a real on-chain record. Every Atcha is registered under the <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID</a> program (<C>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</C>): identity, owner, verification. <strong>Verification is free and automatic</strong>; Atcha sponsors it when you first sign in.</p>
-            <p>The level is built from settled outcomes and anchored on-chain, so it follows you whichever surface you use, and it is what the funding formula reads every month. It is also what other people see when they check your name before paying you. Developers building on SAID can read it directly; that is the whole point of it being on-chain.</p>
+          <Sec id="identity" n={num("identity")} title="What&apos;s underneath">
+            <p>Your {launched ? "level" : "identity"} is a real on-chain record. Every Atcha is registered under the <a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID</a> program (<C>5dpw6KEQPn248pnkkaYyWfHwu2nfb3LUMbTucb6LaA8G</C>): identity, owner, verification. <strong>Verification is free and automatic</strong>; Atcha sponsors it when you first sign in.</p>
+            <p>{launched ? "The level is built from settled outcomes and anchored on-chain, so it follows you whichever surface you use, and it is what the funding formula reads every month." : "Your record is built from settled outcomes and anchored on-chain, so it follows you whichever surface you use."} It is also what other people see when they check your name before paying you. Developers building on SAID can read it directly; that is the whole point of it being on-chain.</p>
             <p>One name, every handle: link X, Telegram and any wallet you already run, and they all resolve to you. Each link is proven by logging in, never by trust.</p>
           </Sec>
 
-          <Sec id="fees" n={8} title="Fees and cashback">
+          <Sec id="fees" n={num("fees")} title="Fees and cashback">
             <p>Every action that moves real value takes a <strong>flat 1%</strong>, bundled into the same Solana transaction, so it lands in the treasury (<C>2XfHTeNWTjNwUmgoXaafYuqHcAAXj8F5Kjw2Bnzi4FxH</C>) in the same block as your action or not at all. Adding money, receiving, claiming and cashback payouts are never charged.</p>
-            <p>Your level earns part of that fee back:</p>
+            <p>Your {launched ? "level" : "record"} earns part of that fee back:</p>
             <table className={s.table}>
               <thead><tr><th>Tier</th><th>Back</th><th>What it takes</th></tr></thead>
               <tbody>
@@ -163,37 +179,41 @@ alert me if SOL drops 5%`}</Block>
                 <tr><td>Platinum</td><td>50%</td><td className={s.m}>100+ interactions, top identity</td></tr>
               </tbody>
             </table>
-            <p>Staking $SAID boosts your cashback. It never lowers the fee. Cashback earned on the budget stays in the budget; cashback earned on your cash is yours.</p>
+            <p>Staking $SAID boosts your cashback. It never lowers the fee.{launched && " Cashback earned on the budget stays in the budget; cashback earned on your cash is yours."}</p>
           </Sec>
 
-          <Sec id="money" n={9} title="Adding and taking out money">
+          <Sec id="money" n={num("money")} title="Adding and taking out money">
             <p><strong>Add money</strong> with a card or Apple Pay inside the app, or send SOL or USDC to your address from any wallet or exchange. On a phone, the Add money screen shows a Solana Pay code any wallet can scan.</p>
-            <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands. From level 3, 80% of the gains made with the budget are yours too. The budget itself never leaves.</p>
+            <p><strong>Take it out</strong> any time: your cash is withdrawable the moment it lands.{launched && " From level 3, 80% of the gains made with the budget are yours too. The budget itself never leaves."}</p>
           </Sec>
 
-          <Sec id="surfaces" n={10} title="Where it lives">
+          <Sec id="surfaces" n={num("surfaces")} title="Where it lives">
             <ul>
-              <li><strong>Web.</strong> The full thing: the funded dashboard, chat, send, wallet, activity. Installs to your home screen.</li>
+              <li><strong>Web.</strong> The full thing: the {launched ? "funded " : ""}dashboard, chat, send, wallet, activity. Installs to your home screen.</li>
               <li><strong>Telegram.</strong> <a href="https://t.me/saidinfrabot" target="_blank" rel="noreferrer">@saidinfrabot</a>, same Atcha, same balance.</li>
               <li><strong>X.</strong> Send and sign in by handle; tag <a href="https://x.com/atchacash" target="_blank" rel="noreferrer">@atchacash</a>.</li>
             </ul>
           </Sec>
 
-          <Sec id="faq" n={11} title="FAQ">
+          <Sec id="faq" n={num("faq")} title="FAQ">
             <Q>Do I need a wallet first?</Q>
             <p>No. Your Atcha has its own wallet, secured by Privy, from the moment it exists. Link an external one later if you want.</p>
-            <Q>Can I withdraw the budget?</Q>
-            <p>No. It trades; it doesn&apos;t leave. Your cash leaves whenever you like, and from level 3 so does your 80% of the gains.</p>
-            <Q>What if the budget goes to zero?</Q>
-            <p>Then it&apos;s gone and your cash was never touched. Next month funds again, if your level holds.</p>
+            {launched && (
+              <>
+                <Q>Can I withdraw the budget?</Q>
+                <p>No. It trades; it doesn&apos;t leave. Your cash leaves whenever you like, and from level 3 so does your 80% of the gains.</p>
+                <Q>What if the budget goes to zero?</Q>
+                <p>Then it&apos;s gone and your cash was never touched. Next month funds again, if your level holds.</p>
+              </>
+            )}
             <Q>Is this a real on-chain identity?</Q>
-            <p>Yes. Anyone can verify your Atcha&apos;s identity, level and history on Solana.</p>
+            <p>Yes. Anyone can verify your Atcha&apos;s identity{launched ? ", level" : ""} and history on Solana.</p>
             <Q>What if I lose my Telegram or X account?</Q>
             <p>Your Atcha persists on-chain. Recovery runs through the other logins you linked.</p>
             <Q>Can I see what it did?</Q>
             <p>Every action has a Solana signature. The <Link href="/activity">Activity</Link> tab shows yours; every Atcha has a public page at atcha.cash/@name.</p>
             <Q>Where do fees go?</Q>
-            <p>To the SAID treasury, on-chain and auditable, which funds the protocol and the funding pool.</p>
+            <p>To the SAID treasury, on-chain and auditable, which funds the protocol{launched ? " and the funding pool" : ""}.</p>
           </Sec>
 
           <footer className={s.pageFoot} style={{ marginTop: 40 }}>

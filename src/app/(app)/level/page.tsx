@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useLaunch } from "@/components/LaunchProvider";
 import { usePrivy } from "@privy-io/react-auth";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
@@ -34,6 +36,13 @@ const usd = (v: number) => `$${v.toLocaleString(undefined, { minimumFractionDigi
  * board. Desktop Home keeps the card too; this is where phones get it.
  */
 export default function LevelPage() {
+  // The Level page is the funded product. Before the mint exists it sends you home.
+  const { launched } = useLaunch();
+  const router = useRouter();
+  useEffect(() => {
+    if (!launched) router.replace("/home");
+  }, [launched, router]);
+  if (!launched) return null;
   return <AuthGate>{(platformId) => <Level platformId={platformId} />}</AuthGate>;
 }
 

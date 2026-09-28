@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
 import { getCreditsByHandle } from "@/lib/api";
+import { getLaunch } from "@/lib/launch";
 import s from "@/app/landing.module.css";
 
 interface PageProps { params: Promise<{ handle: string }> }
@@ -13,16 +14,21 @@ const clean = (h: string) => decodeURIComponent(h).replace(/^@/, "");
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const handle = clean((await params).handle);
   const a = await getCreditsByHandle(handle);
+  const { launched } = getLaunch();
   const title = `@${handle} · Atcha`;
-  const description = a
+  const description = a && launched
     ? `Level ${a.level} · ${a.levelName}. ${a.peoplePaid} people paid, funded ${a.monthsFunded} month${a.monthsFunded === 1 ? "" : "s"}.`
-    : `Pay @${handle} $1 and they have an Atcha.`;
+    : a
+      ? `Pay @${handle} by name.`
+      : `Pay @${handle} $1 and they have an Atcha.`;
   return { title, description, openGraph: { title, description, type: "profile" }, twitter: { card: "summary", title, description } };
 }
 
 export default async function HandlePage({ params }: PageProps) {
   const handle = clean((await params).handle);
   const a = await getCreditsByHandle(handle);
+  // Before the mint exists the page is a name and a Pay button; levels and funding stay off it.
+  const { launched } = getLaunch();
   const payHref = `/send?to=${encodeURIComponent(handle)}`;
 
   return (
@@ -31,11 +37,13 @@ export default async function HandlePage({ params }: PageProps) {
       <Navbar />
       <main className={s.wrap}>
         <header className={s.pageHead} data-reveal>
-          <p className={s.eyebrow}>{a ? `Level ${a.level} · ${a.levelName}` : "Not on Atcha yet"}</p>
+          <p className={s.eyebrow}>{a ? (launched ? `Level ${a.level} · ${a.levelName}` : "On Atcha") : "Not on Atcha yet"}</p>
           <h1 className={s.big}>@{handle}</h1>
           <p className={s.pageSub}>
             {a
-              ? a.funded
+              ? !launched
+                ? `Pay @${handle} by name. Checked before a cent moves.`
+                : a.funded
                 ? `Funded ${a.monthsFunded} month${a.monthsFunded === 1 ? "" : "s"}, ${usd(a.fundedTotalUsd)} in total. ${a.peoplePaid} people paid.`
                 : `${a.peoplePaid} of 5 people paid. Five and it gets funded.`
               : `Pay them $1 by name and they have an Atcha the moment they log in.`}
@@ -46,7 +54,7 @@ export default async function HandlePage({ params }: PageProps) {
           </div>
         </header>
 
-        {a && (
+        {launched && a && (
           <div className={s.tiles} data-stagger>
             <div className={s.tile}>
               <span className={s.eyebrow} style={{ margin: 0 }}>Balance</span>
@@ -66,7 +74,7 @@ export default async function HandlePage({ params }: PageProps) {
           </div>
         )}
 
-        {a && a.fundings.length > 0 && (
+        {launched && a && a.fundings.length > 0 && (
           <section style={{ marginTop: 44 }} data-reveal>
             <p className={s.eyebrow}>Funding record</p>
             <div className={s.list}>
@@ -87,7 +95,7 @@ export default async function HandlePage({ params }: PageProps) {
         )}
 
         <footer className={s.pageFoot}>
-          Want one? <Link href="/">Get your funded Atcha</Link>.
+          Want one? <Link href="/">Get your {launched ? "funded " : ""}Atcha</Link>.
         </footer>
       </main>
     </div>

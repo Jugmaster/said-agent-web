@@ -7,6 +7,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
 import Preloader from "@/components/Preloader";
+import { useLaunch } from "@/components/LaunchProvider";
 import s from "./landing.module.css";
 
 const NAMES = ["@the_groupchat", "@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@anyone."];
@@ -23,9 +24,12 @@ const CHIPS: [string, string][] = [
   ["@that_plumber", "got paid"],
   ["@weekend_five", "chipped in"],
 ];
+// Before the mint exists the page cannot mention funding, so those chips sit out.
+const PRELAUNCH_CHIPS = CHIPS.filter(([, what]) => !/funded|level/i.test(what));
 
 export default function LandingPage() {
   const { ready, authenticated, login } = usePrivy();
+  const { launched } = useLaunch();
   const router = useRouter();
   const [loginInitiated, setLoginInitiated] = useState(false);
 
@@ -45,6 +49,10 @@ export default function LandingPage() {
     }
   };
 
+  const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : launched ? "Get your funded Atcha" : "Get your Atcha";
+  const chips = launched ? CHIPS : PRELAUNCH_CHIPS;
+  const lead = launched ? "Comes funded. Pays" : "Trades anything. Pays";
+
   return (
     <div className={s.page}>
       <script
@@ -58,18 +66,25 @@ export default function LandingPage() {
       <Navbar />
 
       <header className={`${s.hero} ${s.wrap}`} data-hero>
-        <h1 className={s.h1} aria-label="Comes funded. Pays anyone you can name.">
-          <span className={s.row}><span>Comes funded. Pays</span></span>
+        <h1 className={s.h1} aria-label={`${lead} anyone you can name.`}>
+          <span className={s.row}><span>{lead}</span></span>
           <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
         </h1>
-        <p className={s.sub}>
-          It starts with <strong>money in it</strong>{" "}and it does everything: trades anything on Solana, holds the
-          S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
-          work with, every month.
-        </p>
+        {launched ? (
+          <p className={s.sub}>
+            It starts with <strong>money in it</strong>{" "}and it does everything: trades anything on Solana, holds the
+            S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
+            work with, every month.
+          </p>
+        ) : (
+          <p className={s.sub}>
+            Your own AI on Solana. It <strong>trades anything</strong>, holds the S&amp;P, pays anyone you can name, buys
+            things, runs your DCA. Say it in plain English and it does the rest.
+          </p>
+        )}
         <div className={s.ctas}>
           <button type="button" className={s.btn} onClick={start} disabled={!ready}>
-            {ready ? (authenticated ? "Open your Atcha" : "Get your funded Atcha") : "Loading…"}
+            {cta}
           </button>
           <a className={`${s.btn} ${s.ghost}`} href={TG} target="_blank" rel="noreferrer">
             Start in Telegram
@@ -78,71 +93,92 @@ export default function LandingPage() {
       </header>
       <div className={s.marquee} aria-hidden>
         <div className={s.track} data-marquee>
-          {CHIPS.map((c, i) => (
+          {chips.map((c, i) => (
             <span key={i} className={s.chip}><b>{c[0]}</b> {c[1]}</span>
           ))}
         </div>
       </div>
 
-      <section className={`${s.caps} ${s.wrap}`} id="funded">
+      <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>Our money first. All upside.</h2>
+          <h2 className={s.big}>{launched ? "Our money first. All upside." : "One agent. All of it."}</h2>
         </div>
         <div className={s.capGrid} data-stagger>
-          <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own. That budget is what&apos;s at risk, not your money.</p></div>
-          <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
-          <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
+          {launched ? (
+            <>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own. That budget is what&apos;s at risk, not your money.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
+            </>
+          ) : (
+            <>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Pays by name</h3><p>Any X or Telegram handle, a dollar or a hundred. Not on Atcha yet? They claim it by logging in. Every name is checked before a cent moves.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Does the rest</h3><p>Buys things, makes calls, sends email, runs your DCA, watches a price. One message and it handles it, with a receipt for everything.</p></div>
+            </>
+          )}
         </div>
       </section>
 
-      <section className={s.stage} id="how" data-stage>
-        <div className={s.pin}>
-        <div className={`${s.wrap} ${s.demoCols}`}>
-          <div className={s.demoCopy} data-reveal>
-            <p className={s.eyebrow}>The entry</p>
-            <h2 className={s.big}>Five blue ticks. Then it&apos;s funded.</h2>
-            <p>Pay five verified X accounts, a dollar or more each. The fifth one lands and your agent has a budget.</p>
-            <div className={s.mini}>
-              <span><b>Real sends.</b> Each goes to a real, verified person, checked before it moves.</span>
-              <span><b>Any five with a tick.</b> Already on Atcha or not yet; they claim by logging in.</span>
-              <span><b>No deposit.</b> The budget is the network&apos;s money, not yours.</span>
-            </div>
-          </div>
-          <div className={s.card} aria-label="Example first week" data-card>
-            <div className={s.acTop}>
-              <div className={s.to}>
-                <div className={s.avatar}>@</div>
-                <div className={s.who}><b>@you</b><small>level 1 → 2</small></div>
+      {launched && (
+        <>
+          <section className={s.stage} id="how" data-stage>
+            <div className={s.pin}>
+            <div className={`${s.wrap} ${s.demoCols}`}>
+              <div className={s.demoCopy} data-reveal>
+                <p className={s.eyebrow}>The entry</p>
+                <h2 className={s.big}>Five blue ticks. Then it&apos;s funded.</h2>
+                <p>Pay five verified X accounts, a dollar or more each. The fifth one lands and your agent has a budget.</p>
+                <div className={s.mini}>
+                  <span><b>Real sends.</b> Each goes to a real, verified person, checked before it moves.</span>
+                  <span><b>Any five with a tick.</b> Already on Atcha or not yet; they claim by logging in.</span>
+                  <span><b>No deposit.</b> The budget is the network&apos;s money, not yours.</span>
+                </div>
               </div>
-              <div className={s.amt} data-amt="25">$25.00</div>
+              <div className={s.card} aria-label="Example first week" data-card>
+                <div className={s.acTop}>
+                  <div className={s.to}>
+                    <div className={s.avatar}>@</div>
+                    <div className={s.who}><b>@you</b><small>level 1 → 2</small></div>
+                  </div>
+                  <div className={s.amt} data-amt="25">$25.00</div>
+                </div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Five people paid</p><p>@renata, @dan, @mo, @ivy, @kai</p></div><span className={`${s.pill} ${s.pb}`}>5 / 5</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 2</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>Its own money, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
+                <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
+              </div>
             </div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Five people paid</p><p>@renata, @dan, @mo, @ivy, @kai</p></div><span className={`${s.pill} ${s.pb}`}>5 / 5</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 2</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>Its own money, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
-            <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
-            <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
-          </div>
-        </div>
-        </div>
-      </section>
+            </div>
+          </section>
 
-      <section className={`${s.acts} ${s.wrap}`} id="steps">
-        <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
-        <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
-      </section>
-
+          <section className={`${s.acts} ${s.wrap}`} id="steps">
+            <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
+          </section>
+        </>
+      )}
 
       <section className={s.closeOuter} id="claim">
         <div className={s.close} data-close>
           <div className={s.closeIn}>
             <p className={s.eyebrow}>Ready when you are</p>
-            <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
-            <p className={s.csub}>Free, no seed phrase, funded once you&apos;ve paid five verified X accounts. Sign in with X or Telegram and it&apos;s yours in one message.</p>
+            {launched ? (
+              <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
+            ) : (
+              <h2>Get your <span className={s.hl}>Atcha</span>.</h2>
+            )}
+            <p className={s.csub}>
+              {launched
+                ? "Free, no seed phrase, funded once you've paid five verified X accounts. Sign in with X or Telegram and it's yours in one message."
+                : "Free, no seed phrase. Sign in with X or Telegram and it's yours in one message."}
+            </p>
             <div className={s.ctas}>
               <button type="button" className={`${s.btn} ${s.btnCream}`} onClick={start} disabled={!ready}>
-                {ready ? (authenticated ? "Open your Atcha" : "Get your funded Atcha") : "Loading…"}
+                {cta}
               </button>
               <a className={`${s.btn} ${s.ghostCream}`} href={TG} target="_blank" rel="noreferrer">Start in Telegram</a>
             </div>
@@ -154,13 +190,25 @@ export default function LandingPage() {
         <div className={s.wrap}>
           <div className={s.fCols}>
             <div className={s.fBrand}><span className={s.mark}>@</span>atcha</div>
-            <div className={s.fCol}><p>Product</p><a href="#funded">funded</a><a href="#how">how it works</a><Link href="/docs">docs</Link><Link href="/changelog">changelog</Link></div>
+            <div className={s.fCol}>
+              <p>Product</p>
+              {launched ? (
+                <>
+                  <a href="#funded">funded</a>
+                  <a href="#how">how it works</a>
+                </>
+              ) : (
+                <a href="#what">what it does</a>
+              )}
+              <Link href="/docs">docs</Link>
+              <Link href="/changelog">changelog</Link>
+            </div>
             <div className={s.fCol}><p>Network</p><Link href="/agents">agents</Link><Link href="/stats">stats</Link><a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID Protocol</a></div>
             <div className={s.fCol}><p>Socials</p><a href="https://x.com/atchacash" target="_blank" rel="noreferrer">x</a><a href={TG} target="_blank" rel="noreferrer">telegram</a></div>
           </div>
           <div className={s.legal}>
             <div className={s.lrow}><span>© 2026 Atcha, by SAID</span></div>
-            Atcha is a financial technology product. Digital assets are not legal tender, are not backed by the government, and are not subject to FDIC or SIPC protections. The budget your agent trades can lose value. Send only to people you know and trust.
+            Atcha is a financial technology product. Digital assets are not legal tender, are not backed by the government, and are not subject to FDIC or SIPC protections.{launched && " The budget your agent trades can lose value."} Send only to people you know and trust.
           </div>
         </div>
       </footer>
@@ -202,4 +250,3 @@ function Rotator({ words }: { words: string[] }) {
     </span>
   );
 }
-

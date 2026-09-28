@@ -20,6 +20,7 @@ import {
   PlusIcon,
   SendIcon,
   WalletIcon, LevelIcon, SettingsIcon } from "./NavIcons";
+import { useLaunch } from "@/components/LaunchProvider";
 
 const NAV = [
   { href: "/home", label: "Home", icon: HomeIcon, key: "h" },
@@ -61,6 +62,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const agent = useAgent();
   const pathname = usePathname();
   const router = useRouter();
+  // Level is the funded product. Before the mint exists it is not in the nav,
+  // the palette or the g-then-key chords.
+  const { launched } = useLaunch();
+  const nav = useMemo(() => (launched ? NAV : NAV.filter((n) => n.href !== "/level")), [launched]);
 
   const authed = ready && authenticated;
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
@@ -106,7 +111,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         return;
       }
       if (gAt.current && Date.now() - gAt.current < 1500) {
-        const dest = NAV.find((n) => n.key === e.key)?.href;
+        const dest = nav.find((n) => n.key === e.key)?.href;
         gAt.current = 0;
         if (dest) {
           e.preventDefault();
@@ -116,10 +121,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [authed, router]);
+  }, [authed, router, nav]);
 
   const paletteActions = useMemo<PaletteAction[]>(() => {
-    const nav: PaletteAction[] = NAV.map((n) => ({
+    const actions: PaletteAction[] = nav.map((n) => ({
       id: n.href,
       label: `Go to ${n.label}`,
       hint: `g ${n.key}`,
@@ -127,7 +132,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       run: () => router.push(n.href),
     }));
     if (walletAddress) {
-      nav.push({
+      actions.push({
         id: "fund",
         label: "Add funds",
         icon: <PlusIcon className="w-4 h-4" />,
@@ -135,19 +140,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
       });
     }
     if (platformId) {
-      nav.push({
+      actions.push({
         id: "profile",
         label: "View public profile",
         run: () => router.push(`/agents/${encodeURIComponent(platformId)}`),
       });
     }
-    nav.push({
+    actions.push({
       id: "docs",
       label: "Open docs",
       run: () => router.push("/docs"),
     });
-    return nav;
-  }, [router, walletAddress, platformId]);
+    return actions;
+  }, [router, walletAddress, platformId, nav]);
 
   // Palette free-text goes to the agent. Already on /chat → hand it to the
   // mounted chat screen via an event; elsewhere → stash the prompt in
@@ -190,7 +195,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
           </Link>
 
           <nav className="flex flex-col gap-1 px-2 lg:px-3 mt-2">
-            {NAV.map(({ href, label, icon: Icon, key }) => {
+            {nav.map(({ href, label, icon: Icon, key }) => {
               const active = pathname === href || pathname.startsWith(href + "/");
               return (
                 <Link

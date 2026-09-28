@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
+import { notFound } from "next/navigation";
+import { getLaunch } from "@/lib/launch";
 import FleetBoard from "@/components/FleetBoard";
 import s from "@/app/landing.module.css";
 
@@ -11,6 +13,8 @@ export const metadata: Metadata = {
 };
 
 export default function FleetPage() {
+  // The Fleet is the funded product in public. Before the mint exists it does not exist.
+  if (!getLaunch().launched) notFound();
   return (
     <div className={s.page}>
       <PublicMotion />

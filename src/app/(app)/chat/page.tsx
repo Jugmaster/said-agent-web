@@ -20,6 +20,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
 import { getPortfolio, getCredits, type FullPortfolio } from "@/lib/api";
 import EntryProgress from "@/components/EntryProgress";
+import { useLaunch } from "@/components/LaunchProvider";
 
 interface UiMessage {
   id: string;
@@ -43,6 +44,9 @@ const ENTRY_PROMPTS = ["Pay @… $1", "Who can I pay?", "What's my level?"];
 const FUNDED_PROMPTS = ["What's my budget?", "Buy $5 of SOL", "What levels me up?"];
 const ENTRY_ACTIONS = ["Pay @… $1", "Who can I pay?", "What's my level?", "What can you do?"];
 const FUNDED_ACTIONS = ["What's my budget?", "Buy $5 of SOL", "Buy $1 of SOL every day", "What levels me up?"];
+// Before the mint exists nothing can mention a level or a budget.
+const PRELAUNCH_PROMPTS = ["Pay @… $1", "Buy $5 of SOL", "What can you do?"];
+const PRELAUNCH_ACTIONS = ["Pay @… $1", "Who can I pay?", "Buy $5 of SOL", "What can you do?"];
 
 /**
  * Desktop-only (xl+) context rail beside the conversation: one-click prompts
@@ -53,11 +57,13 @@ function ChatContextRail({
   platformId,
   sending,
   funded,
+  launched,
   onQuick,
 }: {
   platformId: string;
   sending: boolean;
   funded: boolean | null;
+  launched: boolean;
   onQuick: (text: string) => void;
 }) {
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
@@ -80,7 +86,7 @@ function ChatContextRail({
           Quick actions
         </h2>
         <div className="flex flex-col gap-1.5">
-          {(funded ? FUNDED_ACTIONS : ENTRY_ACTIONS).map((q) => (
+          {(funded ? FUNDED_ACTIONS : launched ? ENTRY_ACTIONS : PRELAUNCH_ACTIONS).map((q) => (
             <button
               key={q}
               type="button"
@@ -143,6 +149,7 @@ type Received = NonNullable<import("@/lib/api").ClaimResponse["received"]>;
 function ChatScreen({ platformId }: { platformId: string }) {
   // Funded or not decides which starter prompts show. Null until known (or when the API predates credits).
   const [funded, setFunded] = useState<boolean | null>(null);
+  const { launched } = useLaunch();
   useEffect(() => {
     let alive = true;
     getCredits(platformId).then((c) => alive && setFunded(c?.funded ?? null)).catch(() => {});
@@ -456,7 +463,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 !
               </p>
               <p className="text-xs text-emerald-300/70 mt-1">
-                It&apos;s yours. Pay five verified X accounts by name and your agent is funded every month.
+                It&apos;s yours.{launched && " Pay five verified X accounts by name and your agent is funded every month."}
               </p>
               {/* The natural first send is to whoever just paid you: one of five. */}
               {(() => {
@@ -542,7 +549,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                   </h2>
                   <p className="text-sm text-zinc-400 mb-5">
                     {step === "unknown"
-                      ? "Your AI with a budget of its own. Pay five verified X accounts by name and it's funded every month."
+                      ? (launched ? "Your AI with a budget of its own. Pay five verified X accounts by name and it's funded every month." : "Your own AI on Solana. It trades, pays anyone you can name, and does the rest.")
                       : "One step: give it a name. Free, no SOL needed."}
                   </p>
                   {step === "unknown" ? (
@@ -616,7 +623,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 phone there was nothing tappable at all. These are the jobs, not
                 navigation: two go to typed flows, the rest talk to the agent. */}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              {(funded ? FUNDED_PROMPTS : ENTRY_PROMPTS).map((q) => (
+              {(funded ? FUNDED_PROMPTS : launched ? ENTRY_PROMPTS : PRELAUNCH_PROMPTS).map((q) => (
                 <button
                   key={q}
                   type="button"
@@ -670,6 +677,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
       <ChatContextRail
         platformId={platformId}
               funded={funded}
+              launched={launched}
         sending={sending}
         onQuick={(q) => void send(q)}
       />

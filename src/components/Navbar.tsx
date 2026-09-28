@@ -6,6 +6,7 @@ import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance } from "@/hooks/useSendableBalance";
 import { applyTheme, type ThemePref } from "@/components/ThemeToggle";
+import { useLaunch } from "@/components/LaunchProvider";
 
 function shortAddr(a: string | null | undefined): string {
   if (!a) return "—";
@@ -56,14 +57,23 @@ export default function Navbar() {
     return () => document.removeEventListener("pointerdown", onClick);
   }, [menuOpen, navOpen]);
 
-  const NAV: Array<[string, string]> = [
-    ["/#funded", "Funded"],
-    ["/#how", "How it works"],
-    ["/fleet", "Fleet"],
-    ["/agents", "Agents"],
-    ["/stats", "Stats"],
-    ["/docs", "Docs"],
-  ];
+  // Before the mint exists the funded sections and the Fleet are not on the site.
+  const { launched } = useLaunch();
+  const NAV: Array<[string, string]> = launched
+    ? [
+        ["/#funded", "Funded"],
+        ["/#how", "How it works"],
+        ["/fleet", "Fleet"],
+        ["/agents", "Agents"],
+        ["/stats", "Stats"],
+        ["/docs", "Docs"],
+      ]
+    : [
+        ["/#what", "What it does"],
+        ["/agents", "Agents"],
+        ["/stats", "Stats"],
+        ["/docs", "Docs"],
+      ];
 
   return (
     <div

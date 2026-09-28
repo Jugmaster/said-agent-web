@@ -12,6 +12,7 @@ import CashbackCard from "@/components/CashbackCard";
 import PositionsList from "@/components/token/PositionsList";
 import TokenSearch from "@/components/token/TokenSearch";
 import LevelUp from "@/components/LevelUp";
+import { useLaunch } from "@/components/LaunchProvider";
 import { useAgent } from "@/hooks/useAgent";
 import { usePrivy } from "@privy-io/react-auth";
 import {
@@ -105,6 +106,8 @@ function Home({ platformId }: { platformId: string }) {
   const [credits, setCredits] = useState<CreditsSummary | null | undefined>(undefined);
   const [creditsToday, setCreditsToday] = useState<CreditsToday | null>(null);
   const [positions, setPositions] = useState<Position[] | null>(null);
+  // Before the mint exists the funded card, the ladder and the Level tile stay off the page.
+  const { launched } = useLaunch();
 
   useEffect(() => {
     let cancelled = false;
@@ -152,7 +155,7 @@ function Home({ platformId }: { platformId: string }) {
             this API predates credits, so nothing here depends on the deploy. */}
         <div className="mb-8">
           <p className="text-sm text-zinc-500">{greeting()}{userName ? `, ${userName}` : ""}</p>
-          {credits !== null ? (
+          {launched && credits !== null ? (
             <div className="mt-3">
               <FundedCard
                 summary={credits === undefined ? undefined : { ...credits, balanceUsd: credits.balanceUsd ?? total }}
@@ -195,10 +198,10 @@ function Home({ platformId }: { platformId: string }) {
         )}
 
         {/* Quick actions */}
-        <div className="mb-9 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <div className={`mb-9 grid grid-cols-2 gap-3 ${launched ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
           <ActionCard href="/send" title="Pay" sub="Anyone you can name" icon="pay" />
           <ActionCard href="/chat" title="Ask your Atcha" sub="It handles the rest" icon="ask" />
-          <ActionCard href="/level" title="Level" sub="Record, page, the board" icon="level" />
+          {launched && <ActionCard href="/level" title="Level" sub="Record, page, the board" icon="level" />}
           <ActionCard href="/portfolio" title="Wallet" sub="Balances & identity" icon="wallet" />
           <ActionCard href="/activity" title="Activity" sub="Receipts & history" icon="activity" />
         </div>
@@ -226,7 +229,7 @@ function Home({ platformId }: { platformId: string }) {
 
         {/* Aside content inline on smaller screens (aside is xl-only) */}
         <div className="mt-9 space-y-6 xl:hidden">
-          {credits && credits.funded && (
+          {launched && credits && credits.funded && (
             <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
           )}
           <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
@@ -237,7 +240,7 @@ function Home({ platformId }: { platformId: string }) {
 
       {/* RIGHT CONTEXT PANEL — like chat, fills the width on wide screens */}
       <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
-        {credits && credits.funded && (
+        {launched && credits && credits.funded && (
           <DailyTasks tasks={credits.tasks} ownUsd={credits.ownUsd} streak={credits.streak} />
         )}
         <CashbackCard balance={balance} cashback={cashback} level={credits?.funded ? credits.level : null} />
