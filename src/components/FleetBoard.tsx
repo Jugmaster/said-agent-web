@@ -7,7 +7,9 @@ import s from "@/app/landing.module.css";
 
 const usd = (v: number | null | undefined) => (v == null ? "$—" : `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 
-/* The leaderboard, refreshed every 30 seconds. Sorted by result since funded. */
+/* The board, refreshed every 30 seconds. Sorted by level, then how long funded, then
+   how much: standing, not last week's luck. A raw-PnL order on house money is the
+   one board the evidence says amplifies risk-taking, so it is deliberately not that. */
 export default function FleetBoard() {
   const [fleet, setFleet] = useState<PublicCredits[] | null>(null);
   useEffect(() => {
@@ -21,7 +23,9 @@ export default function FleetBoard() {
   if (fleet === null) return <div className={s.empty} style={{ marginTop: 44 }}>Loading the board…</div>;
   if (fleet.length === 0) return <div className={s.empty} style={{ marginTop: 44 }}>The board fills on the first funding day.</div>;
 
-  const sorted = [...fleet].sort((a, b) => (b.pnlUsd ?? -Infinity) - (a.pnlUsd ?? -Infinity));
+  const sorted = [...fleet].sort(
+    (a, b) => (b.level - a.level) || ((b.monthsFunded ?? 0) - (a.monthsFunded ?? 0)) || ((b.fundedTotalUsd ?? 0) - (a.fundedTotalUsd ?? 0)),
+  );
   return (
     <div className={s.list} style={{ marginTop: 44 }}>
       {sorted.map((a, i) => {

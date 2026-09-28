@@ -197,6 +197,16 @@ function Home({ platformId }: { platformId: string }) {
           </div>
         )}
 
+        {/* The budget landed and nothing has been bought yet: the one tap that turns a grant into a trade.
+            Most people handed capital never trade it; this is the answer to that, and it is the user's tap, not ours. */}
+        {launched && credits?.funded && positions !== null && positions.length === 0 && (
+          <Link href="/chat?prompt=Buy%20%245%20of%20SOL" className="mb-8 block rounded-2xl border border-line bg-card p-5 transition hover:border-ink">
+            <div className="text-xs font-medium uppercase tracking-wider text-zinc-500">Your budget landed</div>
+            <div className="mt-1 text-lg font-semibold text-white">Buy $5 of SOL to start.</div>
+            <p className="mt-1 max-w-[46ch] text-sm text-zinc-400">One tap, then send. Your agent takes it from there, and every trade lands on your chart.</p>
+          </Link>
+        )}
+
         {/* Quick actions */}
         <div className={`mb-9 grid grid-cols-2 gap-3 ${launched ? "lg:grid-cols-5" : "lg:grid-cols-4"}`}>
           <ActionCard href="/send" title="Pay" sub="Anyone you can name" icon="pay" />

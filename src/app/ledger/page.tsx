@@ -21,56 +21,35 @@ const sol = (v: number | null | undefined) => (v == null ? "— SOL" : `${v.toLo
 const short = (a: string | null) => (a ? `${a.slice(0, 4)}…${a.slice(-4)}` : "—");
 const monthName = (m: string) => new Date(`${m}-01T00:00:00Z`).toLocaleDateString("en-GB", { month: "short", year: "numeric", timeZone: "UTC" });
 
-/**
- * Example numbers, shown until the pool is live. Marked as such on the page.
- * The shape is exactly what GET /api/credits/ledger returns, so the page
- * doesn't change when the real thing arrives.
- */
-const EXAMPLE: Ledger = {
-  live: false,
-  asOf: new Date().toISOString(),
-  creatorFeesSol: 412.6,
-  creatorWallet: "ATCHAcreator1111111111111111111111111111111",
-  poolWallet: "ATCHApool1111111111111111111111111111111111",
-  poolSol: 38.2,
-  poolUsd: 4470,
-  agentsFunded: 312,
-  agentsFundedThisMonth: 287,
-  fundedTotalUsd: 21_450,
-  fundedThisMonthUsd: 8_925,
-  tradedByFundedUsd: 96_300,
-  feesFromFundedUsd: 963,
-  gainsSettledUsd: 2_140,
-  shareKeptUsd: 535,
-  buyback: { enabled: true, live: true, lockWallet: "ATCHAlock11111111111111111111111111111111111", buys: 9, solSpent: 21.4, usdSpent: 2_505, atchaBought: 1_920_000, lastAt: new Date(Date.now() - 6 * 3600e3).toISOString() },
-  selfFundedPct: 43,
-  months: [
-    { month: "2026-11", agentsFunded: 287, fundedUsd: 8_925, feesUsd: 412, buybackSol: 8.1, buybackUsd: 948 },
-    { month: "2026-10", agentsFunded: 154, fundedUsd: 4_650, feesUsd: 301, buybackSol: 7.9, buybackUsd: 910 },
-    { month: "2026-09", agentsFunded: 61, fundedUsd: 1_525, feesUsd: 88, buybackSol: 5.4, buybackUsd: 647 },
-  ],
-  milestones: [
-    { label: "agents funded", target: 100, have: 312, done: true },
-    { label: "agents funded", target: 1_000, have: 312, done: false },
-    { label: "funded, USD", target: 10_000, have: 21_450, done: true },
-    { label: "a self-funded month", target: 100, have: 43, done: false },
-  ],
-};
 
 export default async function LedgerPage() {
   // The Ledger is where the token's money goes. Before the mint exists there is nothing to show.
   if (!getLaunch().launched) notFound();
   const real = await getLedger();
-  // Example numbers until the pool has actually funded someone; real zeros say nothing.
-  const example = !real || (!real.live && real.agentsFunded === 0);
-  const L = example ? EXAMPLE : real!;
+  // Never an example, never an estimate. If the API is down, say so; zeros are zeros.
+  if (!real) {
+    return (
+      <div className={s.page}>
+        <PublicMotion />
+        <Navbar />
+        <main className={s.wrap}>
+          <header className={s.pageHead} data-reveal>
+            <p className={s.eyebrow}>The ledger</p>
+            <h1 className={s.big}>Where the money goes.</h1>
+            <p className={s.pageSub}>The ledger is not reachable right now. Nothing on this page is ever an estimate; when the API is back, the real numbers are.</p>
+          </header>
+        </main>
+      </div>
+    );
+  }
+  const L = real;
   const flow = [
-    { n: "01", label: "Creator fees in", value: L.creatorFeesSol != null ? sol(L.creatorFeesSol) : "—", sub: L.creatorWallet ? `the token's creator wallet · ${short(L.creatorWallet)}` : "read from the creator wallet once the token is live" },
+    { n: "01", label: "Creator wallet, now", value: L.creatorFeesSol != null ? sol(L.creatorFeesSol) : "—", sub: L.creatorWallet ? `balance right now, not fees to date · ${short(L.creatorWallet)}` : "read from the creator wallet once the token is live" },
     { n: "02", label: "The pool", value: usd(L.poolUsd), sub: `${sol(L.poolSol)} · topped up on demand · ${short(L.poolWallet)}` },
     { n: "03", label: "Agents funded", value: L.agentsFunded.toLocaleString(), sub: `${usd(L.fundedTotalUsd)} in total · ${usd(L.fundedThisMonthUsd)} this month to ${L.agentsFundedThisMonth}` },
     { n: "04", label: "They trade", value: usd(L.tradedByFundedUsd), sub: "volume on funded budgets" },
     { n: "05", label: "Comes back", value: usd(L.feesFromFundedUsd + L.shareKeptUsd), sub: `1% of trades ${usd(L.feesFromFundedUsd)} · 20% of gains ${usd(L.shareKeptUsd)}` },
-    { n: "06", label: "Bought \u0026 locked", value: `${(L.buyback.atchaBought / 1e6).toFixed(2)}M`, sub: `${L.buyback.buys} buys · ${sol(L.buyback.solSpent)} · never sold · ${short(L.buyback.lockWallet)}` },
+    { n: "06", label: "Bought \u0026 locked", value: `${(L.buyback.atchaBought / 1e6).toFixed(2)}M`, sub: `${L.buyback.buys} buys · ${sol(L.buyback.solSpent)} · never sold, by policy · ${short(L.buyback.lockWallet)}` },
   ];
   const pct = L.selfFundedPct;
 
@@ -80,14 +59,14 @@ export default async function LedgerPage() {
       <Navbar />
       <main className={s.wrap}>
         <header className={s.pageHead} data-reveal>
-          <p className={s.eyebrow}>The ledger · {L.live ? "live" : example ? "example numbers" : "dry run"}</p>
+          <p className={s.eyebrow}>The ledger · {L.live ? "live" : "dry run"}</p>
           <h1 className={s.big}>Where the money goes.</h1>
           <p className={s.pageSub}>
             The token funds the agents. Nothing else. This page is the account: what the token earned, what the pool paid out, what came back, and what was bought and locked. Every month, every line, in public.
           </p>
-          {example && (
+          {L.notes && (
             <p className={s.pageSub} style={{ fontSize: "0.95rem", marginTop: 14 }}>
-              <span className={s.okPill} style={{ background: "var(--color-warn-soft)", color: "var(--color-warn)" }}>Example numbers</span>&nbsp; The real ledger switches on the day the token is live and the pool is funded. Nothing here is a claim.
+              What this page can and cannot prove: {L.notes.creatorWallet}. {L.notes.lock}. {L.notes.teamTrading}.
             </p>
           )}
         </header>

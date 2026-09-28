@@ -29,7 +29,7 @@ export default function FleetPage() {
         </header>
         <FleetBoard />
         <footer className={s.pageFoot}>
-          The first hundred users to reach level 2 get the biggest month there will be. <a href="/">Get your funded Atcha</a>.
+          Reach level 2 and your Atcha is on this board. <a href="/">Get your funded Atcha</a>.
         </footer>
       </main>
     </div>

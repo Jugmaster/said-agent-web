@@ -1004,6 +1004,7 @@ export interface Ledger {
   shareKeptUsd: number;
   buyback: { enabled: boolean; live: boolean; lockWallet: string | null; buys: number; solSpent: number; usdSpent: number; atchaBought: number; lastAt: string | null };
   selfFundedPct: number | null;
+  notes?: { creatorWallet: string; lock: string; teamTrading: string; buybackThisMonthUsd: number };
   months: LedgerMonth[];
   milestones: Array<{ label: string; target: number; have: number; done: boolean }>;
 }
