@@ -1,124 +1,252 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "@/components/Navbar";
-import HomeBelowFold from "@/components/HomeBelowFold";
+import PublicMotion from "@/components/PublicMotion";
+import Preloader from "@/components/Preloader";
+import { useLaunch } from "@/components/LaunchProvider";
+import s from "./landing.module.css";
 
-export default function HomePage() {
+const NAMES = ["@the_groupchat", "@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@anyone."];
+const TG = "https://t.me/saidinfrabot";
+const CHIPS: [string, string][] = [
+  ["@little_bro", "got a funded Atcha"],
+  ["@yourbarber", "got paid $25"],
+  ["@the_groupchat", "split $180"],
+  ["@renata_paints", "got tipped"],
+  ["@0xanalyst", "got funded $25"],
+  ["@sol_maxi", "reached level 3"],
+  ["@dinner_crew", "settled up"],
+  ["@mum", "got flowers money"],
+  ["@that_plumber", "got paid"],
+  ["@weekend_five", "chipped in"],
+];
+// Before the mint exists the page cannot mention funding, so those chips sit out.
+const PRELAUNCH_CHIPS = CHIPS.filter(([, what]) => !/funded|level/i.test(what));
+
+export default function LandingPage() {
   const { ready, authenticated, login } = usePrivy();
+  const { launched } = useLaunch();
   const router = useRouter();
   const [loginInitiated, setLoginInitiated] = useState(false);
 
-  // Route into /chat only when the user just logged in FROM this hero — that
-  // closes the post-login dead-end (completing the Privy modal flips
-  // `authenticated`) without trapping already-authed visitors: clicking the
-  // logo or typing the URL while logged in keeps the home page browsable.
+  // Into the app only when the login started here, so a signed-in visitor can still browse.
   useEffect(() => {
     if (ready && authenticated && loginInitiated) router.replace("/home");
   }, [ready, authenticated, loginInitiated, router]);
 
+  useEffect(() => {
+  }, []);
+
+  const start = () => {
+    if (authenticated) router.push("/home");
+    else {
+      setLoginInitiated(true);
+      login();
+    }
+  };
+
+  const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : launched ? "Get your funded Atcha" : "Get your Atcha";
+  const chips = launched ? CHIPS : PRELAUNCH_CHIPS;
+  const lead = launched ? "Comes funded. Pays" : "Trades anything. Pays";
+
   return (
-    <>
+    <div className={s.page}>
+      <script
+        dangerouslySetInnerHTML={{
+          __html:
+            "try{if(sessionStorage.getItem('atcha-seen')==='1'||matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.setAttribute('data-seen','1')}catch(e){}",
+        }}
+      />
+      <div data-preloader><Preloader /></div>
+      <PublicMotion />
       <Navbar />
-      <main className="min-h-[calc(100dvh-65px)] px-6 flex items-center justify-center">
-        <div className="max-w-xl w-full text-center">
-          <div className="inline-block px-4 py-2 mb-8 text-sm text-zinc-400 border border-zinc-700 rounded-full">
-            Now live on Solana Mainnet
-          </div>
 
-          <h1
-            className="text-4xl sm:text-5xl font-bold mb-5 tracking-tight leading-tight"
-            style={{ textShadow: "0 2px 24px rgba(0,0,0,0.85), 0 0 60px rgba(102,126,234,0.15)" }}
-          >
-            Send money. Buy anything. Swap tokens.
-          </h1>
-          <p
-            className="text-base sm:text-lg text-zinc-400 mb-8 max-w-md mx-auto"
-            style={{ textShadow: "0 2px 16px rgba(0,0,0,0.7)" }}
-          >
-            All from one chat — your own AI agent on Solana. No seed phrases, no
-            setup.
+      <header className={`${s.hero} ${s.wrap}`} data-hero>
+        <h1 className={s.h1} aria-label={`${lead} anyone you can name.`}>
+          <span className={s.row}><span>{lead}</span></span>
+          <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
+        </h1>
+        {launched ? (
+          <p className={s.sub}>
+            It starts with <strong>money in it</strong>{" "}and it does everything: trades anything on Solana, holds the
+            S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
+            work with, every month.
           </p>
+        ) : (
+          <p className={s.sub}>
+            Your own AI on Solana. It <strong>trades anything</strong>, holds the S&amp;P, pays anyone you can name, buys
+            things, runs your DCA. Say it in plain English and it does the rest.
+          </p>
+        )}
+        <div className={s.ctas}>
+          <button type="button" className={s.btn} onClick={start} disabled={!ready}>
+            {cta}
+          </button>
+          <a className={`${s.btn} ${s.ghost}`} href={TG} target="_blank" rel="noreferrer">
+            Start in Telegram
+          </a>
+        </div>
+      </header>
+      <div className={s.marquee} aria-hidden>
+        <div className={s.track} data-marquee>
+          {chips.map((c, i) => (
+            <span key={i} className={s.chip}><b>{c[0]}</b> {c[1]}</span>
+          ))}
+        </div>
+      </div>
 
-          {/* Guests: Telegram-first (one tap), web app secondary.
-              Signed in: straight into the app — no re-login, no redirect trap. */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4">
-            {ready && authenticated ? (
-              <>
-                <Link
-                  href="/home"
-                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
-                >
-                  Open app →
-                </Link>
-                <a
-                  href="https://t.me/saidinfrabot"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 transition"
-                >
-                  Telegram →
-                </a>
-              </>
+      <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
+        <div className={s.capsHead} data-reveal>
+          <p className={s.eyebrow}>What it does</p>
+          <h2 className={s.big}>{launched ? "Our money first. All upside." : "One agent. All of it."}</h2>
+        </div>
+        <div className={s.capGrid} data-stagger>
+          {launched ? (
+            <>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own. That budget is what&apos;s at risk, not your money.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
+            </>
+          ) : (
+            <>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Pays by name</h3><p>Any X or Telegram handle, a dollar or a hundred. Not on Atcha yet? They claim it by logging in. Every name is checked before a cent moves.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Does the rest</h3><p>Buys things, makes calls, sends email, runs your DCA, watches a price. One message and it handles it, with a receipt for everything.</p></div>
+            </>
+          )}
+        </div>
+      </section>
+
+      {launched && (
+        <>
+          <section className={s.stage} id="how" data-stage>
+            <div className={s.pin}>
+            <div className={`${s.wrap} ${s.demoCols}`}>
+              <div className={s.demoCopy} data-reveal>
+                <p className={s.eyebrow}>The entry</p>
+                <h2 className={s.big}>Five blue ticks. Then it&apos;s funded.</h2>
+                <p>Pay five verified X accounts, a dollar or more each. The fifth one lands and your agent has a budget.</p>
+                <div className={s.mini}>
+                  <span><b>Real sends.</b> Each goes to a real, verified person, checked before it moves.</span>
+                  <span><b>Any five with a tick.</b> Already on Atcha or not yet; they claim by logging in.</span>
+                  <span><b>No deposit.</b> The budget is the network&apos;s money, not yours.</span>
+                </div>
+              </div>
+              <div className={s.card} aria-label="Example first week" data-card>
+                <div className={s.acTop}>
+                  <div className={s.to}>
+                    <div className={s.avatar}>@</div>
+                    <div className={s.who}><b>@you</b><small>level 1 → 2</small></div>
+                  </div>
+                  <div className={s.amt} data-amt="25">$25.00</div>
+                </div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Five people paid</p><p>@renata, @dan, @mo, @ivy, @kai</p></div><span className={`${s.pill} ${s.pb}`}>5 / 5</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 2</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>Its own money, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
+                <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
+                <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
+              </div>
+            </div>
+            </div>
+          </section>
+
+          <section className={`${s.acts} ${s.wrap}`} id="steps">
+            <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
+          </section>
+        </>
+      )}
+
+      <section className={s.closeOuter} id="claim">
+        <div className={s.close} data-close>
+          <div className={s.closeIn}>
+            <p className={s.eyebrow}>Ready when you are</p>
+            {launched ? (
+              <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
             ) : (
-              <>
-                <a
-                  href="https://t.me/saidinfrabot"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full sm:w-auto sm:px-10 px-6 py-3 bg-white text-black rounded-lg font-semibold hover:bg-zinc-200 transition"
-                >
-                  Start in Telegram →
-                </a>
-                <button
-                  onClick={() => {
-                    setLoginInitiated(true);
-                    login();
-                  }}
-                  disabled={!ready}
-                  className="w-full sm:w-auto sm:px-8 px-6 py-3 border border-zinc-700 text-zinc-200 rounded-lg font-semibold hover:bg-zinc-800/50 disabled:opacity-50 transition"
-                >
-                  {ready ? "Open web app" : "Loading…"}
-                </button>
-              </>
+              <h2>Get your <span className={s.hl}>Atcha</span>.</h2>
             )}
-          </div>
-
-          <p className="text-xs text-zinc-500">
-            Agent-managed wallet · keys secured by Privy · no seed phrase · no
-            SOL to start
-          </p>
-
-          <div className="mt-12 flex items-center justify-center gap-x-5 gap-y-2 text-xs text-zinc-500">
-            <Link href="/agents" className="hover:text-white transition">
-              Agents
-            </Link>
-            <span className="text-zinc-700">·</span>
-            <a
-              href="https://x.com/saidagent"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white transition"
-            >
-              @saidagent
-            </a>
-            <span className="text-zinc-700">·</span>
-            <a
-              href="https://t.me/saidinfrabot"
-              target="_blank"
-              rel="noreferrer"
-              className="hover:text-white transition"
-            >
-              Telegram
-            </a>
+            <p className={s.csub}>
+              {launched
+                ? "Free, no seed phrase, funded once you've paid five verified X accounts. Sign in with X or Telegram and it's yours in one message."
+                : "Free, no seed phrase. Sign in with X or Telegram and it's yours in one message."}
+            </p>
+            <div className={s.ctas}>
+              <button type="button" className={`${s.btn} ${s.btnCream}`} onClick={start} disabled={!ready}>
+                {cta}
+              </button>
+              <a className={`${s.btn} ${s.ghostCream}`} href={TG} target="_blank" rel="noreferrer">Start in Telegram</a>
+            </div>
           </div>
         </div>
-      </main>
+      </section>
 
-      <HomeBelowFold />
-    </>
+      <footer className={s.footer}>
+        <div className={s.wrap}>
+          <div className={s.fCols}>
+            <div className={s.fBrand}><span className={s.mark}>@</span>atcha</div>
+            <div className={s.fCol}>
+              <p>Product</p>
+              {launched ? (
+                <>
+                  <a href="#funded">funded</a>
+                  <a href="#how">how it works</a>
+                </>
+              ) : (
+                <a href="#what">what it does</a>
+              )}
+              <Link href="/docs">docs</Link>
+              <Link href="/changelog">changelog</Link>
+            </div>
+            <div className={s.fCol}><p>Network</p><Link href="/agents">agents</Link><Link href="/stats">stats</Link><a href="https://www.saidprotocol.com" target="_blank" rel="noreferrer">SAID Protocol</a></div>
+            <div className={s.fCol}><p>Socials</p><a href="https://x.com/atchacash" target="_blank" rel="noreferrer">x</a><a href={TG} target="_blank" rel="noreferrer">telegram</a></div>
+          </div>
+          <div className={s.legal}>
+            <div className={s.lrow}><span>© 2026 Atcha, by SAID</span></div>
+            Atcha is a financial technology product. Digital assets are not legal tender, are not backed by the government, and are not subject to FDIC or SIPC protections.{launched && " The budget your agent trades can lose value."} Send only to people you know and trust.
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+}
+
+function Rotator({ words }: { words: string[] }) {
+  const ref = useRef<HTMLSpanElement>(null);
+  const [i, setI] = useState(0);
+  const [out, setOut] = useState<number | null>(null);
+  useEffect(() => {
+    const fit = () => {
+      const el = ref.current;
+      if (!el) return;
+      const w = (el.children[i] as HTMLElement | undefined)?.offsetWidth;
+      if (w) el.style.width = `${w}px`;
+    };
+    fit();
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [i]);
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const t = setInterval(() => {
+      setI((cur) => {
+        setOut(cur);
+        setTimeout(() => setOut(null), 550);
+        return (cur + 1) % words.length;
+      });
+    }, 2400);
+    return () => clearInterval(t);
+  }, [words.length]);
+  return (
+    <span className={s.rot} ref={ref}>
+      {words.map((w, k) => (
+        <span key={w} className={k === i ? s.cur : k === out ? s.out : undefined}>{w}</span>
+      ))}
+    </span>
   );
 }

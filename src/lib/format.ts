@@ -12,18 +12,18 @@ export function timeAgo(iso: string): string {
   return `${d}d ago`;
 }
 
-export function actionLabel(type: string): { emoji: string; text: string; color: string } {
+export function actionLabel(type: string): { text: string; color: string } {
   switch (type) {
     case "swap":
-      return { emoji: "🔄", text: "Swap", color: "text-blue-400" };
+      return { text: "Swap", color: "text-blue-400" };
     case "stake":
-      return { emoji: "🔒", text: "Stake", color: "text-green-400" };
+      return { text: "Stake", color: "text-green-400" };
     case "transfer":
-      return { emoji: "📤", text: "Transfer", color: "text-purple-400" };
+      return { text: "Transfer", color: "text-purple-400" };
     case "test_action":
-      return { emoji: "🧪", text: "Test", color: "text-zinc-500" };
+      return { text: "Test", color: "text-zinc-500" };
     default:
-      return { emoji: "•", text: type, color: "text-zinc-300" };
+      return { text: type, color: "text-zinc-300" };
   }
 }
 

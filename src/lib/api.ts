@@ -152,7 +152,8 @@ export interface SendResult {
 export async function agentSend(input: {
   platformId: string;
   handle: string;
-  platform: "telegram" | "x";
+  /** "atcha": anyone already on Atcha by their X or Telegram name (the butler resolves across both). */
+  platform: "telegram" | "x" | "atcha";
   asset: "SOL" | "USDC";
   amount: number;
 }): Promise<SendResult> {
@@ -400,7 +401,12 @@ export interface ClaimResponse {
   agentName: string | null;
   walletAddress: string | null;
   /** Pending sends settled into this agent at login (drives the receive UX). */
-  received?: { count: number; lines: string[] };
+  received?: {
+    count: number;
+    lines: string[];
+    /** Who paid; the app offers "pay them back $1" as the first of five. */
+    senders?: Array<{ platformId: string; name: string | null; platform: "x" | "telegram" | null; handle: string | null }>;
+  };
 }
 
 export async function claimAgent(input: {
@@ -722,4 +728,411 @@ export async function unlinkReputation(platformId: string): Promise<boolean> {
     { method: "DELETE", headers: await authHeaders() },
   );
   return res.ok;
+}
+
+// ─── Funded agents ──────────────────────────────────────────────────────────
+// Read models from said-butler/src/credits/api.ts. Shapes mirror that file.
+
+export interface CreditsToday {
+  enabled: boolean;
+  live: boolean;
+  fundingUsd: number;
+  capUsd: number;
+  sizedBy: "cap" | "pool";
+  agentsFunded: number;
+  fundedLastHour: number;
+  fundedToday: number;
+  asOf: string;
+}
+
+export interface CreditTask {
+  id: string;
+  type: "pay" | "hire" | "buy" | "lock" | "trade";
+  title: string;
+  detail: string;
+  minUsd: number;
+  scores: boolean;
+  done: boolean;
+  needsOwnMoney: boolean;
+}
+
+export interface CreditEventRow {
+  kind: string;
+  amountUsd: number;
+  asset: string | null;
+  tx: string | null;
+  ref: string | null;
+  at: string;
+}
+
+export interface CreditsSummary {
+  platformId: string;
+  funded: boolean;
+  balanceUsd: number | null;
+  creditUsd: number;
+  ownUsd: number;
+  withdrawableUsd: number;
+  lockedUsd: number;
+  pnlUsd: number;
+  rung: number;
+  rungName: string;
+  /** What the user sees: level 1..4 and its name. */
+  level: number;
+  levelName: string;
+  next: { level: number; unlocks: string; have: number; need: number; unit: "people" | "days" } | null;
+  funding: { monthlyUsd: number; fundedThisMonth: boolean; nextLevelUsd: number; fundingDay: number; nextFundingAt?: string };
+  /** Gains crystallised each morning: what is actually yours. */
+  settlement?: { todayUsd: number; totalUsd: number; lastAt: string | null; fromLevel: number };
+  streak: number;
+  paused: boolean;
+  tier: number;
+  limits: { spend: number; trade: number; spendLeft: number; tradeLeft: number };
+  tasks: CreditTask[];
+  recent: CreditEventRow[];
+  today: CreditsToday;
+}
+
+/** Public. Today's funding and the counter. Null when the API predates credits. */
+export async function getCreditsToday(): Promise<CreditsToday | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/today`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-only. Null when the API predates credits (404) so the UI can degrade. */
+export async function getCredits(platformId: string): Promise<CreditsSummary | null> {
+  const res = await apiFetch(`${API_BASE}/api/credits/${encodeURIComponent(platformId)}`, {
+    headers: await authHeaders(),
+  });
+  if (res.status === 404) return null;
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`credits failed (${res.status}): ${text.slice(0, 200)}`);
+  }
+  return res.json();
+}
+
+
+// ─── Public: the agent page and the Fleet ──────────────────────────────────
+
+export interface PublicCredits {
+  platformId: string;
+  displayName: string | null;
+  funded: boolean;
+  level: number;
+  levelName: string;
+  streak: number;
+  peoplePaid: number;
+  monthsFunded: number;
+  fundedTotalUsd: number;
+  lastFundingAt: string | null;
+  fundedThisMonth: boolean;
+  balanceUsd: number | null;
+  pnlUsd: number | null;
+  verified: boolean;
+  fundings: Array<{ amountUsd: number; at: string; tx: string | null }>;
+}
+
+/** Public. Null when there is no Atcha for that handle, or the API predates credits. */
+export async function getCreditsByHandle(handle: string, options?: { cache?: RequestCache }): Promise<PublicCredits | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/handle/${encodeURIComponent(handle)}`, { cache: options?.cache ?? "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function getFleet(options?: { cache?: RequestCache }): Promise<PublicCredits[]> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/fleet`, { cache: options?.cache ?? "no-store" });
+    if (!res.ok) return [];
+    return ((await res.json()) as { fleet: PublicCredits[] }).fleet ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// ─── The trade log, positions, and token data ──────────────────────────────
+
+export interface TradeRow {
+  id: number;
+  side: "buy" | "sell" | "swap";
+  tokenMint: string | null;
+  tokenAmount: number | null;
+  tokenPriceUsd: number | null;
+  notionalUsd: number | null;
+  inputMint: string;
+  outputMint: string;
+  inAmount: number;
+  outAmount: number;
+  tx: string;
+  provider: string | null;
+  source: string;
+  reason: string | null;
+  at: string;
+}
+
+export interface Position {
+  mint: string;
+  qty: number;
+  costUsd: number;
+  avgEntryUsd: number | null;
+  investedUsd: number;
+  realizedUsd: number;
+  buys: number;
+  sells: number;
+  openedAt: string;
+  lastAt: string;
+  openedBy: string | null;
+  closed: boolean;
+}
+
+/** Owner-only. Empty when the API predates the trade log. */
+export async function getTrades(platformId: string, opts: { mint?: string; limit?: number } = {}): Promise<TradeRow[]> {
+  try {
+    const q = new URLSearchParams();
+    if (opts.mint) q.set("mint", opts.mint);
+    if (opts.limit) q.set("limit", String(opts.limit));
+    const res = await apiFetch(`${API_BASE}/api/trades/${encodeURIComponent(platformId)}?${q}`, { headers: await authHeaders() });
+    if (!res.ok) return [];
+    return ((await res.json()) as { trades: TradeRow[] }).trades ?? [];
+  } catch {
+    return [];
+  }
+}
+
+/** Owner-only. Null when the API predates the trade log (so the UI never claims "not bought"). */
+export async function getPositions(platformId: string): Promise<Position[] | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/positions/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return ((await res.json()) as { positions: Position[] }).positions ?? [];
+  } catch {
+    return null;
+  }
+}
+
+export interface TokenStats {
+  mint: string;
+  symbol: string;
+  name: string;
+  imageUrl: string | null;
+  priceUsd: number | null;
+  marketCapUsd: number | null;
+  fdvUsd: number | null;
+  liquidityUsd: number | null;
+  mainPoolLiquidityUsd: number | null;
+  pools: number;
+  volume24hUsd: number | null;
+  change: { m5: number | null; h1: number | null; h6: number | null; h24: number | null };
+  txns24h: { buys: number; sells: number };
+  buyers24h: number | null;
+  sellers24h: number | null;
+  supply: number | null;
+  pairAddress: string | null;
+  dex: string | null;
+  poolId: string | null;
+  createdAt: string | null;
+  launchpad: string | null;
+  websites: string[];
+  socials: Array<{ type: string; url: string }>;
+}
+
+/** Public, via our own route (DexScreener + GeckoTerminal behind it). */
+export async function getTokenStats(mint: string): Promise<TokenStats | null> {
+  try {
+    const res = await fetch(`/api/token/${encodeURIComponent(mint)}`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export type Candle = [time: number, open: number, high: number, low: number, close: number, volume: number];
+export type Timeframe = "1m" | "5m" | "15m" | "1h" | "4h" | "1d";
+
+export async function getOhlcv(mint: string, tf: Timeframe, opts: { pool?: string | null; limit?: number; before?: number } = {}): Promise<{ candles: Candle[]; pool: string | null; error?: string; retryIn?: number | null }> {
+  try {
+    const q = new URLSearchParams({ tf });
+    if (opts.pool) q.set("pool", opts.pool);
+    if (opts.limit) q.set("limit", String(opts.limit));
+    if (opts.before) q.set("before", String(opts.before));
+    const res = await fetch(`/api/token/${encodeURIComponent(mint)}/ohlcv?${q}`, { cache: "no-store" });
+    if (!res.ok) return { candles: [], pool: opts.pool ?? null };
+    return res.json();
+  } catch {
+    return { candles: [], pool: opts.pool ?? null };
+  }
+}
+
+export interface TokenHit { mint: string; symbol: string; name: string; imageUrl: string | null; priceUsd: number | null; marketCapUsd: number | null; liquidityUsd: number | null; change24h: number | null }
+export async function searchTokens(q: string): Promise<TokenHit[]> {
+  try {
+    const res = await fetch(`/api/token/search?q=${encodeURIComponent(q)}`, { cache: "no-store" });
+    if (!res.ok) return [];
+    return ((await res.json()) as { results: TokenHit[] }).results ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// ─── The ledger: where the token's money goes ──────────────────────────────
+
+export interface LedgerMonth { month: string; agentsFunded: number; fundedUsd: number; feesUsd: number; buybackSol: number; buybackUsd: number }
+export interface Ledger {
+  live: boolean;
+  asOf: string;
+  creatorFeesSol: number | null;
+  creatorWallet: string | null;
+  poolWallet: string | null;
+  poolSol: number | null;
+  poolUsd: number | null;
+  agentsFunded: number;
+  agentsFundedThisMonth: number;
+  fundedTotalUsd: number;
+  fundedThisMonthUsd: number;
+  tradedByFundedUsd: number;
+  feesFromFundedUsd: number;
+  gainsSettledUsd: number;
+  shareKeptUsd: number;
+  buyback: { enabled: boolean; live: boolean; lockWallet: string | null; buys: number; solSpent: number; usdSpent: number; atchaBought: number; lastAt: string | null };
+  selfFundedPct: number | null;
+  notes?: { creatorWallet: string; lock: string; teamTrading: string; buybackThisMonthUsd: number };
+  months: LedgerMonth[];
+  milestones: Array<{ label: string; target: number; have: number; done: boolean }>;
+}
+
+/** Public. Null when the API predates the ledger. */
+export async function getLedger(): Promise<Ledger | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/ledger`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+export interface TokenBrief { symbol: string; name: string; imageUrl: string | null; priceUsd: number | null; marketCapUsd: number | null; change24h: number | null }
+export async function getTokenBriefs(mints: string[]): Promise<Record<string, TokenBrief>> {
+  if (mints.length === 0) return {};
+  try {
+    const res = await fetch(`/api/token/batch?mints=${encodeURIComponent(mints.slice(0, 30).join(","))}`, { cache: "no-store" });
+    if (!res.ok) return {};
+    return ((await res.json()) as { tokens: Record<string, TokenBrief> }).tokens ?? {};
+  } catch {
+    return {};
+  }
+}
+
+/** Owner-only. Imports the wallet's swap history from the chain into the trade log. */
+export async function backfillTrades(platformId: string): Promise<{ status: string; added?: number; found?: number; scanned?: number } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/trades/${encodeURIComponent(platformId)}/backfill`, { method: "POST", headers: await authHeaders() }, 120_000);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-only. Pays out claimable cashback (SOL/USDC at or above the floor) from the pool. */
+export async function claimCashback(platformId: string): Promise<{ status: string; paid?: Array<{ currency: string; amount: number; signature: string }>; message?: string } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/cashback/claim`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify({ platformId }) }, 60_000);
+    const body = await res.json().catch(() => ({}));
+    return { status: body.status ?? (res.ok ? "ok" : `error ${res.status}`), ...body };
+  } catch {
+    return null;
+  }
+}
+
+// ─── The Atcha handle ──────────────────────────────────────────────────────
+
+export type HandleReason = "invalid" | "reserved" | "taken" | "someone-elses-name" | "cooldown" | "no-user";
+export interface HandleInfo { platformId: string; handle: string | null; suggestion: string | null; rules: { pattern: string; renameEveryDays: number } }
+
+/** Owner-only. Null when the API predates handles. */
+export async function getHandle(platformId: string): Promise<HandleInfo | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Public. */
+export async function checkHandle(handle: string): Promise<{ ok: boolean; handle: string; reason?: HandleReason } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle/check?h=${encodeURIComponent(handle)}`);
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+/** Owner-only. Claim or rename. */
+export async function claimHandle(platformId: string, handle: string): Promise<{ ok: boolean; handle: string; renamed?: boolean; reason?: HandleReason } | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/handle`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify({ platformId, handle }) });
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export const HANDLE_REASONS: Record<HandleReason, string> = {
+  invalid: "3 to 20 characters: letters, digits, underscore.",
+  reserved: "That one's reserved.",
+  taken: "Someone has that name.",
+  "someone-elses-name": "That's someone else's verified name on X or Telegram.",
+  cooldown: "You can change your name once a month.",
+  "no-user": "No account found.",
+};
+
+// ─── Autopilot ─────────────────────────────────────────────────────────────
+
+export type AutopilotRisk = "careful" | "normal" | "degen";
+export type AutopilotStrategy = "exit" | "trend" | "scout";
+export interface AutopilotConfig { agentId: string; enabled: boolean; risk: AutopilotRisk; strategies: AutopilotStrategy[]; shadow: boolean; updatedAt: string }
+export interface AutopilotDecision { id: number; strategy: string; mint: string | null; symbol: string | null; action: string; sizeUsd: number | null; reason: string; jev: unknown; executed: boolean; tx: string | null; error: string | null; at: string }
+export interface AutopilotState { config: AutopilotConfig; decisions: AutopilotDecision[]; jev: boolean; globalShadow: boolean; enabled: boolean }
+
+/** Owner-only. Null when the API predates Autopilot. */
+export async function getAutopilot(platformId: string): Promise<AutopilotState | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+export async function setAutopilot(platformId: string, patch: Partial<Pick<AutopilotConfig, "enabled" | "risk" | "strategies" | "shadow">>): Promise<AutopilotConfig | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify(patch) });
+    if (!res.ok) return null;
+    return ((await res.json()) as { config: AutopilotConfig }).config;
+  } catch {
+    return null;
+  }
+}
+export async function runAutopilot(platformId: string): Promise<AutopilotDecision[]> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}/run`, { method: "POST", headers: await authHeaders() }, 90_000);
+    if (!res.ok) return [];
+    return ((await res.json()) as { decisions: AutopilotDecision[] }).decisions ?? [];
+  } catch {
+    return [];
+  }
 }

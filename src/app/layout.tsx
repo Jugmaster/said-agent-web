@@ -2,34 +2,43 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import Providers from "./providers";
-import DotGridBackground from "@/components/DotGridBackground";
 import InstallNudge from "@/components/InstallNudge";
 import BottomTabBar from "@/components/BottomTabBar";
+import { LaunchProvider } from "@/components/LaunchProvider";
+import { getLaunch } from "@/lib/launch";
 
 const inter = Inter({
   variable: "--font-inter",
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://agent.saidprotocol.com"),
-  title: "SAID Agent",
-  description:
-    "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
+// Every page renders per request. The launch state below comes from the
+// environment, and a statically built page would bake the pre-launch state
+// into its HTML where no environment change could reach it.
+export const dynamic = "force-dynamic";
+
+export function generateMetadata(): Metadata {
+  const { launched } = getLaunch();
+  const description = launched
+    ? "Your AI comes funded. Funded every month, sized by its level. Pay anyone you can name."
+    : "Your own AI on Solana. Trades anything, pays anyone you can name, buys things, runs your DCA.";
+  const short = launched ? "Your AI comes funded. Pay anyone you can name." : "Your own AI on Solana. Pays anyone you can name.";
+  return {
+  metadataBase: new URL("https://atcha.cash"),
+  title: "Atcha",
+  description,
   manifest: "/manifest.webmanifest",
   openGraph: {
-    title: "SAID Agent",
-    description:
-      "Your AI agent on Solana — send by @handle, buy real things, swap tokens. One chat, one wallet, no seed phrases.",
-    url: "https://agent.saidprotocol.com",
-    siteName: "SAID Agent",
+    title: "Atcha",
+    description,
+    url: "https://atcha.cash",
+    siteName: "Atcha",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SAID Agent",
-    description:
-      "Your AI agent on Solana — one chat, one wallet, no seed phrases.",
+    title: "Atcha",
+    description: short,
   },
   // Favicon + apple-touch-icon are picked up automatically from
   // app/icon.png and app/apple-icon.png via Next's file convention.
@@ -37,13 +46,17 @@ export const metadata: Metadata = {
   // a .png extension — Safari rejected it.)
   appleWebApp: {
     capable: true,
-    statusBarStyle: "black-translucent",
-    title: "SAID Agent",
+    statusBarStyle: "default",
+    title: "Atcha",
   },
-};
+  };
+}
 
 export const viewport = {
-  themeColor: "#09090b",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F6F4EE" },
+    { media: "(prefers-color-scheme: dark)", color: "#121110" },
+  ],
   width: "device-width",
   initialScale: 1,
   // NO maximumScale — locking it at 1 disabled pinch-zoom, so iOS's auto
@@ -62,6 +75,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const launch = getLaunch();
   return (
     <html
       lang="en"
@@ -72,17 +86,24 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Theme before first paint: an explicit choice stamps data-theme; system leaves it off. */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `try{var t=localStorage.getItem("atcha:theme");if(t==="dark"||t==="light"){document.documentElement.setAttribute("data-theme",t)}}catch(e){}`,
+          }}
+        />
         {/* Telegram Web App SDK — exposes window.Telegram.WebApp inside Telegram */}
         <script src="https://telegram.org/js/telegram-web-app.js" async />
       </head>
       <body className="min-h-full flex flex-col">
         <Providers>
+          <LaunchProvider value={launch}>
           {/* Animated dot-grid canvas (z-0) + radial vignette (z-1) on every page */}
-          <DotGridBackground />
           {/* Content sits above the background */}
           <div className="relative z-10 flex flex-col min-h-dvh">{children}</div>
           <InstallNudge />
           <BottomTabBar />
+          </LaunchProvider>
         </Providers>
       </body>
     </html>

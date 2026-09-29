@@ -1,0 +1,334 @@
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { createChart, ColorType, LineSeries, CandlestickSeries, HistogramSeries, type IChartApi, type ISeriesApi, type UTCTimestamp } from "lightweight-charts";
+import { getOhlcv, type Candle, type Timeframe, type TradeRow } from "@/lib/api";
+import { TradeMarkers, type FillMark, type Hit } from "./trade-markers";
+import { fmtMc, fmtPrice } from "./format";
+
+const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
+/** Candle width per timeframe, in seconds; the feed's buckets are aligned to the epoch. */
+const TF_SECONDS: Record<Timeframe, number> = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "4h": 14_400, "1d": 86_400 };
+
+/** "6 weeks", "212 days", for the footer. */
+function spanLabel(c: Candle[]): string {
+  if (c.length < 2) return "";
+  const days = (c[c.length - 1][0] - c[0][0]) / 86_400;
+  if (days < 2) return `${Math.round(days * 24)}h`;
+  if (days < 60) return `${Math.round(days)} days`;
+  if (days < 730) return `${Math.round(days / 30)} months`;
+  return `${(days / 365).toFixed(1)} years`;
+}
+
+/** Candles strictly ascending by time, one per timestamp (the feed occasionally repeats one; the chart refuses it). */
+function tidy(list: Candle[]): Candle[] {
+  const by = new Map<number, Candle>();
+  for (const c of list) by.set(c[0], c);
+  return [...by.values()].sort((a, b) => a[0] - b[0]);
+}
+
+/** A theme token's current value, so the canvas matches the page in both themes. */
+const css = (name: string, fallback: string) => (typeof window === "undefined" ? fallback : getComputedStyle(document.documentElement).getPropertyValue(name).trim() || fallback);
+const rgba = (hex: string, a: number) => { const m = hex.replace("#", ""); const n = parseInt(m.length === 3 ? m.split("").map((c) => c + c).join("") : m, 16); return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`; };
+
+/**
+ * The token's price with the agent's buys and sells drawn on it. MC or price
+ * on the axis (memecoins are read in MC); line or candles; the markers carry
+ * the fill and the reason as the marker text.
+ */
+export default function TokenChart({
+  mint,
+  pool,
+  ready,
+  trades,
+  supply,
+  defaultTf = "15m",
+  agentName = null,
+}: {
+  mint: string;
+  /** The top pool once stats are known; null when the token has none. */
+  pool: string | null;
+  /** Kept for callers; the chart no longer waits on the stats lookup. */
+  ready?: boolean;
+  trades: TradeRow[];
+  supply: number | null;
+  defaultTf?: Timeframe;
+  /** Named in the hover card: "Your agent (Rex) bought…". */
+  agentName?: string | null;
+}) {
+  const host = useRef<HTMLDivElement>(null);
+  const chartRef = useRef<IChartApi | null>(null);
+  const seriesRef = useRef<ISeriesApi<"Line"> | ISeriesApi<"Candlestick"> | null>(null);
+  const volRef = useRef<ISeriesApi<"Histogram"> | null>(null);
+  const [tf, setTf] = useState<Timeframe>(defaultTf);
+  const [mode, setMode] = useState<"line" | "candles">("line");
+  const [axis, setAxis] = useState<"mc" | "price">(supply && supply > 0 ? "mc" : "price");
+  const [candles, setCandles] = useState<Candle[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [err, setErr] = useState<string | null>(null);
+  // Paging back through history as the user scrolls left.
+  const [hasMore, setHasMore] = useState(true);
+  const loadingMore = useRef(false);
+  const MAX_PAGES = 24;
+  const pagesRef = useRef(0);
+  const candlesRef = useRef<Candle[]>([]);
+  candlesRef.current = candles;
+  const prependedRef = useRef(false);
+  const markersRef = useRef<TradeMarkers | null>(null);
+  const [hover, setHover] = useState<Hit | null>(null);
+  // Re-theme when the page does (toggle or OS).
+  const [themeKey, setThemeKey] = useState(0);
+  useEffect(() => {
+    const bump = () => setThemeKey((k) => k + 1);
+    const mo = new MutationObserver(bump);
+    mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    mq.addEventListener("change", bump);
+    return () => { mo.disconnect(); mq.removeEventListener("change", bump); };
+  }, []);
+
+  // Read the candles for the timeframe the moment the chart mounts. The route
+  // resolves the token's top pool itself, so there is nothing to wait for; a
+  // pool that arrives later from the stats call is ignored once candles are up,
+  // and only retried if the first attempt found none. The first page is small
+  // so the chart paints fast; history pages in behind it.
+  const FIRST_PAGE = 300;
+  const usedPoolRef = useRef<string | null>(null);
+  const loadedKeyRef = useRef<string | null>(null);
+  useEffect(() => {
+    const key = `${mint}:${tf}`;
+    if (loadedKeyRef.current === key && candlesRef.current.length > 0) return;
+    let alive = true;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    setLoading(true); setErr(null);
+    const ask = (attempt: number) => {
+      setHasMore(true);
+      pagesRef.current = 0;
+      getOhlcv(mint, tf, { pool: pool ?? undefined, limit: FIRST_PAGE })
+        .then((r) => {
+          if (!alive) return;
+          usedPoolRef.current = (r as { pool?: string | null }).pool ?? pool ?? null;
+          if (r.candles.length) { loadedKeyRef.current = key; setCandles(tidy(r.candles)); setHasMore(r.candles.length >= FIRST_PAGE); setLoading(false); return; }
+          if (r.retryIn && attempt < 3) { setErr("Busy, trying again…"); timer = setTimeout(() => ask(attempt + 1), r.retryIn * 1000); return; }
+          setCandles([]); setErr("No chart for this token yet."); setLoading(false);
+        })
+        .catch(() => { if (alive) { setErr("Chart unavailable."); setLoading(false); } });
+    };
+    ask(0);
+    return () => { alive = false; if (timer) clearTimeout(timer); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mint, tf, pool]);
+
+  // Build the chart once.
+  useEffect(() => {
+    if (!host.current) return;
+    const ink = css("--color-ink", "#171613");
+    const grey = css("--color-grey", "#6F6B62");
+    const chart = createChart(host.current, {
+      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: grey, fontFamily: "inherit", attributionLogo: false },
+      grid: { vertLines: { color: rgba(ink, 0.06) }, horzLines: { color: rgba(ink, 0.06) } },
+      rightPriceScale: { borderVisible: false },
+      // No scrolling into the future past the last candle, or into the void before the first.
+      timeScale: { borderVisible: false, timeVisible: true, secondsVisible: false, fixRightEdge: true, fixLeftEdge: true, rightOffset: 0, lockVisibleTimeRangeOnResize: true },
+      crosshair: { horzLine: { labelBackgroundColor: ink }, vertLine: { labelBackgroundColor: ink } },
+      handleScale: { axisPressedMouseMove: true },
+      autoSize: true,
+    });
+    chartRef.current = chart;
+    return () => { chart.remove(); chartRef.current = null; seriesRef.current = null; volRef.current = null; };
+  }, [themeKey]);
+
+  // Older candles when the left edge comes into view.
+  const loadOlder = async () => {
+    if (loadingMore.current || !hasMore) return;
+    const first = candlesRef.current[0];
+    if (!first) return;
+    loadingMore.current = true;
+    try {
+      const r = await getOhlcv(mint, tf, { pool: usedPoolRef.current ?? pool ?? undefined, limit: 1000, before: first[0] });
+      if (r.retryIn && r.candles.length === 0) { setTimeout(() => { loadingMore.current = false; void loadOlder(); }, r.retryIn * 1000); return; }
+      // The page is inclusive of `before`, so one candle overlaps; judge "more" by the raw page size.
+      const older = r.candles.filter((c) => c[0] < first[0]);
+      if (older.length === 0) { setHasMore(false); return; }
+      const chart = chartRef.current;
+      const range = chart?.timeScale().getVisibleRange();
+      prependedRef.current = true;
+      setCandles((cur) => tidy([...older, ...cur]));
+      pagesRef.current += 1;
+      if (r.candles.length < 1000 || pagesRef.current >= MAX_PAGES) setHasMore(false);
+      // Keep the user where they were; setData would otherwise jump to the end.
+      if (chart && range) requestAnimationFrame(() => { try { chart.timeScale().setVisibleRange(range); } catch {} });
+    } finally {
+      loadingMore.current = false;
+    }
+  };
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    const onRange = (r: { from: number; to: number } | null) => { if (r && r.from < 40) void loadOlder(); };
+    chart.timeScale().subscribeVisibleLogicalRangeChange(onRange);
+    return () => chart.timeScale().unsubscribeVisibleLogicalRangeChange(onRange);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [themeKey, tf, pool, hasMore]);
+
+  // History without dragging: once the first page is up, keep pulling older
+  // pages in the background, paced under the feed's limit, up to MAX_PAGES.
+  useEffect(() => {
+    if (loading || !hasMore || candles.length === 0) return;
+    let alive = true;
+    const t = setTimeout(async () => {
+      if (!alive) return;
+      await loadOlder();
+    }, 2200);
+    return () => { alive = false; clearTimeout(t); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [candles, loading, hasMore]);
+
+  // (Re)draw the series when data, mode or axis changes.
+  useEffect(() => {
+    const chart = chartRef.current;
+    if (!chart) return;
+    if (seriesRef.current) { chart.removeSeries(seriesRef.current); seriesRef.current = null; }
+    if (volRef.current) { chart.removeSeries(volRef.current); volRef.current = null; }
+    if (!candles.length) return;
+    const k = axis === "mc" && supply ? supply : 1;
+    const fmt = (v: number) => (axis === "mc" ? fmtMc(v) : fmtPrice(v));
+    const priceFormat = { type: "custom" as const, formatter: fmt, minMove: 1e-12 };
+
+    const ink = css("--color-ink", "#171613"), up = css("--color-up", "#157E4E"), down = css("--color-down", "#B93A16");
+    const vol = chart.addSeries(HistogramSeries, { priceScaleId: "vol", color: rgba(ink, 0.12), priceFormat: { type: "volume" }, lastValueVisible: false, priceLineVisible: false });
+    chart.priceScale("vol").applyOptions({ scaleMargins: { top: 0.82, bottom: 0 } });
+    vol.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, value: c[5], color: c[4] >= c[1] ? rgba(up, 0.2) : rgba(down, 0.2) })));
+    volRef.current = vol;
+
+    let series: ISeriesApi<"Line"> | ISeriesApi<"Candlestick">;
+    if (mode === "candles") {
+      const s = chart.addSeries(CandlestickSeries, { upColor: up, downColor: down, wickUpColor: up, wickDownColor: down, borderVisible: false, priceFormat });
+      s.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, open: c[1] * k, high: c[2] * k, low: c[3] * k, close: c[4] * k })));
+      series = s;
+    } else {
+      const s = chart.addSeries(LineSeries, { color: ink, lineWidth: 2, priceFormat, lastValueVisible: true, crosshairMarkerRadius: 4 });
+      s.setData(candles.map((c) => ({ time: c[0] as UTCTimestamp, value: c[4] * k })));
+      series = s;
+    }
+    seriesRef.current = series;
+
+    // The agent's fills as lettered circles, on the candle they fell in. The
+    // interval comes from the timeframe, never from the gap between the first
+    // two candles: the feed omits empty candles, so one early gap used to shift
+    // every marker. A fill lands on the last candle at or before its time; a
+    // fill from before the loaded history is left off until that history loads.
+    const step = TF_SECONDS[tf];
+    const times = candles.map((c) => c[0]);
+    const first = times[0], last = times[times.length - 1];
+    const candleAtOrBefore = (ts: number): Candle | null => {
+      let lo = 0, hi = times.length - 1, hit = -1;
+      while (lo <= hi) { const mid = (lo + hi) >> 1; if (times[mid] <= ts) { hit = mid; lo = mid + 1; } else hi = mid - 1; }
+      return hit >= 0 ? candles[hit] : null;
+    };
+    const marks = trades
+      .filter((t) => t.side === "buy" || t.side === "sell")
+      .map((t): FillMark | null => {
+        const ts = Math.floor(new Date(t.at.endsWith("Z") ? t.at : t.at + "Z").getTime() / 1000);
+        if (ts < first || ts >= last + step) return null;
+        const c = candleAtOrBefore(Math.floor(ts / step) * step) ?? candleAtOrBefore(ts);
+        if (!c) return null;
+        const price = (t.tokenPriceUsd ?? c[4]) * k;
+        return { time: c[0] as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx, agentDecided: t.source === "autopilot" || t.source === "dca" || t.source === "limit" };
+      })
+      .filter((m): m is FillMark => !!m && m.price > 0);
+    const prim = new TradeMarkers();
+    prim.setColors({ up, down: css("--color-coral", "#E8542E") });
+    series.attachPrimitive(prim);
+    prim.setMarks(marks);
+    markersRef.current = prim;
+    setHover(null);
+    if (!prependedRef.current) chart.timeScale().fitContent();
+    prependedRef.current = false;
+  }, [candles, mode, axis, supply, trades, themeKey]);
+
+  return (
+    <div>
+      <div
+        className="relative h-[300px] w-full md:h-[380px]"
+        onMouseMove={(e) => {
+          const el = host.current; const prim = markersRef.current;
+          if (!el || !prim) return;
+          const r = el.getBoundingClientRect();
+          setHover(prim.bubbleAt(e.clientX - r.left, e.clientY - r.top));
+        }}
+        onMouseLeave={() => setHover(null)}
+      >
+        <div ref={host} className="absolute inset-0" />
+        {hover && <FillCard hit={hover} axis={axis} supply={supply} agentName={agentName} />}
+        {loading && !err && <ChartSkeleton />}
+        {err && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-grey">{err}</div>}
+      </div>
+      <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-1">
+          {candles.length > 0 && <span className="mr-1 text-grey">{hasMore ? `loading history… ${spanLabel(candles)}` : `${spanLabel(candles)} of history`}</span>}
+          {TFS.map((x) => (
+            <button key={x} type="button" onClick={() => setTf(x)} className={`rounded-full px-2.5 py-1 transition ${tf === x ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>{x}</button>
+          ))}
+        </div>
+        <div className="flex items-center gap-1">
+          {supply && supply > 0 && (
+            <>
+              <button type="button" onClick={() => setAxis("mc")} className={`rounded-full px-2.5 py-1 transition ${axis === "mc" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>MC</button>
+              <button type="button" onClick={() => setAxis("price")} className={`rounded-full px-2.5 py-1 transition ${axis === "price" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Price</button>
+              <span className="mx-1 text-line">·</span>
+            </>
+          )}
+          <button type="button" onClick={() => setMode("line")} className={`rounded-full px-2.5 py-1 transition ${mode === "line" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Line</button>
+          <button type="button" onClick={() => setMode("candles")} className={`rounded-full px-2.5 py-1 transition ${mode === "candles" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Candles</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/** The chart's shape while the first page loads: faint grid, a soft curve, the mark. Same beat as the site's preloader. */
+function ChartSkeleton() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="absolute inset-0 animate-pulse">
+        {[22, 42, 62, 82].map((y) => (
+          <div key={y} className="absolute left-0 right-12 border-t border-line" style={{ top: `${y}%` }} />
+        ))}
+        <svg className="absolute inset-0 h-full w-full text-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+          <path d="M0 31 C 8 30, 14 24, 22 26 S 36 16, 46 19 S 60 9, 72 12 S 88 3, 100 6" fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+        </svg>
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <span className="inline-flex h-7 w-7 animate-pulse items-center justify-center rounded-[9px] bg-coral text-[15px] font-semibold leading-none text-cream">@</span>
+        <span className="text-xs text-grey">Loading chart</span>
+      </div>
+    </div>
+  );
+}
+
+/** One sentence beside the bubble, tail pointing at it: "Your agent (Rex) bought $12.07 at $232K market cap". */
+function FillCard({ hit, axis, supply, agentName }: { hit: Hit; axis: "mc" | "price"; supply: number | null; agentName: string | null }) {
+  const m = hit.mark;
+  const who = "Your agent";
+  const verb = m.side === "buy" ? "bought" : "sold";
+  const amount = m.notionalUsd != null ? `$${m.notionalUsd.toFixed(2)}` : "";
+  const at = m.tokenPriceUsd != null ? (axis === "mc" && supply ? `${fmtMc(m.tokenPriceUsd * supply)} market cap` : fmtPrice(m.tokenPriceUsd)) : null;
+  // To the left of the bubble when there's room, otherwise to the right; tail points at the bubble.
+  const width = 260;
+  const left = hit.x - 18 - width >= 4;
+  const style = left ? { left: hit.x - 18 - width, top: hit.y } : { left: hit.x + 18, top: hit.y };
+  return (
+    <div className="pointer-events-none absolute z-20 -translate-y-1/2" style={{ ...style, width }}>
+      <div className="relative rounded-xl bg-ink px-3.5 py-2.5 text-[13px] leading-snug text-cream shadow-[0_12px_30px_-8px_rgba(var(--shadow-rgb),0.35)]">
+        <span>{who} {verb}{amount ? ` ${amount}` : ""}{at ? ` at ${at}` : ""}</span>
+        {m.reason && m.agentDecided && <span className="mt-1 block text-[12px] text-cream/70">{m.reason.length > 80 ? m.reason.slice(0, 80) + "…" : m.reason}</span>}
+        <span
+          aria-hidden
+          className="absolute top-1/2 h-3 w-3 -translate-y-1/2 rotate-45 bg-ink"
+          style={left ? { right: -6 } : { left: -6 }}
+        />
+      </div>
+    </div>
+  );
+}

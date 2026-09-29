@@ -6,6 +6,9 @@ const nextConfig: NextConfig = {
     // ~/ as the workspace root; pin it to this project.
     root: __dirname,
   },
+  async rewrites() {
+    return [{ source: "/@:handle", destination: "/u/:handle" }];
+  },
   async headers() {
     return [
       {

@@ -17,7 +17,7 @@ import {
 
 function challengeFor(platformId: string, wallet: string): string {
   return [
-    "SAID Agent · link reputation",
+    "Atcha · link reputation",
     `Account: ${platformId}`,
     `Wallet: ${wallet}`,
     `Issued: ${new Date().toISOString()}`,
@@ -93,7 +93,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
       <Link href="/settings" className="text-sm text-zinc-500 hover:text-zinc-300">
         ← Settings
       </Link>
-      <h1 className="mt-4 text-2xl font-bold">Link an existing agent</h1>
+      <h1 className="mt-4 text-2xl font-semibold tracking-tight">Link an existing agent</h1>
       <p className="mt-2 text-sm leading-relaxed text-zinc-400">
         Registered an agent outside this app? Prove you control its wallet and
         your fees here get priced off the reputation it already earned. The
@@ -125,7 +125,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
           </button>
         </div>
       ) : (
-        <div className="mt-6 space-y-4 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+        <div className="mt-6 space-y-4 rounded-2xl border border-line bg-card p-5">
           <div>
             <label className="mb-2 block text-xs uppercase tracking-wide text-zinc-500">
               Step 1 — your agent&apos;s wallet address
@@ -146,7 +146,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
             <button
               onClick={() => setChallenge(challengeFor(platformId, wallet.trim()))}
               disabled={!walletValid}
-              className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+              className="w-full rounded-lg bg-ink py-3 text-sm font-semibold text-cream hover:bg-coral-deep disabled:opacity-40"
             >
               Generate challenge
             </button>
@@ -189,7 +189,7 @@ function LinkAgent({ platformId }: { platformId: string }) {
               <button
                 onClick={() => void submit()}
                 disabled={!signature.trim() || busy}
-                className="w-full rounded-lg bg-white py-3 text-sm font-semibold text-black hover:bg-zinc-200 disabled:opacity-40"
+                className="w-full rounded-lg bg-ink py-3 text-sm font-semibold text-cream hover:bg-coral-deep disabled:opacity-40"
               >
                 {busy ? "Verifying…" : "Link agent"}
               </button>

@@ -1,6 +1,7 @@
 "use client";
+import ActionIcon, { iconFor } from "@/components/ActionIcon";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import {
   getBalance,
@@ -8,10 +9,11 @@ import {
   getActivity,
   type BalanceResponse,
   type FullPortfolio,
-  type ActivityReceipt,
-} from "@/lib/api";
+  type ActivityReceipt, getPositions, type Position, backfillTrades } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
+import PositionsList from "@/components/token/PositionsList";
+import TokenSearch from "@/components/token/TokenSearch";
 import { truncMiddle, timeAgo, actionLabel } from "@/lib/format";
 import { requestRefresh } from "@/lib/refresh";
 
@@ -75,17 +77,33 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
+  const [positions, setPositions] = useState<Position[] | null>(null);
+  const [importing, setImporting] = useState(false);
+  const importedOnce = useRef(false);
+  useEffect(() => { getPositions(platformId).then(setPositions).catch(() => {}); }, [platformId, main]);
+  // The log starts the day it ships; the first time a wallet with holdings has no
+  // positions, pull its swap history from the chain once, then re-read.
+  useEffect(() => {
+    if (importedOnce.current || positions === null || positions.length > 0 || !main || main.tokens.every((t) => t.balance <= 0)) return;
+    importedOnce.current = true;
+    setImporting(true);
+    backfillTrades(platformId).then(() => getPositions(platformId)).then((p) => p && setPositions(p)).catch(() => {}).finally(() => setImporting(false));
+  }, [positions, main, platformId]);
+  const reimport = () => {
+    setImporting(true);
+    backfillTrades(platformId).then(() => getPositions(platformId)).then((p) => p && setPositions(p)).catch(() => {}).finally(() => setImporting(false));
+  };
 
   // Rendered in BOTH the desktop aside and the mobile stack: it carries the
   // wallet address and copy button, the only way to fund the agent by hand.
   const identityCard = (
-    <section className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-4">
+    <section className="rounded-2xl border border-line bg-card p-4">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500/30 to-zinc-800 text-sm font-semibold text-white">
           {(balance?.displayName ?? "A").slice(0, 1).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
-          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your agent"}</div>
+          <div className="truncate text-sm font-semibold text-white">{balance?.displayName ?? "Your Atcha"}</div>
           <div className="text-xs">
             {balance?.verified ? <span className="text-emerald-400">● Verified</span> : balance?.registered ? <span className="text-amber-400">● Registered</span> : <span className="text-zinc-500">○ Unverified</span>}
             {balance && balance.proTier > 0 && <span className="ml-2 text-amber-400">Pro</span>}
@@ -108,7 +126,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
+      <div className="min-w-0 flex-1 md:overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-12">
         {/* Hero */}
         <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -132,12 +150,12 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
               {refreshing ? "Refreshing…" : "↻ Refresh"}
             </button>
             {balance?.saidWallet ? (
-              <button onClick={() => setFunding(true)} className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
+              <button onClick={() => setFunding(true)} className="rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep">
                 Add funds
               </button>
             ) : (
-              <Link href="/fund" className="rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-zinc-200">
-                Set up agent
+              <Link href="/fund" className="rounded-xl bg-ink px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep">
+                Set up your Atcha
               </Link>
             )}
           </div>
@@ -147,33 +165,24 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
           <div className="mb-6 rounded-xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
         )}
 
-        {/* Holdings */}
+        {/* Positions: what the agent holds, with entry and P&L from the trade log. */}
         <section className="mb-9">
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">Holdings</h2>
-          <div className="overflow-hidden rounded-2xl border border-zinc-800">
-            {main == null && !error ? (
-              <div className="divide-y divide-zinc-800/60">
-                {[0, 1, 2].map((i) => (
-                  <div key={i} className="h-16 animate-pulse bg-zinc-900/40" />
-                ))}
-              </div>
-            ) : (
-              <div className="divide-y divide-zinc-800/60">
-                <HoldingRow symbol="SOL" balance={main?.solBalance ?? 0} usd={main?.solUsdValue ?? null} />
-                {holdings.map((t) => (
-                  <HoldingRow key={t.mint} symbol={t.symbol} balance={t.balance} usd={t.usdValue} />
-                ))}
-                {holdings.length === 0 && (main?.solBalance ?? 0) === 0 && (
-                  <div className="px-4 py-6 text-center text-sm text-zinc-500">
-                    Nothing here yet.{" "}
-                    <button onClick={() => setFunding(true)} className="text-zinc-300 underline underline-offset-2 hover:text-white">
-                      Add funds
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="text-sm font-medium text-zinc-300">Positions {importing && <span className="ml-2 text-xs font-normal text-grey">importing history from the chain…</span>}</h2>
+            <div className="flex items-center gap-2">
+              {positions !== null && !importing && (
+                <button type="button" onClick={reimport} className="text-xs text-grey underline underline-offset-2 hover:text-ink" title="Re-read the wallet's swaps from the chain">Import history</button>
+              )}
+              <TokenSearch />
+            </div>
           </div>
+          {main == null && !error ? (
+            <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line">
+              {[0, 1, 2].map((i) => <div key={i} className="h-16 animate-pulse bg-card" />)}
+            </div>
+          ) : (
+            <PositionsList holdings={main?.tokens ?? []} positions={positions} solBalance={main?.solBalance ?? 0} solUsd={main?.solUsdValue ?? null} showClosed />
+          )}
         </section>
 
         {/* Aside content inline on smaller screens. The identity card carries
@@ -186,7 +195,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT PANEL */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
 {identityCard}
         <RecentActivity receipts={receipts} />
       </aside>
@@ -238,8 +247,8 @@ function RecentActivity({ receipts }: { receipts: ActivityReceipt[] | null }) {
           {receipts.map((r) => {
             const label = actionLabel(r.type);
             return (
-              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2">
-                <span className="text-base leading-none">{label.emoji}</span>
+              <div key={r.seq} className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2">
+                <span className="text-grey"><ActionIcon name={iconFor(r.type)} /></span>
                 <span className={`flex-1 text-sm font-medium ${label.color}`}>{label.text}</span>
                 <span className="text-[11px] text-zinc-500">{timeAgo(r.occurredAt)}</span>
               </div>

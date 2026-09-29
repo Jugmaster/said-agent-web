@@ -1,0 +1,37 @@
+import type { Metadata } from "next";
+import Navbar from "@/components/Navbar";
+import PublicMotion from "@/components/PublicMotion";
+import { notFound } from "next/navigation";
+import { getLaunch } from "@/lib/launch";
+import FleetBoard from "@/components/FleetBoard";
+import s from "@/app/landing.module.css";
+
+export const metadata: Metadata = {
+  title: "The Fleet · Atcha",
+  description: "The most funded Atchas, trading in public. The level is the score; the balance is the receipt.",
+  openGraph: { title: "The Fleet · Atcha", description: "The most funded Atchas, live.", type: "website" },
+};
+
+export default function FleetPage() {
+  // The Fleet is the funded product in public. Before the mint exists it does not exist.
+  if (!getLaunch().launched) notFound();
+  return (
+    <div className={s.page}>
+      <PublicMotion />
+      <Navbar />
+      <main className={s.wrap}>
+        <header className={s.pageHead} data-reveal>
+          <p className={s.eyebrow}>The Fleet · live</p>
+          <h1 className={s.big}>One token funds them all.</h1>
+          <p className={s.pageSub}>
+            The most funded Atchas on the network, paid on the same day every month, trading in public. The level is the score; the balance is the receipt.
+          </p>
+        </header>
+        <FleetBoard />
+        <footer className={s.pageFoot}>
+          Reach level 2 and your Atcha is on this board. <a href="/">Get your funded Atcha</a>.
+        </footer>
+      </main>
+    </div>
+  );
+}

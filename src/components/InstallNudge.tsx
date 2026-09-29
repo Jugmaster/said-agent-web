@@ -119,11 +119,11 @@ export default function InstallNudge() {
   return (
     <div
       role="dialog"
-      aria-label="Install SAID Agent to your home screen"
+      aria-label="Install Atcha to your home screen"
       style={{
         bottom: "max(1rem, calc(env(safe-area-inset-bottom) + 0.5rem))",
       }}
-      className="fixed left-1/2 -translate-x-1/2 z-50 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-zinc-950/90 backdrop-blur-md shadow-xl"
+      className="fixed left-1/2 -translate-x-1/2 z-50 w-[min(420px,calc(100vw-2rem))] px-4 py-3 rounded-2xl border border-zinc-800 bg-cream/90 backdrop-blur-md shadow-xl"
     >
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-white flex-shrink-0 overflow-hidden">
@@ -133,7 +133,7 @@ export default function InstallNudge() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-sm font-semibold text-white truncate">
-            Install SAID Agent
+            Install Atcha
           </p>
           <p className="text-xs text-zinc-400 truncate">
             {platform === "ios"
@@ -144,7 +144,7 @@ export default function InstallNudge() {
         {platform === "android" && deferred ? (
           <button
             onClick={() => void install()}
-            className="px-3 py-1.5 bg-white text-black text-xs font-semibold rounded-full hover:bg-zinc-200 transition whitespace-nowrap"
+            className="px-3 py-1.5 bg-ink text-cream text-xs font-semibold rounded-full hover:bg-coral-deep transition whitespace-nowrap"
           >
             Install
           </button>
@@ -174,7 +174,7 @@ export default function InstallNudge() {
             2. Scroll down and tap{" "}
             <span className="text-zinc-200">Add to Home Screen</span>.
           </p>
-          <p>3. Tap Add — done. SAID Agent will open like a native app.</p>
+          <p>3. Tap Add. Atcha will open like a native app.</p>
         </div>
       )}
     </div>

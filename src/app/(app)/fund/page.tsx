@@ -1,10 +1,12 @@
 "use client";
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { getBalance, type BalanceResponse } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
+import AppPage from "@/components/AppPage";
 
 
 function FundScreen({ platformId }: { platformId: string }) {
@@ -56,7 +58,7 @@ function FundScreen({ platformId }: { platformId: string }) {
     }
     // Solana Pay URI — wallet apps recognize this and prefill the recipient;
     // the user picks the amount (activation is free, this is just a top-up).
-    const uri = `solana:${wallet}?label=Fund%20SAID%20Agent&message=Top%20up%20your%20SAID%20agent`;
+    const uri = `solana:${wallet}?label=Atcha&message=Add%20money%20to%20your%20Atcha`;
     QRCode.toString(uri, {
       type: "svg",
       margin: 1,
@@ -75,16 +77,12 @@ function FundScreen({ platformId }: { platformId: string }) {
   }
 
   return (
-    <main className="px-4 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1rem)] md:pb-12 max-w-md md:max-w-lg mx-auto w-full">
-      <header className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-semibold">Fund your agent</h1>
-        <Link
-          href="/portfolio"
-          className="text-xs px-3 py-1 rounded-md border border-zinc-700 hover:border-zinc-500"
-        >
-          Back
-        </Link>
-      </header>
+    <AppPage
+      title="Add money"
+      sub="Card, Apple Pay, or a transfer from any wallet or exchange. It lands in your one balance."
+      actions={<Link href="/portfolio" className="rounded-full px-3.5 py-2 text-xs font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream">Back to Wallet</Link>}
+      narrow
+    >
 
       {loading && <p className="text-sm text-zinc-500">Loading…</p>}
 
@@ -96,16 +94,16 @@ function FundScreen({ platformId }: { platformId: string }) {
 
       {balance && balance.verified && (
         <div className="bg-green-950/30 border border-green-900 rounded-xl px-4 py-6 text-center">
-          <p className="text-2xl mb-2">✅</p>
+          <div className="mb-2 flex justify-center"><Mark name="check" tone="up" /></div>
           <p className="text-sm font-medium text-green-300 mb-1">
-            {balance.displayName ?? "Your agent"} is verified
+            {balance.displayName ?? "Your Atcha"} is verified
           </p>
           <p className="text-xs text-zinc-400 mb-4">
             On-chain identity active. Pro features unlocked.
           </p>
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-ink text-cream font-semibold hover:bg-coral-deep transition"
           >
             Open chat →
           </Link>
@@ -115,9 +113,10 @@ function FundScreen({ platformId }: { platformId: string }) {
       {balance && !balance.verified && balance.saidWallet && (
         <>
           <p className="text-sm text-zinc-400 mb-6">
-            Activation is <span className="text-zinc-100 font-medium">free and automatic</span> —
-            no deposit needed. Top up your agent&apos;s wallet here so it can
-            swap, send, and buy: send SOL or USDC to the address below.
+            Activation is <span className="text-zinc-100 font-medium">free and automatic</span>,
+            no deposit needed. Money you add is yours to take out any time, and
+            is what pays people, buys things, and hires: send SOL or USDC to the
+            address below.
           </p>
 
           {qrSvg && (
@@ -164,13 +163,13 @@ function FundScreen({ platformId }: { platformId: string }) {
           agent gets provisioned on first message.
           <Link
             href="/chat"
-            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200 transition"
+            className="mt-3 inline-block text-sm px-4 py-2 rounded-lg bg-ink text-cream font-semibold hover:bg-coral-deep transition"
           >
             Open chat →
           </Link>
         </div>
       )}
-    </main>
+    </AppPage>
   );
 }
 

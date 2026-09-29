@@ -2,7 +2,6 @@
 
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
 import Navbar from "./Navbar";
@@ -20,16 +19,18 @@ import {
   PhoneIcon,
   PlusIcon,
   SendIcon,
-  WalletIcon,
-} from "./NavIcons";
+  WalletIcon, LevelIcon, SettingsIcon } from "./NavIcons";
+import { useLaunch } from "@/components/LaunchProvider";
 
 const NAV = [
   { href: "/home", label: "Home", icon: HomeIcon, key: "h" },
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
-  { href: "/send", label: "Send", icon: SendIcon, key: "s" },
+  { href: "/send", label: "Pay", icon: SendIcon, key: "s" },
+  { href: "/level", label: "Level", icon: LevelIcon, key: "v" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
   { href: "/calls", label: "Comms", icon: PhoneIcon, key: "l" },
   { href: "/activity", label: "Activity", icon: ActivityIcon, key: "a" },
+  { href: "/settings", label: "Settings", icon: SettingsIcon, key: "," },
 ] as const;
 
 function isEditable(t: EventTarget | null): boolean {
@@ -61,6 +62,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const agent = useAgent();
   const pathname = usePathname();
   const router = useRouter();
+  // Level is the funded product. Before the mint exists it is not in the nav,
+  // the palette or the g-then-key chords.
+  const { launched } = useLaunch();
+  const nav = useMemo(() => (launched ? NAV : NAV.filter((n) => n.href !== "/level")), [launched]);
 
   const authed = ready && authenticated;
   const walletAddress = agent.status === "ready" ? agent.walletAddress : null;
@@ -106,7 +111,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         return;
       }
       if (gAt.current && Date.now() - gAt.current < 1500) {
-        const dest = NAV.find((n) => n.key === e.key)?.href;
+        const dest = nav.find((n) => n.key === e.key)?.href;
         gAt.current = 0;
         if (dest) {
           e.preventDefault();
@@ -116,10 +121,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [authed, router]);
+  }, [authed, router, nav]);
 
   const paletteActions = useMemo<PaletteAction[]>(() => {
-    const nav: PaletteAction[] = NAV.map((n) => ({
+    const actions: PaletteAction[] = nav.map((n) => ({
       id: n.href,
       label: `Go to ${n.label}`,
       hint: `g ${n.key}`,
@@ -127,7 +132,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       run: () => router.push(n.href),
     }));
     if (walletAddress) {
-      nav.push({
+      actions.push({
         id: "fund",
         label: "Add funds",
         icon: <PlusIcon className="w-4 h-4" />,
@@ -135,19 +140,19 @@ export default function AppShell({ children }: { children: ReactNode }) {
       });
     }
     if (platformId) {
-      nav.push({
+      actions.push({
         id: "profile",
         label: "View public profile",
         run: () => router.push(`/agents/${encodeURIComponent(platformId)}`),
       });
     }
-    nav.push({
+    actions.push({
       id: "docs",
       label: "Open docs",
       run: () => router.push("/docs"),
     });
-    return nav;
-  }, [router, walletAddress, platformId]);
+    return actions;
+  }, [router, walletAddress, platformId, nav]);
 
   // Palette free-text goes to the agent. Already on /chat → hand it to the
   // mounted chat screen via an event; elsewhere → stash the prompt in
@@ -176,28 +181,21 @@ export default function AppShell({ children }: { children: ReactNode }) {
       {!authed && <Navbar />}
 
       {authed && (
-        <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-zinc-800/60 bg-zinc-950/70 backdrop-blur-md">
+        <aside className="hidden md:flex fixed inset-y-0 left-0 z-40 w-16 lg:w-64 flex-col border-r border-line bg-zinc-950/70 backdrop-blur-md">
           <Link
             href="/"
             className="flex h-16 items-center justify-center lg:justify-start gap-2.5 px-3 lg:px-5 shrink-0"
           >
             {/* Intrinsic 354×370 — size via CSS with w-auto so the non-square
                 logo isn't distorted (and Next doesn't warn about it). */}
-            <Image
-              src="/logo-dark.png"
-              alt="SAID"
-              width={354}
-              height={370}
-              className="h-[22px] w-auto"
-              priority
-            />
-            <span className="hidden lg:inline text-sm font-bold tracking-wide">
-              SAID Agent
+            <span aria-hidden className="inline-flex h-[22px] w-[22px] items-center justify-center rounded-[7px] bg-coral text-[13px] font-semibold leading-none text-cream">@</span>
+            <span className="hidden lg:inline text-[17px] font-medium tracking-[-0.02em]">
+              atcha
             </span>
           </Link>
 
           <nav className="flex flex-col gap-1 px-2 lg:px-3 mt-2">
-            {NAV.map(({ href, label, icon: Icon, key }) => {
+            {nav.map(({ href, label, icon: Icon, key }) => {
               const active = pathname === href || pathname.startsWith(href + "/");
               return (
                 <Link
@@ -268,7 +266,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setFunding(true)}
-                  className="mt-2.5 w-full rounded-lg bg-white text-black text-xs font-semibold py-2 hover:bg-zinc-200 transition"
+                  className="mt-2.5 w-full rounded-lg bg-ink text-cream text-xs font-semibold py-2 hover:bg-coral-deep transition"
                 >
                   Add funds
                 </button>
@@ -284,7 +282,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
             </>
           )}
 
-          <div className="border-t border-zinc-800/60 px-2 lg:px-3 py-3">
+          <div className="border-t border-line px-2 lg:px-3 py-3">
             <div className="flex items-center justify-center lg:justify-start gap-2.5 px-0.5 lg:px-1">
               <span
                 title={agentName ?? undefined}
@@ -338,7 +336,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
         key={pathname}
         className={`flex-1 flex flex-col min-w-0 ${
           authed
-            ? "h-dvh overflow-y-auto overscroll-contain md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
+            // flex-none on phones: as a flex item, flex-1 sets basis 0 and grows
+            // to the content, which silently overrode h-dvh — the container was
+            // never a scroller, so the document scrolled and the fixed tab bar
+            // rode along. Pinned to the viewport it scrolls for real.
+            ? "flex-none h-dvh overflow-y-auto overscroll-contain md:flex-1 md:h-auto md:overflow-visible md:pl-16 lg:pl-64"
             : ""
         }`}
       >

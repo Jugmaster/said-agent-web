@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
@@ -6,12 +7,16 @@ import { useSearchParams } from "next/navigation";
 import { chat, agentSend, getSends, type SendRecord } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 import AuthGate from "@/components/AuthGate";
+import EntryProgress from "@/components/EntryProgress";
 import MessageText from "@/components/MessageText";
 import { useAgent } from "@/hooks/useAgent";
 import { useSendableBalance, maxSendable } from "@/hooks/useSendableBalance";
 import { requestRefresh } from "@/lib/refresh";
 
-type Platform = "telegram" | "x";
+/** Atcha's own X handle: pinned as the first recipient on the Pay page. */
+const ATCHA_HANDLE = process.env.NEXT_PUBLIC_ATCHA_HANDLE ?? "atcha";
+
+type Platform = "atcha" | "telegram" | "x";
 type Asset = "USDC" | "SOL";
 
 function normalizeHandle(raw: string): string {
@@ -40,12 +45,14 @@ function SendSuccessCard({
   asset,
   recipient,
   message,
+  platformId,
   onSendAnother,
 }: {
   amount: string;
   asset: Asset;
   recipient: string;
   message: string;
+  platformId: string;
   onSendAnother: () => void;
 }) {
   const txUrl = message.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0] ?? null;
@@ -68,11 +75,11 @@ function SendSuccessCard({
 
       {executed ? (
         <p className="mt-2 text-xs text-emerald-300/80">
-          They’ll see it the moment they open SAID.
+          They’ll see it the moment they open Atcha.
         </p>
       ) : (
         <p className="mt-2 text-xs text-zinc-400">
-          They’ll get it the moment they open SAID — even if they’re not on it yet.
+          They’ll get it the moment they open Atcha, even if they’re not on it yet.
         </p>
       )}
 
@@ -99,10 +106,15 @@ function SendSuccessCard({
         )}
       </div>
 
+      {/* Where this send put them on the ladder. */}
+      <div className="mt-5 text-left">
+        <EntryProgress platformId={platformId} refreshKey={1} />
+      </div>
+
       <button
         type="button"
         onClick={onSendAnother}
-        className="mt-5 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
+        className="mt-4 w-full rounded-xl border border-zinc-700 py-2.5 text-sm font-medium text-zinc-300 hover:border-zinc-500 hover:text-white transition"
       >
         Send another
       </button>
@@ -115,20 +127,20 @@ function HowItWorksPanel() {
   const steps = [
     {
       title: "Pick a person, not an address",
-      body: "Any Telegram or X handle works — they don’t need a wallet, or to have ever heard of SAID.",
+      body: "Any X or Telegram handle. They don’t need a wallet, or to have heard of Atcha. The name is checked on SAID before money moves.",
     },
     {
-      title: "Your agent routes it",
+      title: "Your Atcha routes it",
       body: "Funds move on Solana in seconds, with an on-chain receipt you can verify on Solscan.",
     },
     {
-      title: "Not on SAID yet?",
+      title: "Not on Atcha yet?",
       body: "Funds stay reserved in your wallet and they get an invite link. Delivery is automatic the moment they first log in.",
     },
   ];
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5">
+      <div className="rounded-2xl border border-line bg-card p-5">
         <h2 className="text-xs font-medium uppercase tracking-wider text-zinc-500 mb-4">
           How it works
         </h2>
@@ -148,7 +160,7 @@ function HowItWorksPanel() {
           ))}
         </ol>
       </div>
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-5 text-xs leading-relaxed text-zinc-500">
+      <div className="rounded-2xl border border-line bg-card p-5 text-xs leading-relaxed text-zinc-500">
         <span className="text-zinc-300">Prefer typing?</span> Press{" "}
         <kbd className="rounded border border-zinc-700 bg-zinc-800 px-1.5 py-0.5 text-[10px] text-zinc-300">
           ⌘K
@@ -209,33 +221,38 @@ function SendsPanel({
         <h2 className="mb-3 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Recent recipients
         </h2>
-        {sends === null ? (
-          <div className="flex gap-2">
-            {[0, 1, 2].map((i) => (
-              <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-zinc-800 bg-zinc-900/40" />
-            ))}
-          </div>
-        ) : recents.length === 0 ? (
-          <p className="text-xs italic text-zinc-600">
-            People you send to appear here for one-tap re-sends.
-          </p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {recents.map((s) => (
+        <div className="flex flex-wrap gap-2">
+          {/* Atcha itself, always first: the one recipient every user can pay on day one. */}
+          <button
+            type="button"
+            onClick={() => onPick(ATCHA_HANDLE, "atcha")}
+            className="flex items-center gap-2 rounded-full border border-line bg-paper py-1.5 pl-1.5 pr-3.5 transition hover:border-ink"
+            title="Pay Atcha"
+          >
+            <span className="flex h-6 w-6 items-center justify-center rounded-[7px] bg-coral text-[11px] font-semibold text-cream">@</span>
+            <span className="text-sm text-ink">@{ATCHA_HANDLE}</span>
+            <span className="text-[10px] uppercase tracking-wider text-grey">Atcha</span>
+          </button>
+          {sends === null ? (
+            [0, 1].map((i) => <div key={i} className="h-9 w-24 animate-pulse rounded-full border border-line bg-card" />)
+          ) : recents.length === 0 ? (
+            <span className="self-center text-xs italic text-zinc-600">People you send to appear here for one-tap re-sends.</span>
+          ) : (
+            recents.filter((r) => r.recipientHandle.toLowerCase() !== ATCHA_HANDLE.toLowerCase()).map((s) => (
               <button
                 key={s.recipientHandle}
                 type="button"
                 onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : "telegram")}
-                className="flex items-center gap-2 rounded-full border border-zinc-800 bg-zinc-900/40 py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
+                className="flex items-center gap-2 rounded-full border border-line bg-card py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-zinc-200">
                   {s.recipientHandle.slice(0, 1).toUpperCase()}
                 </span>
                 <span className="text-sm text-zinc-200">@{s.recipientHandle}</span>
               </button>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </section>
 
       {/* Your sends */}
@@ -244,11 +261,11 @@ function SendsPanel({
           Your sends
         </h2>
         {sends === null ? (
-          <div className="h-32 animate-pulse rounded-2xl border border-zinc-800 bg-zinc-900/40" />
+          <div className="h-32 animate-pulse rounded-2xl border border-line bg-card" />
         ) : sends.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-zinc-800 px-4 py-10 text-center text-sm text-zinc-500">
             No sends yet. Your first one shows up here — with live claim status
-            for recipients who aren&apos;t on SAID yet.
+            for people who aren&apos;t on Atcha yet.
           </div>
         ) : (
           <div className="overflow-hidden rounded-2xl border border-zinc-800">
@@ -297,7 +314,7 @@ function SendScreen({ platformId }: { platformId: string }) {
     (params.get("to") ?? "").replace(/^@+/, ""),
   );
   const [platform, setPlatform] = useState<Platform>(() =>
-    params.get("platform") === "x" ? "x" : "telegram",
+    params.get("platform") === "x" ? "x" : params.get("platform") === "telegram" ? "telegram" : "atcha",
   );
   const [amount, setAmount] = useState(() => params.get("amount") ?? "");
   const [asset, setAsset] = useState<Asset>(() =>
@@ -419,19 +436,22 @@ function SendScreen({ platformId }: { platformId: string }) {
   return (
     <div className="flex min-h-dvh">
       {/* MAIN — form + send history fill the canvas like the sibling pages */}
-      <div className="min-w-0 flex-1 overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
+      <div className="min-w-0 flex-1 md:overflow-y-auto px-5 pt-[max(1.5rem,env(safe-area-inset-top))] md:px-8 md:pt-10 pb-[calc(var(--tabbar-h)+1.5rem)] md:pb-16">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold mb-1">Send</h1>
+          <h1 className="text-2xl font-semibold tracking-tight mb-1">Pay</h1>
           <p className="text-sm text-zinc-500">
-            One handle. Any chain. Your agent figures out the rest.
+            Anyone you can name, $1 or more. Five verified X accounts and your agent is funded.
           </p>
+          <div className="mt-4 max-w-md">
+            <EntryProgress platformId={platformId} />
+          </div>
         </div>
 
         <div className="flex w-full flex-col">
         <div className="flex flex-col">
           {/* Agent balance — the two sendable assets, live from chain */}
           {agent.status === "ready" && agent.walletAddress && (
-            <div className="mb-6 flex items-center justify-between rounded-xl border border-zinc-800 bg-zinc-900/40 px-4 py-3">
+            <div className="mb-6 flex items-center justify-between rounded-xl border border-line bg-card px-4 py-3">
               <div>
                 <div className="text-xs text-zinc-500 mb-0.5">Your balance</div>
                 {bal.error ? (
@@ -463,6 +483,18 @@ function SendScreen({ platformId }: { platformId: string }) {
           <div className="flex gap-2 mb-2">
             <button
               type="button"
+              onClick={() => setPlatform("atcha")}
+              className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
+                platform === "atcha"
+                  ? "border-white bg-white text-black"
+                  : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
+              }`}
+              title="Anyone already on Atcha, by their X or Telegram name"
+            >
+              Atcha
+            </button>
+            <button
+              type="button"
               onClick={() => setPlatform("telegram")}
               className={`px-4 py-2.5 rounded-full text-sm font-semibold border transition ${
                 platform === "telegram"
@@ -484,6 +516,13 @@ function SendScreen({ platformId }: { platformId: string }) {
               X
             </button>
           </div>
+          <p className="mb-2 text-xs text-zinc-500">
+            {platform === "atcha"
+              ? "Anyone already on Atcha, by their X or Telegram name. Not on it yet? Pick X or Telegram and they get it when they log in."
+              : platform === "x"
+                ? "Any X account. If they're not on Atcha yet, the money waits under their name."
+                : "Any Telegram username. If they're not on Atcha yet, the money waits under their name."}
+          </p>
           <div className="relative mb-1">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500 select-none">
               @
@@ -492,7 +531,7 @@ function SendScreen({ platformId }: { platformId: string }) {
               type="text"
               value={handle.replace(/^@+/, "")}
               onChange={(e) => setHandle(e.target.value)}
-              placeholder={platform === "telegram" ? "username" : "handle"}
+              placeholder={platform === "telegram" ? "username" : platform === "x" ? "handle" : "name on Atcha"}
               autoCapitalize="none"
               autoCorrect="off"
               spellCheck={false}
@@ -513,8 +552,8 @@ function SendScreen({ platformId }: { platformId: string }) {
           )}
           {!handleLooksLikeAddress && !handleInvalid && handle.trim() && (
             <p className="text-xs text-zinc-500 mb-3">
-              If they don’t have a SAID agent yet, your funds stay in your wallet
-              and they get an invite link to claim them.
+              If they’re not on Atcha yet, the money waits in your balance under
+              their name until they log in.
             </p>
           )}
           {!handle.trim() && <div className="mb-3" />}
@@ -623,7 +662,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                 </span>{" "}
                 to{" "}
                 <span className="font-semibold text-white break-all">
-                  {addr ? addr : `@${handleNorm} on ${platform === "x" ? "X" : "Telegram"}`}
+                  {addr ? addr : `@${handleNorm}${platform === "x" ? " on X" : platform === "telegram" ? " on Telegram" : " on Atcha"}`}
                 </span>
                 ?
               </p>
@@ -639,7 +678,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                   type="button"
                   onClick={() => void submit()}
                   disabled={sending}
-                  className="flex-1 py-3 rounded-xl bg-white text-black text-sm font-semibold hover:bg-zinc-200 transition disabled:opacity-50"
+                  className="flex-1 py-3 rounded-xl bg-ink text-cream text-sm font-semibold hover:bg-coral-deep transition disabled:opacity-50"
                 >
                   {sending ? "Sending…" : "Confirm send"}
                 </button>
@@ -649,7 +688,7 @@ function SendScreen({ platformId }: { platformId: string }) {
             <button
               onClick={() => setConfirming(true)}
               disabled={!canSubmit}
-              className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 disabled:opacity-40 disabled:cursor-not-allowed transition"
+              className="w-full py-3.5 bg-ink text-cream rounded-xl font-semibold hover:bg-coral-deep disabled:opacity-40 disabled:cursor-not-allowed transition"
             >
               {sending
                 ? "Sending…"
@@ -662,6 +701,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           {/* Result */}
           {result?.kind === "ok" && (
             <SendSuccessCard
+              platformId={platformId}
               amount={result.amount}
               asset={result.asset}
               recipient={result.recipient}
@@ -682,7 +722,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           {result?.kind === "waitlist" && (
             <div className="mt-5 px-5 py-6 rounded-xl border border-indigo-800/50 bg-gradient-to-b from-indigo-950/40 to-zinc-950 text-center">
               <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-indigo-500/15 text-2xl">
-                ✦
+                <ActionIcon name="ask" className="w-[22px] h-[22px]" />
               </div>
               <div className="text-lg font-semibold text-white">You&apos;re on the list</div>
               <p className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap break-words">
@@ -724,7 +764,7 @@ function SendScreen({ platformId }: { platformId: string }) {
       </div>
 
       {/* RIGHT RAIL — matches the app's context-panel pattern */}
-      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-zinc-800/60 p-5 pt-10 xl:flex">
+      <aside className="hidden w-80 shrink-0 flex-col gap-4 overflow-y-auto border-l border-line p-5 pt-10 xl:flex">
         <HowItWorksPanel />
       </aside>
     </div>

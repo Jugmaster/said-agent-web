@@ -1,3 +1,4 @@
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
@@ -27,18 +28,18 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const invite = await fetchInvite(token);
   if (invite === "unavailable") {
     return {
-      title: "You've been sent crypto · SAID Agent",
+      title: "You've been sent money · Atcha",
       description: "Open the link to claim — sign in with the account it was sent to.",
     };
   }
   if (!invite) {
     return {
-      title: "Invite not found · SAID Agent",
+      title: "Invite not found · Atcha",
       description: "This invite link doesn't exist or has expired.",
     };
   }
   const senderName = invite.sender.displayName ?? "Someone";
-  const ogTitle = `${senderName} sent you ${invite.amount} ${invite.asset} on SAID`;
+  const ogTitle = `${senderName} sent you ${invite.amount} ${invite.asset} on Atcha`;
   // Describes the CURRENT flow: open the link, log in with the account it was
   // sent to, and the money is already there. (The old copy sent people off to
   // DM a bot, which is a dead end now and cost conversions on the one link
@@ -84,7 +85,7 @@ export default async function InvitePage({ params }: PageProps) {
     // must never see a 404 for a transient failure — that reads as a scam.
     return (
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto flex flex-col items-center justify-center text-center">
-        <p className="text-3xl mb-4">⏳</p>
+        <div className="mb-4"><Mark name="clock" /></div>
         <h1 className="text-xl font-bold mb-2">One moment…</h1>
         <p className="text-sm text-zinc-400 mb-6">
           We couldn&apos;t load this invite right now — your funds are safe and
@@ -92,7 +93,7 @@ export default async function InvitePage({ params }: PageProps) {
         </p>
         <a
           href=""
-          className="px-5 py-2.5 rounded-lg bg-white text-black text-sm font-semibold hover:bg-zinc-200"
+          className="px-5 py-2.5 rounded-lg bg-ink text-cream text-sm font-semibold hover:bg-coral-deep"
         >
           Retry
         </a>
@@ -110,11 +111,11 @@ export default async function InvitePage({ params }: PageProps) {
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
           <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-            ← SAID Agent
+            ← Atcha
           </Link>
         </header>
         <section className="bg-green-950/30 border border-green-900 rounded-xl px-4 py-6 text-center">
-          <p className="text-3xl mb-2">✅</p>
+          <div className="mb-2 flex justify-center"><Mark name="check" tone="up" /></div>
           <p className="text-sm font-medium text-green-300 mb-1">
             Already claimed
           </p>
@@ -134,9 +135,9 @@ export default async function InvitePage({ params }: PageProps) {
           )}
           <Link
             href="/chat"
-            className="inline-block text-sm px-4 py-2 rounded-lg bg-white text-black font-semibold hover:bg-zinc-200"
+            className="inline-block text-sm px-4 py-2 rounded-lg bg-ink text-cream font-semibold hover:bg-coral-deep"
           >
-            Get your own agent →
+            Get your own Atcha →
           </Link>
         </section>
       </main>
@@ -148,11 +149,11 @@ export default async function InvitePage({ params }: PageProps) {
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
           <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-            ← SAID Agent
+            ← Atcha
           </Link>
         </header>
         <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
-          <p className="text-3xl mb-2">↩</p>
+          <div className="mb-2 flex justify-center"><Mark name="undo" /></div>
           <p className="text-sm font-medium mb-1">Cancelled</p>
           <p className="text-sm text-zinc-500">
             {senderName} cancelled this send. Funds returned to their wallet.
@@ -173,11 +174,11 @@ export default async function InvitePage({ params }: PageProps) {
       <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
         <header className="mb-6">
           <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-            ← SAID Agent
+            ← Atcha
           </Link>
         </header>
         <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-6 text-center">
-          <p className="text-3xl mb-2">⏰</p>
+          <div className="mb-2 flex justify-center"><Mark name="clock" tone="warn" /></div>
           <p className="text-sm font-medium mb-1">Expired</p>
           <p className="text-sm text-zinc-500">
             This invite expired on {formatDate(invite.expiresAt)}. Funds returned to {senderName}.
@@ -189,19 +190,19 @@ export default async function InvitePage({ params }: PageProps) {
 
   // Pending — the meaningful state. Show the claim CTA.
   const tgDeepLink = `https://t.me/saidinfrabot?start=invite_${invite.token}`;
-  const xDeepLink = `https://x.com/saidagent`;
+  const xDeepLink = `https://x.com/atchacash`;
 
   return (
     <main className="min-h-dvh bg-zinc-950 text-zinc-100 px-4 pt-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-w-md mx-auto">
       <header className="mb-6">
         <Link href="/" className="text-sm text-zinc-500 hover:text-zinc-300">
-          ← SAID Agent
+          ← Atcha
         </Link>
       </header>
 
       <section className="mb-8">
         <p className="text-sm text-zinc-500 mb-2">
-          {senderName} sent you crypto.
+          {senderName} paid you.
         </p>
         <h1 className="text-3xl font-semibold mb-1">
           {invite.amount} {invite.asset}
@@ -212,11 +213,10 @@ export default async function InvitePage({ params }: PageProps) {
       </section>
 
       <section className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-5 mb-6">
-        <h2 className="text-sm font-medium mb-3">Claim your crypto</h2>
+        <h2 className="text-sm font-medium mb-1">Sign in as @{invite.recipient.handle} and it&apos;s yours.</h2>
         <p className="text-sm text-zinc-500 mb-4">
-          Sign in with the same {platformLabel(invite.recipient.platform)} account
-          (@{invite.recipient.handle}) and your funds drop in automatically — no
-          need to leave the web.
+          Same {platformLabel(invite.recipient.platform)} account, nothing to set up. What you get is an Atcha:
+          an AI with a balance. Pay five verified X accounts by name and it comes funded every month.
         </p>
 
         <div className="flex flex-col gap-2">
@@ -237,7 +237,7 @@ export default async function InvitePage({ params }: PageProps) {
               rel="noreferrer"
               className="w-full text-center text-sm px-4 py-3 rounded-lg border border-zinc-700 hover:border-zinc-500"
             >
-              Or reply on X → @saidagent
+              Or reply on X → @atchacash
             </a>
           )}
         </div>
@@ -260,8 +260,8 @@ export default async function InvitePage({ params }: PageProps) {
 
       <footer className="mt-12 pt-6 border-t border-zinc-900 text-xs text-zinc-600 text-center">
         <p>
-          Funds stay in {senderName}&apos;s wallet until you claim — no escrow,
-          the money isn&apos;t parked anywhere. A name → wallet route through SAID Protocol.
+          The money stays in {senderName}&apos;s balance until you claim it. Nothing parked
+          anywhere. Your name was checked before it was committed.
         </p>
       </footer>
     </main>

@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { iconFor, Mark } from "@/components/ActionIcon";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Link from "next/link";
@@ -17,7 +18,9 @@ import { actionLabel, timeAgo } from "@/lib/format";
 import { onRefresh, requestRefresh } from "@/lib/refresh";
 import { usePrivy } from "@privy-io/react-auth";
 import { useAgent } from "@/hooks/useAgent";
-import { getPortfolio, type FullPortfolio } from "@/lib/api";
+import { getPortfolio, getCredits, type FullPortfolio } from "@/lib/api";
+import EntryProgress from "@/components/EntryProgress";
+import { useLaunch } from "@/components/LaunchProvider";
 
 interface UiMessage {
   id: string;
@@ -35,18 +38,15 @@ type AgentStep =
   | "returning_verified";
 
 // Short enough to read on a chip; phrased as things you'd actually ask.
-const MOBILE_PROMPTS = [
-  "What can you do?",
-  "Watch SOL under $150",
-  "Show my holdings",
-];
-
-const QUICK_ACTIONS = [
-  "What can you do?",
-  "Show my portfolio",
-  "Swap 0.01 SOL for USDC",
-  "DCA $1 into SOL daily",
-];
+/* Starter prompts follow the ladder: before funding, the job is paying five
+   people; after, it's using the budget. */
+const ENTRY_PROMPTS = ["Pay @… $1", "Who can I pay?", "What's my level?"];
+const FUNDED_PROMPTS = ["What's my budget?", "Buy $5 of SOL", "What levels me up?"];
+const ENTRY_ACTIONS = ["Pay @… $1", "Who can I pay?", "What's my level?", "What can you do?"];
+const FUNDED_ACTIONS = ["What's my budget?", "Buy $5 of SOL", "Buy $1 of SOL every day", "What levels me up?"];
+// Before the mint exists nothing can mention a level or a budget.
+const PRELAUNCH_PROMPTS = ["Pay @… $1", "Buy $5 of SOL", "What can you do?"];
+const PRELAUNCH_ACTIONS = ["Pay @… $1", "Who can I pay?", "Buy $5 of SOL", "What can you do?"];
 
 /**
  * Desktop-only (xl+) context rail beside the conversation: one-click prompts
@@ -56,10 +56,14 @@ const QUICK_ACTIONS = [
 function ChatContextRail({
   platformId,
   sending,
+  funded,
+  launched,
   onQuick,
 }: {
   platformId: string;
   sending: boolean;
+  funded: boolean | null;
+  launched: boolean;
   onQuick: (text: string) => void;
 }) {
   const [receipts, setReceipts] = useState<ActivityReceipt[] | null>(null);
@@ -76,19 +80,19 @@ function ChatContextRail({
   }, [platformId, nonce]);
 
   return (
-    <aside className="hidden xl:flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-zinc-800/60 p-5">
+    <aside className="hidden xl:flex w-80 shrink-0 flex-col gap-6 overflow-y-auto border-l border-line p-5">
       <section>
         <h2 className="mb-2 text-xs font-medium uppercase tracking-wider text-zinc-500">
           Quick actions
         </h2>
         <div className="flex flex-col gap-1.5">
-          {QUICK_ACTIONS.map((q) => (
+          {(funded ? FUNDED_ACTIONS : launched ? ENTRY_ACTIONS : PRELAUNCH_ACTIONS).map((q) => (
             <button
               key={q}
               type="button"
               disabled={sending}
               onClick={() => onQuick(q)}
-              className="rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2 text-left text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-40"
+              className="rounded-lg border border-line bg-card px-3 py-2 text-left text-sm text-zinc-300 transition hover:border-zinc-600 hover:text-white disabled:opacity-40"
             >
               {q}
             </button>
@@ -121,9 +125,9 @@ function ChatContextRail({
               return (
                 <div
                   key={r.seq}
-                  className="flex items-center gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/40 px-3 py-2"
+                  className="flex items-center gap-2.5 rounded-lg border border-line bg-card px-3 py-2"
                 >
-                  <span className="text-base leading-none">{label.emoji}</span>
+                  <span className="text-grey"><ActionIcon name={iconFor(r.type)} /></span>
                   <span className={`flex-1 text-sm font-medium ${label.color}`}>
                     {label.text}
                   </span>
@@ -140,13 +144,23 @@ function ChatContextRail({
   );
 }
 
+type Received = NonNullable<import("@/lib/api").ClaimResponse["received"]>;
+
 function ChatScreen({ platformId }: { platformId: string }) {
+  // Funded or not decides which starter prompts show. Null until known (or when the API predates credits).
+  const [funded, setFunded] = useState<boolean | null>(null);
+  const { launched } = useLaunch();
+  useEffect(() => {
+    let alive = true;
+    getCredits(platformId).then((c) => alive && setFunded(c?.funded ?? null)).catch(() => {});
+    return () => { alive = false; };
+  }, [platformId]);
   const [messages, setMessages] = useState<UiMessage[]>([]);
   const [input, setInput] = useState("");
   const [sending, setSending] = useState(false);
   const [agentName, setAgentName] = useState<string>("Your butler");
   const [step, setStep] = useState<AgentStep>("unknown");
-  const [received, setReceived] = useState<{ count: number; lines: string[] } | null>(null);
+  const [received, setReceived] = useState<Received | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const router = useRouter();
@@ -174,7 +188,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
     try {
       const raw = sessionStorage.getItem("said-agent:received");
       if (raw) {
-        setReceived(JSON.parse(raw) as { count: number; lines: string[] });
+        setReceived(JSON.parse(raw) as Received);
         sessionStorage.removeItem("said-agent:received");
       }
     } catch {
@@ -208,7 +222,13 @@ function ChatScreen({ platformId }: { platformId: string }) {
           role: m.role === "assistant" ? "agent" : "user",
           text: m.content,
         }));
-        setMessages((prev) => (prev.length ? [...history, ...prev] : history));
+        // Merge by id: React's dev double-mount runs this twice, and a refetch
+        // must never duplicate bubbles.
+        setMessages((prev) => {
+          const seen = new Set(prev.map((m) => m.id));
+          const fresh = history.filter((m) => !seen.has(m.id));
+          return prev.length ? [...fresh, ...prev] : history;
+        });
       })
       .catch(() => {
         // best-effort — empty history is the existing fallback
@@ -279,7 +299,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
       const errMsg: UiMessage = {
         id: `e-${Date.now()}`,
         role: "agent",
-        text: `⚠️ ${err instanceof Error ? err.message : "request failed"}`,
+        text: `Couldn't do that: ${err instanceof Error ? err.message : "request failed"}`,
       };
       setMessages((prev) => [...prev, errMsg]);
     } finally {
@@ -434,7 +454,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
         {received && (
           <div className="px-4 py-4 bg-gradient-to-b from-emerald-950/50 to-transparent border-b border-emerald-900/50">
             <div className="max-w-md mx-auto text-center">
-              <div className="text-2xl mb-1">🎁</div>
+              <div className="mb-2 flex justify-center"><Mark name="gift" tone="up" /></div>
               <p className="text-base font-semibold text-emerald-200">
                 You received {received.lines
                   .map((l) => l.match(/[\d.]+\s*(?:SOL|USDC)/i)?.[0])
@@ -443,8 +463,21 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 !
               </p>
               <p className="text-xs text-emerald-300/70 mt-1">
-                It’s in your wallet. Pass some on — send to a friend by @handle.
+                It&apos;s yours.{launched && " Pay five verified X accounts by name and your agent is funded every month."}
               </p>
+              {/* The natural first send is to whoever just paid you: one of five. */}
+              {(() => {
+                const s = received.senders?.find((x) => x.handle && x.platform);
+                if (!s) return null;
+                return (
+                  <Link
+                    href={`/send?to=${encodeURIComponent(s.handle!)}&platform=${s.platform}&amount=1&asset=USDC`}
+                    className="mt-3 inline-flex items-center justify-center rounded-xl bg-ink px-4 py-2.5 text-sm font-semibold text-cream transition hover:bg-coral-deep"
+                  >
+                    Pay @{s.handle} back $1 · 1 of 5
+                  </Link>
+                );
+              })()}
               <div className="mt-3 flex items-center justify-center gap-3">
                 {received.lines
                   .map((l) => l.match(/https?:\/\/[^\s)]*solscan[^\s)]*/)?.[0])
@@ -482,7 +515,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
         {needsFunding && (
           <div className="px-4 py-3 bg-blue-950/30 border-b border-blue-900/50">
             <div className="mx-auto flex w-full max-w-3xl items-start gap-3">
-              <span className="text-lg leading-none">✨</span>
+              <span className="text-info"><ActionIcon name="ask" /></span>
               <div className="flex-1 text-sm">
                 <p className="font-medium text-blue-200">Activating your agent…</p>
                 <p className="text-xs text-blue-300/80 mt-0.5">
@@ -501,23 +534,28 @@ function ChatScreen({ platformId }: { platformId: string }) {
           </div>
         )}
 
+        {/* Phones: the ladder in one line, above the conversation. Desktop has the card on Home. */}
+        <div className="md:hidden">
+          <EntryProgress platformId={platformId} variant="strip" href="/level" />
+        </div>
+
         <div ref={scrollRef} className="flex-1 overflow-y-auto overflow-x-hidden px-4 py-6 md:px-6">
           <div className="mx-auto w-full max-w-3xl space-y-4">
             {isFresh && (
               <div className="max-w-md mx-auto pt-8">
                 <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 text-center">
                   <h2 className="text-lg font-semibold mb-2">
-                    {step === "unknown" ? "Meet your butler" : "Name your agent"}
+                    {step === "unknown" ? "Meet your Atcha" : "Name it"}
                   </h2>
                   <p className="text-sm text-zinc-400 mb-5">
                     {step === "unknown"
-                      ? "A personal AI agent on Solana. Your own wallet, your own identity, yours forever."
-                      : "One step to activate — give your agent a name. It's free, no SOL needed."}
+                      ? (launched ? "Your AI with a budget of its own. Pay five verified X accounts by name and it's funded every month." : "Your own AI on Solana. It trades, pays anyone you can name, and does the rest.")
+                      : "One step: give it a name. Free, no SOL needed."}
                   </p>
                   {step === "unknown" ? (
                     <button
                       onClick={() => void send("hi")}
-                      className="w-full px-4 py-3 rounded-xl bg-white text-black font-semibold hover:bg-zinc-200 transition"
+                      className="w-full px-4 py-3 rounded-xl bg-ink text-cream font-semibold hover:bg-coral-deep transition"
                     >
                       Say hi to start
                     </button>
@@ -537,7 +575,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 </div>
                 <p className="text-xs text-zinc-600 text-center mt-4">
                   {step === "unknown"
-                    ? 'Or try: "create my agent", "what can you do?"'
+                    ? 'Or try: "what can you do?", "what\'s my budget?"'
                     : "Or type any name in the box below."}
                 </p>
               </div>
@@ -585,13 +623,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                 phone there was nothing tappable at all. These are the jobs, not
                 navigation: two go to typed flows, the rest talk to the agent. */}
             <div className="mb-2 flex gap-2 overflow-x-auto pb-1 md:hidden [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-              <Link
-                href="/calls"
-                className="shrink-0 rounded-full border border-zinc-700 bg-zinc-900 px-3.5 py-2 text-sm font-medium text-zinc-200 active:bg-zinc-800"
-              >
-                ☏ Comms
-              </Link>
-              {MOBILE_PROMPTS.map((q) => (
+              {(funded ? FUNDED_PROMPTS : launched ? ENTRY_PROMPTS : PRELAUNCH_PROMPTS).map((q) => (
                 <button
                   key={q}
                   type="button"
@@ -621,7 +653,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
                     e.target.scrollHeight > 128 ? "auto" : "hidden";
                 }}
                 onKeyDown={onKeyDown}
-                placeholder="Message your agent…"
+                placeholder="Tell your Atcha what to do…"
                 rows={1}
                 className="flex-1 resize-none overflow-y-hidden rounded-xl bg-zinc-900 border border-zinc-800 px-4 py-2 text-base sm:text-sm focus:outline-none focus:border-zinc-600 max-h-32"
                 disabled={sending}
@@ -629,7 +661,7 @@ function ChatScreen({ platformId }: { platformId: string }) {
               <button
                 type="submit"
                 disabled={sending || !input.trim()}
-                className="rounded-xl bg-white text-black hover:bg-zinc-200 disabled:bg-zinc-800 disabled:text-zinc-600 px-4 py-2 text-sm font-semibold transition"
+                className="rounded-xl bg-ink text-cream hover:bg-coral-deep disabled:bg-zinc-800 disabled:text-zinc-600 px-4 py-2 text-sm font-semibold transition"
               >
                 Send
               </button>
@@ -644,6 +676,8 @@ function ChatScreen({ platformId }: { platformId: string }) {
 
       <ChatContextRail
         platformId={platformId}
+              funded={funded}
+              launched={launched}
         sending={sending}
         onQuick={(q) => void send(q)}
       />

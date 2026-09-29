@@ -1,0 +1,115 @@
+# Atcha: build plan, end to end
+
+The product in one sentence: **an AI agent with a balance that the $ATCHA token funds every month, and the funding grows with the agent's level.** Users see a level; the level is an on-chain record underneath (SAID). This document is the order of work to ship it, across the two codebases, with what is done, what is next, and who owns each step.
+
+Dates: register and tokenize on ClawPump by **1 October 24:00 EST**. Judging **28 September to 7 October**. Winner **8 October**.
+
+Codebases:
+- **app** (this repo, `atchacash/app`): the Next.js web app. Mirrored to `Jugmaster/said-agent-web` branch `atcha` until staging is repointed.
+- **butler** (`said-butler`, private): the agent runtime and HTTP API. Credits live in `src/credits/`. Production runs on a hand-deployed box; nothing here is live until it is deployed there.
+
+Status key: `[x]` done · `[ ]` to do · `[~]` in progress · `(C)` needs Callum
+
+---
+
+## 0. Decisions already made
+
+- Entry: five sends by handle, $1 minimum each, from own money, to five distinct people who verify by claiming and then do one thing of their own. Unlocks level 2 (funding and the first trade allowance).
+- Funding: monthly, in SOL, ledgered in dollars, sized by level. No lock tier (dropped 23 Sept on Bunny's feedback).
+- Credit trades majors, $ANSEM, $CLAW, ClawPump-ecosystem tokens and xStocks. No whitelist; general rules for every token: liquidity floor, age floor, per-token cap, aggregate cap on non-majors, passport check on xStocks. Spot only.
+- Money out: own money any time; realised profits above the funded amount at level 3, on a split; the funded principal never.
+- Sender funding bonus in credit when a paid recipient activates.
+- Token: creator rewards fund the pool; funding never pays in $ATCHA; agents' trading fees buy and stake $ATCHA in batches with a public receipt; no burn, no yield, no airdrops.
+- Vocabulary: users see **level 1 / 2 / 3 / 4** (internally rung 0–3). "Reputation" is never on a user surface. "Credit" is the funded money; "cash" is theirs.
+- Every rule is written as a capability that grows, never as a limit.
+
+The full spec: the "Atcha Product Spec" doc (Claude Docs). The simulation behind the sizes is section 12 there.
+
+---
+
+## 1. Butler: the mechanic
+
+| # | Step | Where | Status |
+| --- | --- | --- | --- |
+| 1.1 | Ledger, guards, daily tasks, ladder, drawdown pause, limits | `src/credits/{ledger,guards,tasks}.ts` | [x] |
+| 1.2 | Entry rule: settled sends recorded in dollars at claim; distinct identity clusters; recipient activation; rung 1 on five | `src/credits/entry.ts`, claim hooks in `src/social/send.ts` | [x] ba12d23 |
+| 1.3 | Signup no longer funds; first funding on reaching rung 1 | `src/identity/provisioning.ts`, `src/credits/tasks.ts` | [x] |
+| 1.4 | Monthly funding: size table by rung, idempotent per month, pool budget with reserve, funding-day timer | `src/credits/funding.ts` | [x] 8cfa5d6 |
+| 1.5 | Trading rules v2: per-token cap, aggregate non-major cap, liquidity and age floors, passport check on xStocks, no whitelist | `src/credits/guards.ts` | [x] (floor is $100K: $CLAW itself sits at ~$190K liquidity, so $250K would exclude the ecosystem token) |
+| 1.6 | Spend guard: pays/buys/hires only from own money (amount ≤ withdrawable) | `src/credits/guards.ts` `canSpend` | [x] wired for transfer_usdc/transfer_sol by handle |
+| 1.7 | One gate for every money path: swaps (chat, DCA fills, limit fills, staking), sends by handle, contacts, bridges, AgentCash, cross-chain, purchases | `src/credits/gate.ts`, `src/agent/butler.ts`, `src/dca/executor.ts`, `src/limit/executor.ts` | [x] (no launch tool exists in the chat agent; purchases are gated on having own money, since the price is only known after checkout: quote-before-buy is a follow-up) |
+| 1.8 | Two-phase funding (pending, then confirm) so a crash never double-funds | `src/credits/funding.ts` | [x] `pendingFundings()` lists what needs a human |
+| 1.9 | Deposit detection: a claimed send is the recipient's cash; daily snapshot deltas on days with no swap | `src/credits/deposits.ts`, `entry.ts`, `wallet-snapshot.ts` | [x] swap days are skipped, not guessed; on-ramp orders land as the next quiet day's delta |
+| 1.10 | Sender funding bonus on recipient activation, capped per month | `src/credits/funding.ts` `activationBonusUsd` | [x] $10 per activated person, five a month, folded into next month's funding |
+| 1.11 | Profit withdrawal at rung 2: gains above funded, split | `src/credits/ledger.ts` `computePosition(rung)` | [x] 80% of gains withdrawable from level 3; principal at level 4 |
+| 1.12 | Reclaim untouched credit after 14 days | `src/credits/funding.ts` `reclaimUntouched` | [x] daily at 04:00 UTC behind the flag; only the last funding, only what is left, never cash |
+| 1.13 | Batched buy-and-lock of $ATCHA from fees: `src/credits/buyback.ts`, `GET /api/credits/buybacks`, totals on `/today`; inert until `ATCHA_MINT`; needs `BUYBACK_PLATFORM_ID` (a hosting-signed wallet ops top up from fees), `BUYBACK_MIN_SOL`, `BUYBACK_DRY_RUN=false`. Tokens stay in that wallet (the lock); `BUYBACK_STAKE_TO` reserved for a staking destination | `tests/credits.buyback.test.ts` | [x] built 24 Sept; switch-on waits for the mint |
+| 1.14 | Ring test: six accounts, every extraction path, ends with zero withdrawable and nobody above rung 0 | `tests/credits.ring.test.mts` (`npm run test:credits:ring`) | [x] passes; plus the ring that spends real money earns rung 1 and can take out only what it put in |
+| 1.15 | Read API for the app: level, funding, allowance, tasks, events, today's funding | `src/credits/api.ts`, `src/http/server.ts` | [x] level, levelName, next, funding added (9f15064) |
+| 1.16 | Independent review of 1.1–1.14 by someone who did not write it, brief in `docs/REVIEW.md` | — | [ ] (C) |
+| 1.17 | One funding day for everyone: entry queues for the next funding day; `forecast()` = what is due, what the pool holds, the top-up in SOL; ops told at T-7/3/1; `GET /api/credits/forecast` | `funding.ts`, `tests/credits.funding.test.ts` | [x] 23 Sept |
+
+## 2. Butler: deploy
+
+| # | Step | Status |
+| --- | --- | --- |
+| 2.1 | Pool wallet (hosting-signable) and team wallet created; env set: `CREDITS_ENABLED`, `CREDIT_POOL_*`, funding sizes | [ ] (C) |
+| 2.2 | Surgical deploy of the credits module and routes to the box, dry-run on | [ ] |
+| 2.3 | Ops wired: `CREDIT_OPS_PLATFORM_IDS` (who gets the T-7/3/1 forecast), `CREDIT_OPS_TOKEN` (for `GET /api/credits/forecast`); first forecast read and the pool topped up to it | [ ] (C) |
+| 2.4 | Dry-run off for everyone once 1.14 and 1.16 pass | [ ] (C) |
+
+## 3. App
+
+| # | Step | Status |
+| --- | --- | --- |
+| 3.1 | Atcha design system, landing, motion, public pages, dashboard cards, icons | [x] |
+| 3.2 | Vocabulary pass: rung → level, "reputation" off every user surface, every rule as a capability that grows | [x] level card, cashback card, tasks, landing, Docs. Stats and link-agent (network/developer pages) still say reputation on purpose |
+| 3.3 | Landing: capabilities-first hero and sections (trade anything, hold the S&P, pay anyone by name, buy things, DCA); "comes funded" as the promise; the counter | [x] |
+| 3.4 | Home: the level card (funding this month, allowance today, what the next level unlocks), the five-people progress at level 1 | [x] reads `level`, `next`, `funding` from the API (butler 9f15064) |
+| 3.5 | Recipient's first screen: "@name paid you $1. This is your Atcha. Pay five people and it gets funded." | [x] the invite claim page |
+| 3.6 | Public agent page `atcha.cash/@name`: level, months funded, P&L, people paid, funding record; `/@name` rewrites to `/u/[handle]`; OG tags = the share card | [x] |
+| 3.7 | Fleet page `/fleet`: the top funded real accounts (or `CREDIT_FLEET_IDS` if pinned), leaderboard by result, 30s refresh, Nav link | [x] |
+| 3.8 | Docs rewritten to the final mechanic in the level vocabulary; the paper-account decision reflected | [x] levels, no lock tier, "What's underneath" names SAID for developers; paper account still open |
+| 3.9 | Phone nav menu (hamburger, same links); metadata and adopt copy on `atcha.cash`; manifest starts at `/home`; no `sw.js` in the tree | [x] |
+| 3.10 | Merge to main and point `atcha.cash` at the app, in one move, when 2.4 is live | [ ] (C) |
+| 3.11 | The ladder in the app: `EntryProgress` (N of 5 / level + next funding) on Pay and every send receipt; strip above chat on phones; level-aware starter prompts; Comms off the front | [x] 24 Sept |
+| 3.12 | Pay-back after claim: the receive celebration offers "Pay @sender back $1 · 1 of 5" (butler claim returns `received.senders`) | [x] 24 Sept |
+| 3.13 | `/level` page and tab (Agent / Pay / Level / Settings): funded card, today, your page + share, funding record, the board | [x] 24 Sept |
+| 3.14 | Copy and rules aligned: levels count from 1 (five paid = level 2, gains from level 3), "budget" not "credit", docs money table matches `guards.ts`/`ledger.ts` | [x] 24 Sept |
+| 3.15 | Visual pass of in-app screens (blue/indigo tokens remapped; per-screen sweep of dark-era gradients still to do by eye) | [~] |
+| 3.16 | Token page `/token/[mint]`: own chart (lightweight-charts, GeckoTerminal candles) with the agent's buys/sells and reasons as markers, MC/price axis, stats strip (DexScreener), the trust line (passport + guards), your position (avg entry, P&L, invested, realized, opened-by), the agent's trades here, "Tell your agent" ($10/25/50/100/custom, sell half/all) through chat with the gates | [x] 25 Sept |
+| 3.17 | Wallet = positions (chain qty + value, avg entry and P&L from the trade log, the instruction that opened each, closed positions with realized) + token search (name/symbol/mint) | [x] 25 Sept |
+| 3.18 | `/ledger`: the MADE-style public account (creator fees in → pool → agents funded → traded → fees and share back → $ATCHA bought & locked), the mission bar "the pool pays for itself", milestones, month-by-month table, the rules; example numbers until the pool is live (`GET /api/credits/ledger`, butler) | [x] 25 Sept |
+| 3.19 | The Atcha handle: claim on Level and Settings (`ClaimHandle`), suggestion from X/Telegram, availability as you type; Pay tab "Atcha" resolves it first; `/@name` and the pinned @atcha chip use it | [x] 25 Sept |
+| 1.19 | Butler `identity/handles.ts` + `handle-routes.ts`: unique, reserved list, never another user's verified name, one rename a month; resolver reads a bare name as an Atcha handle first (butler 90bc367) | [x] 25 Sept |
+| 3.20 | Dark mode: second token set (warm near-black ground, same coral), system by default, Light/Dark/System toggle in Settings applied before first paint; every component literal tokenised (`paper/ring/up/down/warn/info` roles); chart re-themes live; Privy modal follows | [x] 25 Sept |
+| 1.20 | Autopilot (butler `src/autopilot/`): exits / SOL trend vs USDC / scout; rules decide, Jev refines (`JEV_API_KEY`, pinned `JEV_MODEL`), gate last; shadow by default per account and via `AUTOPILOT_SHADOW`; `GET/POST /api/autopilot/:id`, `/run`; 10 tests | [x] 25 Sept (e04d8c5) |
+| 3.21 | `AutopilotCard` on Level: switch, risk, strategies, shadow, Run now, the decision log with reasons | [x] 25 Sept |
+| 1.18 | Butler trade log `src/defi/trades.ts`: every fill at the swap choke point with side, token, fill price, notional, tx, source (chat/dca/limit/buyback) and reason; `GET /api/trades/:id`, `/api/positions/:id` (owner) via `trades-routes.ts`; one more line in `swap.js` for the box | [x] 25 Sept (butler 794ff7a) |
+
+## 4. Token and launch
+
+| # | Step | Status |
+| --- | --- | --- |
+| 4.1 | Independent review of `src/credits/` against `docs/REVIEW.md` in said-butler, before the token launches | [ ] (C) |
+| 4.2 | X account renamed to Atcha; keys audited; public sends by handle from the timeline through the same rules | [ ] (C) + butler |
+| 4.3 | Stream slot with ClawPump in the judging window | [ ] (C) |
+| 4.4 | Token live on ClawPump by 1 Oct; MM briefed on the mechanic (funds agents; bought by their trading; no lock tier) | [ ] (C) |
+| 4.5 | Launch: Fleet live, first-hundred race announced, funding-day cadence set | [ ] |
+
+## 5. Open decisions
+
+- Rung 0 paper account: yes or no (changes 3.4 and 3.5).
+- Exact size table after the first real month (spec §2 proposal: 25 / 75 / by review).
+- Floors and caps: coded as $100K liquidity, 7 days, 25% per token, 25% aggregate non-major (env-overridable). The spec said $250K; $CLAW would fail that.
+- Profit split and the level-3 threshold (proposal 80/20, 30-day streak).
+- Sender bonus cap (proposal $10 per activated person, five a month).
+- Buy-and-stake threshold (proposal $1,000 or monthly).
+
+## 6. Order of work, from here
+
+1. ~~Butler 1.4 → 1.5 → 1.6 → 1.7 → 1.14~~ done 23 Sept.
+2. App 3.2 → 3.3 → 3.4 → 3.5 (the vocabulary and the first screens).
+3. ~~Butler 1.8 → 1.9 → 1.10 → 1.11 → 1.12~~ done 23 Sept; 1.13 waits for the mint.
+4. Deploy 2.1 → 2.2 → 2.3; app 3.6 → 3.7 → 3.8.
+5. Launch 4.x; then 2.4 when cleared.

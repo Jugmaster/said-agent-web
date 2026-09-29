@@ -1,4 +1,5 @@
 "use client";
+import ActionIcon, { Mark } from "@/components/ActionIcon";
 
 /**
  * Native in-PWA funding pop-up.
@@ -162,7 +163,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
             </div>
             <button
               onClick={() => void start()}
-              className="w-full py-3.5 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition mb-2"
+              className="w-full py-3.5 bg-ink text-cream rounded-xl font-semibold hover:bg-coral-deep transition mb-2"
             >
               Continue to payment →
             </button>
@@ -219,7 +220,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
               </>
             ) : (
               <>
-                <p className="text-2xl mb-3">⏳</p>
+                <div className="mb-3 flex justify-center"><Mark name="clock" /></div>
                 <p className="text-sm font-medium mb-1">Still processing</p>
                 <p className="text-xs text-zinc-400 max-w-xs mb-4">
                   Card payments can take a few minutes. You can close this — your
@@ -238,14 +239,14 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
 
         {phase === "done" && (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-3xl mb-3">✅</p>
+            <div className="mb-3 flex justify-center"><Mark name="check" tone="up" /></div>
             <p className="text-sm font-medium mb-1">Funds added</p>
             <p className="text-xs text-zinc-400 max-w-xs mb-5">
-              Your agent is topped up and ready to swap, send, and buy.
+              Money added. Yours to take out any time, and ready to pay, buy, or trade.
             </p>
             <button
               onClick={onClose}
-              className="px-6 py-3 bg-white text-black rounded-xl font-semibold hover:bg-zinc-200 transition"
+              className="px-6 py-3 bg-ink text-cream rounded-xl font-semibold hover:bg-coral-deep transition"
             >
               Done
             </button>
@@ -254,7 +255,7 @@ export default function FundModal({ walletAddress, onClose, onFunded }: FundModa
 
         {phase === "error" && (
           <div className="flex flex-col items-center justify-center py-6 text-center">
-            <p className="text-2xl mb-3">⚠️</p>
+            <div className="mb-3 flex justify-center"><Mark name="warn" tone="warn" /></div>
             <p className="text-sm text-red-300 mb-2">Couldn&apos;t open card payment</p>
             <p className="text-xs text-zinc-400 mb-5 max-w-xs whitespace-pre-line break-words">
               {errorMsg}

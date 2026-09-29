@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 
 import { PrivyProvider } from "@privy-io/react-auth";
 import { useSolanaFundingPlugin } from "@privy-io/react-auth/solana";
@@ -16,6 +17,12 @@ function SolanaFundingBootstrap() {
 }
 
 export default function Providers({ children }: { children: ReactNode }) {
+  // Privy's modal follows the page theme as it was at mount.
+  const [privyTheme, setPrivyTheme] = useState<"light" | "dark">("light");
+  useEffect(() => {
+    const t = document.documentElement.getAttribute("data-theme");
+    setPrivyTheme(t === "dark" || (!t && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light");
+  }, []);
   return (
     <PrivyProvider
       appId={PRIVY_APP_ID}
@@ -25,11 +32,9 @@ export default function Providers({ children }: { children: ReactNode }) {
         // automatically. Other methods provision a fresh pwa_<privyId> agent.
         loginMethods: ["telegram", "email", "wallet", "google", "twitter"],
         appearance: {
-          theme: "dark",
-          accentColor: "#667eea",
-          // Canonical SAID brand logo — same asset used by saidprotocol.com
-          // and app.saidprotocol.com in their Privy modals.
-          logo: "/logo-dark.png",
+          theme: privyTheme,
+          accentColor: "#E8542E",
+          logo: "/logo.png",
         },
         embeddedWallets: {
           solana: { createOnLogin: "users-without-wallets" },

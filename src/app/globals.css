@@ -1,5 +1,87 @@
 @import "tailwindcss";
 
+/*
+ * Atcha design system, applied at the token level. The app was written on
+ * Tailwind's zinc scale for a dark ground; the scale is remapped here to the
+ * Atcha neutrals (cream ground, ink text) so the layout stays and the palette
+ * changes. white/black are swapped to ink/cream for the same reason: a
+ * `bg-white text-black` button is the primary button, and stays one.
+ */
+@theme {
+  --color-cream: #F6F4EE;
+  --color-card: #ECE9E1;
+  --color-btn: #E3E0D7;
+  --color-ink: #171613;
+  --color-grey: #6F6B62;
+  --color-line: #E3E0D6;
+  --color-coral: #E8542E;
+  --color-coral-deep: #C9401D;
+  --color-coral-soft: #FAE4DC;
+  --color-coral-text: #B93A16;
+
+  /* Named roles so no component carries a literal colour. */
+  --color-paper: #FFFFFF;        /* raised surfaces: cards on cream, menus */
+  --color-ring: #D5D1C5;         /* hairline ring on ghost buttons */
+  --color-up: #157E4E;  --color-up-soft: #DDF3E7;
+  --color-down: #B93A16; --color-down-soft: #FBE3D8;
+  --color-warn: #B98A1C; --color-warn-soft: #F8EED4;
+  --color-info: #3D6BB8; --color-info-soft: #DFE9F6;
+
+  --color-white: #171613;
+  --color-black: #F6F4EE;
+
+  --color-zinc-50: #171613;
+  --color-zinc-100: #211F1B;
+  --color-zinc-200: #2F2D28;
+  --color-zinc-300: #4B4841;
+  --color-zinc-400: #63605A;
+  --color-zinc-500: #6F6B62;
+  --color-zinc-600: #A6A196;
+  --color-zinc-700: #D3CFC4;
+  --color-zinc-800: #E3E0D6;
+  --color-zinc-900: #ECE9E1;
+  --color-zinc-950: #F6F4EE;
+
+  /* Status colours. The app tints with `bg-x-950/30 border-x-900 text-x-300`
+     (dark tint, light text); on cream the 950 is chosen so that /30 over
+     cream lands on the Atcha pill fill, and the light steps become the deep
+     pill text. */
+  --color-green-950: #A6E7CD; --color-emerald-950: #A6E7CD;
+  --color-green-900: #C6E3D0; --color-emerald-900: #C6E3D0;
+  --color-green-500: #157E4E; --color-emerald-500: #157E4E;
+  --color-green-400: #157E4E; --color-emerald-400: #157E4E;
+  --color-green-300: #157E4E; --color-emerald-300: #157E4E;
+  --color-green-200: #126B42; --color-emerald-200: #126B42;
+
+  /* Blue / indigo were never remapped: the activating banner, the on-list card,
+     the identity avatar. One quiet ink-blue tint keeps them in the palette. */
+  --color-blue-950: #DCE6F7; --color-indigo-950: #DCE6F7;
+  --color-blue-900: #C6D6F0; --color-indigo-900: #C6D6F0;
+  --color-blue-800: #C6D6F0; --color-indigo-800: #C6D6F0;
+  --color-blue-500: #2F5497; --color-indigo-500: #2F5497;
+  --color-blue-400: #2F5497; --color-indigo-400: #2F5497;
+  --color-blue-300: #2F5497; --color-indigo-300: #2F5497;
+  --color-blue-200: #274579; --color-indigo-200: #274579;
+  --color-amber-950: #FDE097; --color-yellow-950: #FDE097;
+  --color-amber-900: #EEDFB3; --color-yellow-900: #EEDFB3;
+  --color-amber-600: #8F6A12; --color-yellow-600: #8F6A12;
+  --color-amber-500: #B98A1C; --color-yellow-500: #B98A1C;
+  --color-amber-400: #B98A1C; --color-yellow-400: #B98A1C;
+  --color-amber-300: #B98A1C; --color-yellow-300: #B98A1C;
+
+  --color-red-950: #FFBFB2; --color-rose-950: #FFBFB2;
+  --color-red-900: #F2C9BC; --color-rose-900: #F2C9BC;
+  --color-red-400: #B93A16; --color-rose-400: #B93A16;
+  --color-red-300: #B93A16; --color-rose-300: #B93A16;
+  --color-red-200: #9E2F10; --color-rose-200: #9E2F10;
+
+  --color-blue-950: #DFE9F6; --color-sky-950: #DFE9F6;
+  --color-blue-500: #3D6BB8; --color-blue-400: #3D6BB8; --color-blue-300: #3D6BB8; --color-blue-200: #2F5799;
+  --color-sky-300: #3D6BB8;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
 html {
   scroll-behavior: smooth;
   /* Stop iOS/Android auto-inflating text; with 16px inputs this kills the
@@ -9,12 +91,14 @@ html {
 }
 
 :root {
-  /* Match DotGridBackground bg + vignette tint */
-  --background: #09090b;
-  --foreground: #ffffff;
-  --bg-secondary: #141414;
-  --border: #2a2a2a;
-  --text-secondary: #999;
+  --shadow-rgb: 23, 22, 19;
+  color-scheme: light;
+  /* Page ground */
+  --background: #F6F4EE;
+  --foreground: #171613;
+  --bg-secondary: #ECE9E1;
+  --border: #E3E0D6;
+  --text-secondary: #6F6B62;
   /* Mobile bottom tab bar height (incl. iOS home-indicator safe area). */
   --tabbar-h: calc(3.5rem + env(safe-area-inset-bottom));
   /* Fixed pill navbar height incl. the iOS notch inset. Pages must clear this
@@ -23,11 +107,24 @@ html {
   --navbar-h: calc(3rem + max(1rem, env(safe-area-inset-top)));
 }
 
+/* No scrollbars anywhere: the app scrolls, it just doesn't draw a track. Chrome
+   and Safari through the pseudo-element, Firefox through scrollbar-width. */
+html, body, * {
+  scrollbar-width: none;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+*::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 html,
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-inter), system-ui, -apple-system, sans-serif;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 }
 
 button,
@@ -46,9 +143,98 @@ a,
   background: var(--bg-secondary);
 }
 ::-webkit-scrollbar-thumb {
-  background: #333;
+  background: #D3CFC4;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #444;
+  background: #A6A196;
+}
+
+/* Lenis smooth scroll (public pages) */
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+/* ─── Dark: the same tokens, second values. System by default; the toggle
+   stamps data-theme. Warm near-black ground, never pure black. ─── */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-cream: #121110; --color-card: #1B1A17; --color-btn: #26241F;
+    --color-ink: #F1EEE6; --color-grey: #9A968B; --color-line: #2B2924;
+    --color-coral-deep: #F26A45; --color-coral-soft: #3A1E15; --color-coral-text: #F28A6B;
+    --color-paper: #1F1D19; --color-ring: #34322B;
+    --color-up: #3DBE83; --color-up-soft: #143526;
+    --color-down: #F07A57; --color-down-soft: #3A1E15;
+    --color-warn: #E0B44A; --color-warn-soft: #3A3117;
+    --color-info: #7FA3E8; --color-info-soft: #16233A;
+    --color-white: #F1EEE6; --color-black: #121110;
+    --color-zinc-50: #F1EEE6; --color-zinc-100: #E3E0D6; --color-zinc-200: #C9C5B9; --color-zinc-300: #ABA79B;
+    --color-zinc-400: #9A968B; --color-zinc-500: #8A867B; --color-zinc-600: #5C5950; --color-zinc-700: #3A3831;
+    --color-zinc-800: #2B2924; --color-zinc-900: #1B1A17; --color-zinc-950: #121110;
+    --color-green-950: #143526; --color-emerald-950: #143526; --color-green-900: #1C4A34; --color-emerald-900: #1C4A34;
+    --color-green-500: #3DBE83; --color-emerald-500: #3DBE83; --color-green-400: #3DBE83; --color-emerald-400: #3DBE83;
+    --color-green-300: #3DBE83; --color-emerald-300: #3DBE83; --color-green-200: #5FD19C; --color-emerald-200: #5FD19C;
+    --color-amber-950: #3A3117; --color-yellow-950: #3A3117; --color-amber-900: #4A3F1C; --color-yellow-900: #4A3F1C;
+    --color-amber-600: #E0B44A; --color-yellow-600: #E0B44A; --color-amber-500: #E0B44A; --color-yellow-500: #E0B44A;
+    --color-amber-400: #E0B44A; --color-yellow-400: #E0B44A; --color-amber-300: #E0B44A; --color-yellow-300: #E0B44A;
+    --color-red-950: #3A1E15; --color-rose-950: #3A1E15; --color-red-900: #4E2419; --color-rose-900: #4E2419;
+    --color-red-400: #F07A57; --color-rose-400: #F07A57; --color-red-300: #F07A57; --color-rose-300: #F07A57;
+    --color-red-200: #F59A7E; --color-rose-200: #F59A7E;
+    --color-blue-950: #16233A; --color-indigo-950: #16233A; --color-sky-950: #16233A;
+    --color-blue-900: #1E2F4E; --color-indigo-900: #1E2F4E; --color-blue-800: #1E2F4E; --color-indigo-800: #1E2F4E;
+    --color-blue-500: #7FA3E8; --color-indigo-500: #7FA3E8; --color-blue-400: #7FA3E8; --color-indigo-400: #7FA3E8;
+    --color-blue-300: #7FA3E8; --color-indigo-300: #7FA3E8; --color-sky-300: #7FA3E8; --color-blue-200: #9DB9EE; --color-indigo-200: #9DB9EE;
+    --background: #121110; --foreground: #F1EEE6; --bg-secondary: #1B1A17; --border: #2B2924; --text-secondary: #9A968B;
+    --shadow-rgb: 0, 0, 0;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --color-cream: #121110; --color-card: #1B1A17; --color-btn: #26241F;
+  --color-ink: #F1EEE6; --color-grey: #9A968B; --color-line: #2B2924;
+  --color-coral-deep: #F26A45; --color-coral-soft: #3A1E15; --color-coral-text: #F28A6B;
+  --color-paper: #1F1D19; --color-ring: #34322B;
+  --color-up: #3DBE83; --color-up-soft: #143526;
+  --color-down: #F07A57; --color-down-soft: #3A1E15;
+  --color-warn: #E0B44A; --color-warn-soft: #3A3117;
+  --color-info: #7FA3E8; --color-info-soft: #16233A;
+  --color-white: #F1EEE6; --color-black: #121110;
+  --color-zinc-50: #F1EEE6; --color-zinc-100: #E3E0D6; --color-zinc-200: #C9C5B9; --color-zinc-300: #ABA79B;
+  --color-zinc-400: #9A968B; --color-zinc-500: #8A867B; --color-zinc-600: #5C5950; --color-zinc-700: #3A3831;
+  --color-zinc-800: #2B2924; --color-zinc-900: #1B1A17; --color-zinc-950: #121110;
+  --color-green-950: #143526; --color-emerald-950: #143526; --color-green-900: #1C4A34; --color-emerald-900: #1C4A34;
+  --color-green-500: #3DBE83; --color-emerald-500: #3DBE83; --color-green-400: #3DBE83; --color-emerald-400: #3DBE83;
+  --color-green-300: #3DBE83; --color-emerald-300: #3DBE83; --color-green-200: #5FD19C; --color-emerald-200: #5FD19C;
+  --color-amber-950: #3A3117; --color-yellow-950: #3A3117; --color-amber-900: #4A3F1C; --color-yellow-900: #4A3F1C;
+  --color-amber-600: #E0B44A; --color-yellow-600: #E0B44A; --color-amber-500: #E0B44A; --color-yellow-500: #E0B44A;
+  --color-amber-400: #E0B44A; --color-yellow-400: #E0B44A; --color-amber-300: #E0B44A; --color-yellow-300: #E0B44A;
+  --color-red-950: #3A1E15; --color-rose-950: #3A1E15; --color-red-900: #4E2419; --color-rose-900: #4E2419;
+  --color-red-400: #F07A57; --color-rose-400: #F07A57; --color-red-300: #F07A57; --color-rose-300: #F07A57;
+  --color-red-200: #F59A7E; --color-rose-200: #F59A7E;
+  --color-blue-950: #16233A; --color-indigo-950: #16233A; --color-sky-950: #16233A;
+  --color-blue-900: #1E2F4E; --color-indigo-900: #1E2F4E; --color-blue-800: #1E2F4E; --color-indigo-800: #1E2F4E;
+  --color-blue-500: #7FA3E8; --color-indigo-500: #7FA3E8; --color-blue-400: #7FA3E8; --color-indigo-400: #7FA3E8;
+  --color-blue-300: #7FA3E8; --color-indigo-300: #7FA3E8; --color-sky-300: #7FA3E8; --color-blue-200: #9DB9EE; --color-indigo-200: #9DB9EE;
+  --background: #121110; --foreground: #F1EEE6; --bg-secondary: #1B1A17; --border: #2B2924; --text-secondary: #9A968B;
+  --shadow-rgb: 0, 0, 0;
+  color-scheme: dark;
+}
+
+/* ─── The theme switch, same as saidprotocol.com: a round button whose sun and
+   moon cross-fade and rotate off the html theme, no JS state. Surfaces
+   transition their colours so the flip is a fade, not a cut. ─── */
+body, [data-nav], [data-preloader], .rounded-2xl, .rounded-xl, .rounded-full, input, textarea, select, button, aside, table, th, td {
+  transition: background-color .5s, color .5s, border-color .5s, box-shadow .5s;
+}
+.themebtn { width: 36px; height: 36px; border-radius: 50%; box-shadow: inset 0 0 0 1px var(--color-ring); background: none; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; position: relative; color: var(--color-ink); }
+.themebtn:hover { box-shadow: inset 0 0 0 1px var(--color-ink); }
+.themebtn svg { position: absolute; transition: opacity .4s, transform .5s; }
+.themebtn .sun { opacity: 1; transform: rotate(0); }
+.themebtn .moon { opacity: 0; transform: rotate(-60deg); }
+html[data-theme="dark"] .themebtn .sun { opacity: 0; transform: rotate(60deg); }
+html[data-theme="dark"] .themebtn .moon { opacity: 1; transform: rotate(0); }
+@media (prefers-color-scheme: dark) {
+  html:not([data-theme="light"]) .themebtn .sun { opacity: 0; transform: rotate(60deg); }
+  html:not([data-theme="light"]) .themebtn .moon { opacity: 1; transform: rotate(0); }
 }

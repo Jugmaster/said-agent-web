@@ -2,6 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import ClaimHandle from "@/components/ClaimHandle";
+import AppPage from "@/components/AppPage";
+import ThemeToggle from "@/components/ThemeToggle";
 import { usePrivy } from "@privy-io/react-auth";
 import AuthGate from "@/components/AuthGate";
 import { useAgent } from "@/hooks/useAgent";
@@ -62,7 +65,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
       <h2 className="mb-2 px-1 text-[11px] font-medium uppercase tracking-wider text-zinc-500">
         {title}
       </h2>
-      <div className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900/40">
+      <div className="overflow-hidden rounded-2xl border border-line bg-card">
         {children}
       </div>
     </section>
@@ -96,11 +99,11 @@ function Settings({ platformId }: { platformId: string }) {
   }
 
   return (
-    <div className="mx-auto max-w-2xl px-4 pt-[max(1.5rem,env(safe-area-inset-top))] pb-[calc(var(--tabbar-h)+1.5rem)] md:px-6 md:pt-10 md:pb-12">
-      <h1 className="mb-6 text-2xl font-bold">Settings</h1>
+    <AppPage title="Settings" sub="Your Atcha, your name, how it looks, and your account." narrow>
 
-      <Section title="Your agent">
-        <Row label="Name" value={agentName ?? "—"} />
+      <Section title="Your Atcha">
+        <Row label="Agent" value={agentName ?? "—"} />
+        <div className="px-4 py-3"><div className="mb-1 text-xs text-grey">Your @name</div><ClaimHandle platformId={platformId} compact /></div>
         <Row
           label="Wallet"
           value={walletAddress ? truncMiddle(walletAddress, 4, 4) : "—"}
@@ -110,7 +113,14 @@ function Settings({ platformId }: { platformId: string }) {
           <div className="px-4 pb-2 text-xs text-emerald-400">Address copied</div>
         )}
         <Row label="Public profile" href={`/agents/${encodeURIComponent(platformId)}`} />
-        <Row label="Link an existing agent" href="/settings/link-agent" />
+        <Row label="Link an agent you already run" href="/settings/link-agent" />
+      </Section>
+
+      <Section title="Appearance">
+        <div className="flex items-center justify-between px-4 py-3">
+          <span className="text-sm text-zinc-200">Theme</span>
+          <ThemeToggle />
+        </div>
       </Section>
 
       <Section title="Account">
@@ -130,8 +140,8 @@ function Settings({ platformId }: { platformId: string }) {
       </Section>
 
       <p className="px-1 pb-2 text-center text-xs text-zinc-600">
-        SAID Agent · your keys are secured by Privy
+        Atcha, by SAID · your keys are secured by Privy
       </p>
-    </div>
+    </AppPage>
   );
 }

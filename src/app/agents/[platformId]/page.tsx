@@ -27,7 +27,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const agent = await fetchAgent(platformId);
   if (!agent) {
     return {
-      title: "Agent not found · SAID Agent",
+      title: "Agent not found · Atcha",
       description: "This agent doesn't exist on SAID Protocol.",
     };
   }
@@ -36,16 +36,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     ? `${name} is a verified SAID Protocol agent. ${agent.activityCounts.total} on-chain actions, ${agent.activityCounts.swaps} swaps, ${agent.activityCounts.stakes} stakes.`
     : `${name} is an unverified SAID Protocol agent.`;
   return {
-    title: `${name} · SAID Agent`,
+    title: `${name} · Atcha`,
     description: desc,
     openGraph: {
-      title: `${name} · SAID Agent`,
+      title: `${name} · Atcha`,
       description: desc,
       type: "profile",
     },
     twitter: {
       card: "summary",
-      title: `${name} · SAID Agent`,
+      title: `${name} · Atcha`,
       description: desc,
     },
   };
@@ -135,7 +135,7 @@ export default async function AgentProfilePage({ params }: PageProps) {
             <div className="mt-6 md:mt-0 md:w-72 shrink-0">
               <Link
                 href={tipHref}
-                className="block w-full text-center rounded-xl bg-white text-black font-semibold py-3 hover:bg-zinc-200 transition"
+                className="block w-full text-center rounded-xl bg-ink text-cream font-semibold py-3 hover:bg-coral-deep transition"
               >
                 Send {name} a tip →
               </Link>
@@ -161,33 +161,20 @@ export default async function AgentProfilePage({ params }: PageProps) {
           <section>
             <h2 className="text-sm font-medium text-zinc-400 mb-3">Recent</h2>
             <div className="space-y-2 md:space-y-0 md:grid md:grid-cols-2 md:gap-2">
-              {agent.recentActivity.map((a) => (
+              {agent.recentActivity.filter((a) => a.type !== "idle_compute").map((a) => (
                 <div
                   key={a.seq}
                   className="bg-zinc-900 border border-zinc-800 rounded-xl px-4 py-3 flex items-center justify-between"
                 >
                   <div>
                     <span className="text-sm font-medium capitalize">
-                      {a.type === "idle_compute"
-                        ? "IDLE compute"
-                        : a.type.replace(/_/g, " ")}
+                      {a.type.replace(/_/g, " ")}
                     </span>
                     <span className="text-xs text-zinc-500 ml-2">
                       {formatDate(a.occurredAt)}
                     </span>
                   </div>
                   <div className="flex items-center gap-3 shrink-0">
-                    {a.type === "idle_compute" && agent.saidWallet && (
-                      <a
-                        href={`https://api.earnidle.com/api/public/node-earnings?wallet=${agent.saidWallet}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="text-xs text-emerald-400/80 hover:text-emerald-300"
-                        title="Verify this agent's IDLE work at the source"
-                      >
-                        verify on IDLE ↗
-                      </a>
-                    )}
                     {a.onChainTx && (
                       <a
                         href={`https://solscan.io/tx/${a.onChainTx}`}
