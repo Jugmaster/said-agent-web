@@ -74,7 +74,7 @@ export default function LandingPage() {
         </h1>
         {launched ? (
           <p className={s.sub}>
-            {soon ? <>It will start with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}. Funding opens soon; the entry is open now.</> : <>It starts with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}</>}{" "}and it does everything: trades anything on Solana, holds the
+            {soon ? <>It will start with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}, once funding opens,</> : <>It starts with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}</>}{" "}and it does everything: trades anything on Solana, holds the
             S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
             work with, every month.
           </p>
