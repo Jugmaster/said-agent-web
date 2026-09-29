@@ -7,6 +7,8 @@ import { TradeMarkers, type FillMark, type Hit } from "./trade-markers";
 import { fmtMc, fmtPrice } from "./format";
 
 const TFS: Timeframe[] = ["1m", "5m", "15m", "1h", "4h", "1d"];
+/** Candle width per timeframe, in seconds; the feed's buckets are aligned to the epoch. */
+const TF_SECONDS: Record<Timeframe, number> = { "1m": 60, "5m": 300, "15m": 900, "1h": 3600, "4h": 14_400, "1d": 86_400 };
 
 /** "6 weeks", "212 days", for the footer. */
 function spanLabel(c: Candle[]): string {
@@ -46,8 +48,8 @@ export default function TokenChart({
   mint: string;
   /** The top pool once stats are known; null when the token has none. */
   pool: string | null;
-  /** False until the stats lookup has finished, so the chart asks once, with the pool. */
-  ready: boolean;
+  /** Kept for callers; the chart no longer waits on the stats lookup. */
+  ready?: boolean;
   trades: TradeRow[];
   supply: number | null;
   defaultTf?: Timeframe;
@@ -85,20 +87,28 @@ export default function TokenChart({
     return () => { mo.disconnect(); mq.removeEventListener("change", bump); };
   }, []);
 
-  // Read the candles for the timeframe: once the pool is known, one request,
-  // and a short retry when the upstream is rate-limited.
+  // Read the candles for the timeframe the moment the chart mounts. The route
+  // resolves the token's top pool itself, so there is nothing to wait for; a
+  // pool that arrives later from the stats call is ignored once candles are up,
+  // and only retried if the first attempt found none. The first page is small
+  // so the chart paints fast; history pages in behind it.
+  const FIRST_PAGE = 300;
+  const usedPoolRef = useRef<string | null>(null);
+  const loadedKeyRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!ready) return;
+    const key = `${mint}:${tf}`;
+    if (loadedKeyRef.current === key && candlesRef.current.length > 0) return;
     let alive = true;
     let timer: ReturnType<typeof setTimeout> | null = null;
     setLoading(true); setErr(null);
     const ask = (attempt: number) => {
       setHasMore(true);
       pagesRef.current = 0;
-      getOhlcv(mint, tf, { pool, limit: 1000 })
+      getOhlcv(mint, tf, { pool: pool ?? undefined, limit: FIRST_PAGE })
         .then((r) => {
           if (!alive) return;
-          if (r.candles.length) { setCandles(tidy(r.candles)); setHasMore(r.candles.length >= 1000); setLoading(false); return; }
+          usedPoolRef.current = (r as { pool?: string | null }).pool ?? pool ?? null;
+          if (r.candles.length) { loadedKeyRef.current = key; setCandles(tidy(r.candles)); setHasMore(r.candles.length >= FIRST_PAGE); setLoading(false); return; }
           if (r.retryIn && attempt < 3) { setErr("Busy, trying again…"); timer = setTimeout(() => ask(attempt + 1), r.retryIn * 1000); return; }
           setCandles([]); setErr("No chart for this token yet."); setLoading(false);
         })
@@ -106,7 +116,8 @@ export default function TokenChart({
     };
     ask(0);
     return () => { alive = false; if (timer) clearTimeout(timer); };
-  }, [mint, tf, pool, ready]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mint, tf, pool]);
 
   // Build the chart once.
   useEffect(() => {
@@ -134,7 +145,7 @@ export default function TokenChart({
     if (!first) return;
     loadingMore.current = true;
     try {
-      const r = await getOhlcv(mint, tf, { pool, limit: 1000, before: first[0] });
+      const r = await getOhlcv(mint, tf, { pool: usedPoolRef.current ?? pool ?? undefined, limit: 1000, before: first[0] });
       if (r.retryIn && r.candles.length === 0) { setTimeout(() => { loadingMore.current = false; void loadOlder(); }, r.retryIn * 1000); return; }
       // The page is inclusive of `before`, so one candle overlaps; judge "more" by the raw page size.
       const older = r.candles.filter((c) => c[0] < first[0]);
@@ -202,20 +213,30 @@ export default function TokenChart({
     }
     seriesRef.current = series;
 
-    // The agent's fills as lettered circles, snapped to the candle they fell in, on that candle's close.
-    const first = candles[0][0];
-    const step = candles.length > 1 ? candles[1][0] - candles[0][0] : 60;
-    const byTime = new Map<number, Candle>(candles.map((c) => [c[0], c]));
-    const marks: FillMark[] = trades
+    // The agent's fills as lettered circles, on the candle they fell in. The
+    // interval comes from the timeframe, never from the gap between the first
+    // two candles: the feed omits empty candles, so one early gap used to shift
+    // every marker. A fill lands on the last candle at or before its time; a
+    // fill from before the loaded history is left off until that history loads.
+    const step = TF_SECONDS[tf];
+    const times = candles.map((c) => c[0]);
+    const first = times[0], last = times[times.length - 1];
+    const candleAtOrBefore = (ts: number): Candle | null => {
+      let lo = 0, hi = times.length - 1, hit = -1;
+      while (lo <= hi) { const mid = (lo + hi) >> 1; if (times[mid] <= ts) { hit = mid; lo = mid + 1; } else hi = mid - 1; }
+      return hit >= 0 ? candles[hit] : null;
+    };
+    const marks = trades
       .filter((t) => t.side === "buy" || t.side === "sell")
-      .map((t) => {
+      .map((t): FillMark | null => {
         const ts = Math.floor(new Date(t.at.endsWith("Z") ? t.at : t.at + "Z").getTime() / 1000);
-        const snapped = Math.max(first, first + Math.floor((ts - first) / step) * step);
-        const c = byTime.get(snapped);
-        const price = (t.tokenPriceUsd ?? c?.[4] ?? 0) * k;
-        return { time: snapped as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx, agentDecided: t.source === "autopilot" || t.source === "dca" || t.source === "limit" };
+        if (ts < first || ts >= last + step) return null;
+        const c = candleAtOrBefore(Math.floor(ts / step) * step) ?? candleAtOrBefore(ts);
+        if (!c) return null;
+        const price = (t.tokenPriceUsd ?? c[4]) * k;
+        return { time: c[0] as UTCTimestamp, price, side: t.side as "buy" | "sell", notionalUsd: t.notionalUsd, tokenPriceUsd: t.tokenPriceUsd, at: t.at, reason: t.reason, tx: t.tx, agentDecided: t.source === "autopilot" || t.source === "dca" || t.source === "limit" };
       })
-      .filter((m) => m.price > 0);
+      .filter((m): m is FillMark => !!m && m.price > 0);
     const prim = new TradeMarkers();
     prim.setColors({ up, down: css("--color-coral", "#E8542E") });
     series.attachPrimitive(prim);
@@ -240,9 +261,8 @@ export default function TokenChart({
       >
         <div ref={host} className="absolute inset-0" />
         {hover && <FillCard hit={hover} axis={axis} supply={supply} agentName={agentName} />}
-        {(loading || err) && (
-          <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-grey">{err ?? "Loading chart…"}</div>
-        )}
+        {loading && !err && <ChartSkeleton />}
+        {err && <div className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm text-grey">{err}</div>}
       </div>
       <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs">
         <div className="flex items-center gap-1">
@@ -262,6 +282,26 @@ export default function TokenChart({
           <button type="button" onClick={() => setMode("line")} className={`rounded-full px-2.5 py-1 transition ${mode === "line" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Line</button>
           <button type="button" onClick={() => setMode("candles")} className={`rounded-full px-2.5 py-1 transition ${mode === "candles" ? "bg-ink text-cream" : "text-grey hover:text-ink"}`}>Candles</button>
         </div>
+      </div>
+    </div>
+  );
+}
+
+/** The chart's shape while the first page loads: faint grid, a soft curve, the mark. Same beat as the site's preloader. */
+function ChartSkeleton() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden>
+      <div className="absolute inset-0 animate-pulse">
+        {[22, 42, 62, 82].map((y) => (
+          <div key={y} className="absolute left-0 right-12 border-t border-line" style={{ top: `${y}%` }} />
+        ))}
+        <svg className="absolute inset-0 h-full w-full text-line" viewBox="0 0 100 40" preserveAspectRatio="none">
+          <path d="M0 31 C 8 30, 14 24, 22 26 S 36 16, 46 19 S 60 9, 72 12 S 88 3, 100 6" fill="none" stroke="currentColor" strokeWidth="1.5" vectorEffect="non-scaling-stroke" />
+        </svg>
+      </div>
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+        <span className="inline-flex h-7 w-7 animate-pulse items-center justify-center rounded-[9px] bg-coral text-[15px] font-semibold leading-none text-cream">@</span>
+        <span className="text-xs text-grey">Loading chart</span>
       </div>
     </div>
   );

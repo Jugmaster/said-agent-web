@@ -21,6 +21,22 @@ export async function GET(req: Request) {
         out[a] = { symbol: p.baseToken.symbol, name: p.baseToken.name, imageUrl: p.info?.imageUrl ?? null, priceUsd: p.priceUsd != null ? Number(p.priceUsd) : null, marketCapUsd: p.marketCap ?? null, change24h: p.priceChange?.h24 ?? null, ...({ _liq: liq } as object) };
       }
       for (const k of Object.keys(out)) delete (out[k] as any)._liq;
+      // DexScreener has no picture for many listed tokens (the xStocks among them),
+      // and nothing at all for some. Jupiter's token metadata fills those in; a
+      // logo does not change, so it is cached for hours rather than seconds.
+      const missing = mints.filter((m) => !out[m] || !out[m].imageUrl);
+      await Promise.all(missing.map(async (m) => {
+        const j = await cached(`jup:${m}`, 6 * 3_600_000, async () => {
+          const r = await fetch(`https://lite-api.jup.ag/tokens/v2/search?query=${m}`, { cache: "no-store" });
+          if (!r.ok) throw new Error(`jup ${r.status}`);
+          const arr = (await r.json()) as any[];
+          const t = arr.find((x) => x?.id === m) ?? null;
+          return t ? { symbol: String(t.symbol ?? ""), name: String(t.name ?? ""), icon: (t.icon as string | null) ?? null, priceUsd: t.usdPrice != null ? Number(t.usdPrice) : null, marketCapUsd: t.mcap != null ? Number(t.mcap) : null, change24h: t.stats24h?.priceChange != null ? Number(t.stats24h.priceChange) : null } : null;
+        }).catch(() => null);
+        if (!j) return;
+        if (out[m]) { out[m].imageUrl = out[m].imageUrl ?? j.icon; return; }
+        out[m] = { symbol: j.symbol, name: j.name, imageUrl: j.icon, priceUsd: j.priceUsd, marketCapUsd: j.marketCapUsd, change24h: j.change24h };
+      }));
       return out;
     });
     return NextResponse.json({ tokens }, { headers: { "Cache-Control": "public, max-age=30" } });

@@ -7,6 +7,8 @@ import { fmtPrice } from "./format";
 
 const usd = (v: number | null | undefined) => (v == null ? "$—" : `$${v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`);
 const SOL = "So11111111111111111111111111111111111111112";
+// Native SOL is not a token account, so no lookup ever returns a picture for it.
+const SOL_LOGO = "https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png";
 
 /**
  * What the agent holds, as positions: chain quantity and value, the average
@@ -46,7 +48,7 @@ export default function PositionsList({
 
   return (
     <div className="overflow-hidden rounded-2xl border border-line">
-      <Row href={`/token/${SOL}`} symbol="SOL" qty={solBalance} value={solUsd} sub="cash" pnl={null} />
+      <Row href={`/token/${SOL}`} symbol="SOL" name="Solana" image={SOL_LOGO} qty={solBalance} value={solUsd} sub="cash" pnl={null} />
       {open.map(({ h, p }) => {
         const b = briefs[h.mint];
         const value = h.usdValue ?? (b?.priceUsd != null ? h.balance * b.priceUsd : null);
