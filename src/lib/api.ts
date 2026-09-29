@@ -107,6 +107,37 @@ export interface AgentProfileResponse {
   }>;
 }
 
+/** The passport's verdict on a mint, as the buy buttons apply it: red never buys, amber asks once more, green is instant. */
+export interface TokenCheck { mint: string; verdict: "red" | "amber" | "green"; why: string | null; passport: string | null }
+export async function getTokenCheck(mint: string): Promise<TokenCheck> {
+  const res = await apiFetch(`${API_BASE}/api/token-check/${encodeURIComponent(mint)}`);
+  if (!res.ok) return { mint, verdict: "amber", why: "Couldn't verify this token right now.", passport: null };
+  return res.json();
+}
+
+export interface TradeResult { ok: boolean; tx?: string; outAmount?: number | null; qty?: number; verdict?: string; needsConfirm?: boolean; error?: string }
+/** A click on the token page is the confirmation: no model, no "reply yes". Same gate as the Telegram tap. */
+export async function tradeBuy(platformId: string, mint: string, usd: number, anyway = false): Promise<TradeResult> {
+  const res = await apiFetch(`${API_BASE}/api/trade/buy`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify({ platformId, mint, usd, anyway }),
+  });
+  const j = (await res.json().catch(() => null)) as TradeResult | { error?: string } | null;
+  if (!res.ok) return { ok: false, error: (j as { error?: string } | null)?.error ?? `That didn't go through (${res.status}).` };
+  return (j as TradeResult) ?? { ok: false, error: "That didn't go through." };
+}
+export async function tradeSell(platformId: string, mint: string, pct: number): Promise<TradeResult> {
+  const res = await apiFetch(`${API_BASE}/api/trade/sell`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify({ platformId, mint, pct }),
+  });
+  const j = (await res.json().catch(() => null)) as TradeResult | { error?: string } | null;
+  if (!res.ok) return { ok: false, error: (j as { error?: string } | null)?.error ?? `That didn't go through (${res.status}).` };
+  return (j as TradeResult) ?? { ok: false, error: "That didn't go through." };
+}
+
 export async function chat(
   platformId: string,
   message: string

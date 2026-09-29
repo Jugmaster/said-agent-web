@@ -8,7 +8,7 @@ import MessageText from "@/components/MessageText";
 import TokenChart from "@/components/token/TokenChart";
 import { fmtMc, fmtPrice } from "@/components/token/format";
 import { useAgent } from "@/hooks/useAgent";
-import { chat, getPortfolio, getPositions, getTokenStats, getTrades, type Position, type TokenStats, type TradeRow } from "@/lib/api";
+import { chat, getPortfolio, getPositions, getTokenStats, getTrades, type Position, type TokenStats, type TradeRow, getTokenCheck, tradeBuy, tradeSell, type TokenCheck } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 import { requestRefresh } from "@/lib/refresh";
 
@@ -58,6 +58,9 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
   const [busy, setBusy] = useState<string | null>(null);
   const [reply, setReply] = useState<string | null>(null);
   const [custom, setCustom] = useState("");
+  // The passport's verdict, as the buttons apply it. Unknown reads as amber until the check answers.
+  const [check, setCheck] = useState<TokenCheck | null>(null);
+  const [txSig, setTxSig] = useState<string | null>(null);
 
   const load = useCallback(() => {
     getTokenStats(mint).then(setStats).catch(() => setStats(null));
@@ -72,6 +75,7 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
     getPositions(platformId).then((ps) => setPosition(ps?.find((p) => p.mint === mint) ?? null)).catch(() => {});
     if (wallet) getPortfolio(wallet).then((p) => setQty(mint === "So11111111111111111111111111111111111111112" ? p.solBalance : p.tokens.find((t) => t.mint === mint)?.balance ?? 0)).catch(() => {});
     fetch(`${SAID_API}/api/asset/${mint}`).then((r) => (r.ok ? r.json() : null)).then(setPassport).catch(() => {});
+    getTokenCheck(mint).then(setCheck).catch(() => setCheck({ mint, verdict: "amber", why: "Couldn't verify this token right now.", passport: null }));
   }, [mint, platformId, wallet]);
   useEffect(() => { load(); }, [load]);
 
@@ -82,13 +86,31 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
   const pnlPct = pnl != null && position && position.costUsd > 0 ? (pnl / position.costUsd) * 100 : null;
   const age = stats?.createdAt ? timeAgo(stats.createdAt).replace(" ago", "") : null;
 
-  const tell = async (text: string) => {
-    setBusy(text); setReply(null);
+  // A click is the confirmation. No model between the button and the swap; the same
+  // verdict, identity and credit rules as a tap in Telegram. Red never buys, amber
+  // asks once more with an "anyway" button, green is instant.
+  const verdict = check?.verdict ?? "amber";
+  const anyway = verdict === "amber";
+  const buy = async (usdAmount: number) => {
+    const label = `Buy $${usdAmount}${anyway ? " anyway" : ""}`;
+    setBusy(label); setReply(null); setTxSig(null);
     try {
-      const r = await chat(platformId, text);
-      setReply(r.message);
-      requestRefresh();
-      setTimeout(load, 2500);
+      const r = await tradeBuy(platformId, mint, usdAmount, anyway);
+      if (r.ok) { setReply(`Bought $${usdAmount} of ${symbol}.`); setTxSig(r.tx ?? null); requestRefresh(); setTimeout(load, 2500); }
+      else setReply(r.error ?? "That didn't go through.");
+    } catch (e) {
+      setReply(e instanceof Error ? e.message : "That didn't go through.");
+    } finally {
+      setBusy(null);
+    }
+  };
+  const sell = async (pct: number) => {
+    const label = pct >= 100 ? "Sell all" : `Sell ${pct}%`;
+    setBusy(label); setReply(null); setTxSig(null);
+    try {
+      const r = await tradeSell(platformId, mint, pct);
+      if (r.ok) { setReply(`Sold ${pct >= 100 ? "all" : `${pct}%`} of your ${symbol}.`); setTxSig(r.tx ?? null); requestRefresh(); setTimeout(load, 2500); }
+      else setReply(r.error ?? "That didn't go through.");
     } catch (e) {
       setReply(e instanceof Error ? e.message : "That didn't go through.");
     } finally {
@@ -204,25 +226,37 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
           </div>
 
           <div className="rounded-2xl border border-line bg-paper p-4">
-            <div className="text-xs font-medium uppercase tracking-wider text-grey">Tell your agent</div>
-            <div className="mt-2 grid grid-cols-4 gap-1.5">
-              {[10, 25, 50, 100].map((n) => (
-                <button key={n} type="button" disabled={!!busy} onClick={() => tell(`buy $${n} of ${symbol} (${mint})`)} className="rounded-xl bg-ink py-2 text-sm font-semibold text-cream transition hover:bg-coral-deep disabled:opacity-40">${n}</button>
-              ))}
-            </div>
-            <form className="mt-2 flex gap-1.5" onSubmit={(e) => { e.preventDefault(); const n = Number(custom); if (n > 0) tell(`buy $${n} of ${symbol} (${mint})`); }}>
-              <input inputMode="decimal" value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Any amount, $" className="min-w-0 flex-1 rounded-xl border border-line bg-cream px-3 py-2 text-sm focus:border-ink focus:outline-none" />
-              <button type="submit" disabled={!!busy || !(Number(custom) > 0)} className="rounded-xl px-3 py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">Buy</button>
-            </form>
+            <div className="text-xs font-medium uppercase tracking-wider text-grey">Buy</div>
+            {verdict === "red" ? (
+              <p className="mt-2 text-sm text-coral-text">{check?.why ?? "Your agent won't buy this."} You can still sell what you hold.</p>
+            ) : (
+              <>
+                {verdict === "amber" && <p className="mt-2 text-xs text-coral-text">{check?.why ?? "Couldn't verify this token right now."} Buy only if you're sure.</p>}
+                <div className="mt-2 grid grid-cols-4 gap-1.5">
+                  {[10, 25, 50, 100].map((n) => (
+                    <button key={n} type="button" disabled={!!busy || !check} onClick={() => buy(n)} className="rounded-xl bg-ink py-2 text-sm font-semibold text-cream transition hover:bg-coral-deep disabled:opacity-40">${n}{anyway ? "*" : ""}</button>
+                  ))}
+                </div>
+                <form className="mt-2 flex gap-1.5" onSubmit={(e) => { e.preventDefault(); const n = Number(custom); if (n > 0) buy(n); }}>
+                  <input inputMode="decimal" value={custom} onChange={(e) => setCustom(e.target.value)} placeholder="Any amount, $" className="min-w-0 flex-1 rounded-xl border border-line bg-cream px-3 py-2 text-sm focus:border-ink focus:outline-none" />
+                  <button type="submit" disabled={!!busy || !check || !(Number(custom) > 0)} className="rounded-xl px-3 py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">{anyway ? "Buy anyway" : "Buy"}</button>
+                </form>
+              </>
+            )}
             {qty != null && qty > 0 && (
               <div className="mt-2 grid grid-cols-2 gap-1.5">
-                <button type="button" disabled={!!busy} onClick={() => tell(`sell half of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">Sell half</button>
-                <button type="button" disabled={!!busy} onClick={() => tell(`sell all of my ${symbol} (${mint})`)} className="rounded-xl py-2 text-sm font-medium text-coral-text shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-coral hover:text-cream disabled:opacity-40">Sell all</button>
+                <button type="button" disabled={!!busy} onClick={() => sell(50)} className="rounded-xl py-2 text-sm font-medium text-ink shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-ink hover:text-cream disabled:opacity-40">Sell half</button>
+                <button type="button" disabled={!!busy} onClick={() => sell(100)} className="rounded-xl py-2 text-sm font-medium text-coral-text shadow-[inset_0_0_0_1px_var(--color-ring)] transition hover:bg-coral hover:text-cream disabled:opacity-40">Sell all</button>
               </div>
             )}
-            <p className="mt-2 text-[11px] text-grey">Goes through your agent: same allowance, same rules as chat. It quotes first; nothing moves until it says so.</p>
-            {busy && <p className="mt-2 text-xs text-grey">Asking… &ldquo;{busy}&rdquo;</p>}
-            {reply && <div className="mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm"><MessageText text={reply} /></div>}
+            <p className="mt-2 text-[11px] text-grey">One click, and it&apos;s done through your agent: same allowance, same rules as chat.{anyway ? " * This one asks no further questions once you click." : ""}</p>
+            {busy && <p className="mt-2 text-xs text-grey">{busy}…</p>}
+            {reply && (
+              <div className="mt-2 rounded-xl border border-line bg-card px-3 py-2 text-sm">
+                <MessageText text={reply} />
+                {txSig && <a href={`https://solscan.io/tx/${txSig}`} target="_blank" rel="noreferrer" className="mt-1 block text-xs text-grey underline underline-offset-2 hover:text-ink">View on Solscan ↗</a>}
+              </div>
+            )}
             <Link href="/chat" className="mt-2 block text-xs text-grey underline underline-offset-2 hover:text-ink">Or say it your own way in chat →</Link>
           </div>
 
