@@ -3,7 +3,7 @@
 import { createContext, useContext, type ReactNode } from "react";
 import type { Launch } from "@/lib/launch";
 
-const OFF: Launch = { launched: false, mint: null, ticker: null };
+const OFF: Launch = { launched: false, fundingOpen: false, mint: null, ticker: null };
 const Ctx = createContext<Launch>(OFF);
 
 /**

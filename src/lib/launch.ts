@@ -11,14 +11,25 @@
  * The root layout is force-dynamic for exactly that reason.
  */
 export interface Launch {
+  /** The mint exists: the token, the ticker, the ledger and the buybacks are public. */
   launched: boolean;
+  /** Credits are switched on: an agent can actually be funded today. Only ever true once launched. */
+  fundingOpen: boolean;
   mint: string | null;
   ticker: string | null;
 }
 
+/**
+ * Three stages, two variables. No mint: the product without the funded
+ * story. Mint set: the token is real and the funded story is told as what
+ * is coming. Mint set and ATCHA_FUNDING_OPEN=true: it is live. A site that
+ * promised a funded account before one could be had would be lying, and a
+ * judge would notice.
+ */
 export function getLaunch(): Launch {
   const mint = (process.env.ATCHA_MINT ?? "").trim();
   const ticker = (process.env.ATCHA_TICKER ?? "").trim();
   const launched = mint.length > 0;
-  return { launched, mint: launched ? mint : null, ticker: launched && ticker ? ticker : null };
+  const fundingOpen = launched && process.env.ATCHA_FUNDING_OPEN === "true";
+  return { launched, fundingOpen, mint: launched ? mint : null, ticker: launched && ticker ? ticker : null };
 }

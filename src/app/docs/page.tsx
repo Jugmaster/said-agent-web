@@ -49,7 +49,10 @@ const Q = ({ children }: { children: ReactNode }) => <p className={s.faqQ}>{chil
 export default function DocsPage() {
   // Before the mint exists the docs cannot describe funding or levels, so those
   // sections and every mention of them sit out, and the numbering closes up.
-  const { launched } = getLaunch();
+  // Once it exists they return, told as what is coming until funding opens.
+  const { launched, fundingOpen, ticker } = getLaunch();
+  const soon = launched && !fundingOpen;
+  const tick = ticker ? `$${ticker.replace(/^\$/, "")}` : "the token";
   const sections = launched ? SECTIONS : SECTIONS.filter((x) => x.id !== "funded" && x.id !== "ladder");
   const num = (id: string) => sections.findIndex((x) => x.id === id) + 1;
   return (
@@ -107,6 +110,8 @@ bot  →  ✓ Vega is ready.
 
           {launched && (
           <Sec id="funded" n={num("funded")} title="Funded: two kinds of money">
+            {soon && <p><strong>Funding has not opened yet.</strong> Everything below is how it works from the day it does; the entry counts from today, so the five people you pay now are the five that fund you then.</p>}
+            <p>The budget is {tick}&apos;s money: the token&apos;s creator rewards top up the pool that funds every agent, and every fee buys {tick} back and locks it, on the <Link href="/ledger">ledger</Link>.</p>
             <p>Your balance is one number with two things inside it. The dashboard never hides which is which.</p>
             <table className={s.table}>
               <thead><tr><th></th><th>The budget</th><th>Your money</th></tr></thead>

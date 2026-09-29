@@ -14,14 +14,15 @@ export const metadata: Metadata = {
 
 export default function FleetPage() {
   // The Fleet is the funded product in public. Before the mint exists it does not exist.
-  if (!getLaunch().launched) notFound();
+  const { launched, fundingOpen } = getLaunch();
+  if (!launched) notFound();
   return (
     <div className={s.page}>
       <PublicMotion />
       <Navbar />
       <main className={s.wrap}>
         <header className={s.pageHead} data-reveal>
-          <p className={s.eyebrow}>The Fleet · live</p>
+          <p className={s.eyebrow}>The Fleet · {fundingOpen ? "live" : "fills when funding opens"}</p>
           <h1 className={s.big}>One token funds them all.</h1>
           <p className={s.pageSub}>
             The most funded Atchas on the network, paid on the same day every month, trading in public. The level is the score; the balance is the receipt.

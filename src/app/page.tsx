@@ -29,7 +29,9 @@ const PRELAUNCH_CHIPS = CHIPS.filter(([, what]) => !/funded|level/i.test(what));
 
 export default function LandingPage() {
   const { ready, authenticated, login } = usePrivy();
-  const { launched } = useLaunch();
+  const { launched, fundingOpen, ticker } = useLaunch();
+  const soon = launched && !fundingOpen;
+  const tick = ticker ? `$${ticker.replace(/^\$/, "")}` : null;
   const router = useRouter();
   const [loginInitiated, setLoginInitiated] = useState(false);
 
@@ -49,7 +51,7 @@ export default function LandingPage() {
     }
   };
 
-  const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : launched ? "Get your funded Atcha" : "Get your Atcha";
+  const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : fundingOpen ? "Get your funded Atcha" : "Get your Atcha";
   const chips = launched ? CHIPS : PRELAUNCH_CHIPS;
   const lead = launched ? "Comes funded. Pays" : "Trades anything. Pays";
 
@@ -72,7 +74,7 @@ export default function LandingPage() {
         </h1>
         {launched ? (
           <p className={s.sub}>
-            It starts with <strong>money in it</strong>{" "}and it does everything: trades anything on Solana, holds the
+            {soon ? <>It will start with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}. Funding opens soon; the entry is open now.</> : <>It starts with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}</>}{" "}and it does everything: trades anything on Solana, holds the
             S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
             work with, every month.
           </p>
@@ -103,11 +105,12 @@ export default function LandingPage() {
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
           <h2 className={s.big}>{launched ? "Our money first. All upside." : "One agent. All of it."}</h2>
+          {soon && <p className={s.eyebrow} style={{ marginTop: 10 }}>Funding opens soon · pay your five now and be first in line</p>}
         </div>
         <div className={s.capGrid} data-stagger>
           {launched ? (
             <>
-              <div className={s.cap}><span className={s.n}>01</span><h3>Comes funded</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own. That budget is what&apos;s at risk, not your money.</p></div>
+              <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""}</p></div>
               <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
               <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
             </>
@@ -148,7 +151,7 @@ export default function LandingPage() {
                 <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Level 2</p><p>Earned, not applied for</p></div><span className={`${s.pill} ${s.pm}`}>Unlocked</span></div>
                 <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>Budget lands</p><p>Its own money, in SOL</p></div><span className={`${s.pill} ${s.pg}`}>Funded</span></div>
                 <div className={s.step} data-step><span className={s.dot} /><div><p className={s.sh}>First trade</p><p>SOL, at market, on its own money</p></div><span className={`${s.pill} ${s.pg}`}>Trading</span></div>
-                <div className={s.done} data-done><span className={s.check}>✓</span> Funded · 1 Oct · posted in public</div>
+                <div className={s.done} data-done><span className={s.check}>✓</span> {soon ? "Funded · when funding opens · posted in public" : "Funded · posted in public"}</div>
               </div>
             </div>
             </div>
@@ -166,15 +169,17 @@ export default function LandingPage() {
         <div className={s.close} data-close>
           <div className={s.closeIn}>
             <p className={s.eyebrow}>Ready when you are</p>
-            {launched ? (
+            {fundingOpen ? (
               <h2>Get your <span className={s.hl}>funded</span> Atcha.</h2>
             ) : (
               <h2>Get your <span className={s.hl}>Atcha</span>.</h2>
             )}
             <p className={s.csub}>
-              {launched
+              {fundingOpen
                 ? "Free, no seed phrase, funded once you've paid five verified X accounts. Sign in with X or Telegram and it's yours in one message."
-                : "Free, no seed phrase. Sign in with X or Telegram and it's yours in one message."}
+                : soon
+                  ? "Free, no seed phrase. Pay five verified X accounts now and your budget lands the day funding opens. Sign in with X or Telegram and it's yours in one message."
+                  : "Free, no seed phrase. Sign in with X or Telegram and it's yours in one message."}
             </p>
             <div className={s.ctas}>
               <button type="button" className={`${s.btn} ${s.btnCream}`} onClick={start} disabled={!ready}>

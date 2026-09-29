@@ -24,7 +24,8 @@ const monthName = (m: string) => new Date(`${m}-01T00:00:00Z`).toLocaleDateStrin
 
 export default async function LedgerPage() {
   // The Ledger is where the token's money goes. Before the mint exists there is nothing to show.
-  if (!getLaunch().launched) notFound();
+  const { launched, fundingOpen, ticker } = getLaunch();
+  if (!launched) notFound();
   const real = await getLedger();
   // Never an example, never an estimate. If the API is down, say so; zeros are zeros.
   if (!real) {
@@ -59,7 +60,7 @@ export default async function LedgerPage() {
       <Navbar />
       <main className={s.wrap}>
         <header className={s.pageHead} data-reveal>
-          <p className={s.eyebrow}>The ledger · {L.live ? "live" : "dry run"}</p>
+          <p className={s.eyebrow}>The ledger{ticker ? ` · $${ticker.replace(/^\$/, "")}` : ""} · {L.live && fundingOpen ? "live" : fundingOpen ? "dry run" : "funding opens soon"}</p>
           <h1 className={s.big}>Where the money goes.</h1>
           <p className={s.pageSub}>
             The token funds the agents. Nothing else. This page is the account: what the token earned, what the pool paid out, what came back, and what was bought and locked. Every month, every line, in public.
