@@ -12,7 +12,6 @@ import DailyTasks from "@/components/DailyTasks";
 import CashbackCard from "@/components/CashbackCard";
 import FleetBoard from "@/components/FleetBoard";
 import ClaimHandle from "@/components/ClaimHandle";
-import AutopilotCard from "@/components/AutopilotCard";
 import LevelUp from "@/components/LevelUp";
 import { useAgent } from "@/hooks/useAgent";
 import {
@@ -110,12 +109,7 @@ function Level({ platformId }: { platformId: string }) {
         </div>
       )}
 
-      {/* Autopilot: the agent trades the budget on its own. */}
-      {credits !== null && (
-        <div className="mt-6">
-          <AutopilotCard platformId={platformId} funded={!!credits?.funded} />
-        </div>
-      )}
+      {/* Autopilot: off the product until it has been backtested and run in shadow. The card and its routes stay in the code. */}
 
       {credits && credits.funded && (
         <div className="mt-6">

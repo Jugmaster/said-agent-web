@@ -4,7 +4,7 @@ import { useLaunch } from "@/components/LaunchProvider";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getAutopilot, getHandle, getTrades, type CreditsSummary } from "@/lib/api";
+import { getHandle, getTrades, type CreditsSummary } from "@/lib/api";
 
 interface Quest { id: string; title: string; reward: string; href: string; cta: string; have: number; need: number; done: boolean }
 
@@ -17,12 +17,10 @@ export default function LevelUp({ platformId, summary }: { platformId: string; s
   const { launched } = useLaunch();
   const [handle, setHandle] = useState<string | null | undefined>(undefined);
   const [traded, setTraded] = useState<number | null>(null);
-  const [autopilot, setAutopilot] = useState<boolean | null>(null);
   useEffect(() => {
     let alive = true;
     getHandle(platformId).then((h) => alive && setHandle(h?.handle ?? null)).catch(() => alive && setHandle(null));
     getTrades(platformId, { limit: 1 }).then((t) => alive && setTraded(t.length)).catch(() => alive && setTraded(0));
-    getAutopilot(platformId).then((a) => alive && setAutopilot(a?.config.enabled ?? null)).catch(() => alive && setAutopilot(null));
     return () => { alive = false; };
   }, [platformId]);
 
@@ -38,7 +36,6 @@ export default function LevelUp({ platformId, summary }: { platformId: string; s
     { id: "name", title: "Claim your @name", reward: "Your page: atcha.cash/@you", href: "/level", cta: "Claim it", have: handle ? 1 : 0, need: 1, done: !!handle },
     { id: "trade", title: "Make your first trade", reward: "Your first position", href: "/portfolio", cta: "Look up a token", have: traded ? 1 : 0, need: 1, done: !!traded },
     { id: "cash", title: "Add your own money", reward: "Trades without a cap, and pays anyone by name", href: "/fund", cta: "Add money", have: (s?.ownUsd ?? 0) > 0 ? 1 : 0, need: 1, done: (s?.ownUsd ?? 0) > 0 },
-    { id: "auto", title: "Turn on Autopilot", reward: "It trades the budget for you and tells you why", href: "/level", cta: "Switch it on", have: autopilot ? 1 : 0, need: 1, done: !!autopilot },
     { id: "streak", title: `Keep a ${days?.need ?? 30}-day streak`, reward: `Level 3 · $75 a month, and your gains become yours`, href: "/level", cta: "Today's things", have: level >= 3 ? days?.need ?? 30 : days?.have ?? s?.streak ?? 0, need: days?.need ?? 30, done: level >= 3 },
   ];
   const doneCount = quests.filter((q) => q.done).length;
