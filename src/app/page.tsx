@@ -10,19 +10,20 @@ import Preloader from "@/components/Preloader";
 import { useLaunch } from "@/components/LaunchProvider";
 import s from "./landing.module.css";
 
-const NAMES = ["@the_groupchat", "@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@anyone."];
-const TG = "https://t.me/saidinfrabot";
+// Only handles: the product pays a person by name. No group pay, so no group in the rotation.
+const NAMES = ["@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@yourbarber", "@anyone."];
+const TG = "https://t.me/atchacashbot";
 const CHIPS: [string, string][] = [
   ["@little_bro", "got a funded Atcha"],
   ["@yourbarber", "got paid $25"],
-  ["@the_groupchat", "split $180"],
+  ["fake NVDAx", "refused"],
   ["@renata_paints", "got tipped"],
   ["@0xanalyst", "got funded $25"],
   ["@sol_maxi", "reached level 3"],
-  ["@dinner_crew", "settled up"],
+  ["$SOL", "bought in one click"],
   ["@mum", "got flowers money"],
   ["@that_plumber", "got paid"],
-  ["@weekend_five", "chipped in"],
+  ["@new_here", "signed in, $5 waiting"],
 ];
 // Before the mint exists the page cannot mention funding, so those chips sit out.
 const PRELAUNCH_CHIPS = CHIPS.filter(([, what]) => !/funded|level/i.test(what));
@@ -53,7 +54,7 @@ export default function LandingPage() {
 
   const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : fundingOpen ? "Get your funded Atcha" : "Get your Atcha";
   const chips = launched ? CHIPS : PRELAUNCH_CHIPS;
-  const lead = launched ? "Comes funded. Pays" : "Trades anything. Pays";
+  const lead = launched ? "Comes funded. Pays" : "Send money like a DM.";
 
   return (
     <div className={s.page}>
@@ -68,9 +69,9 @@ export default function LandingPage() {
       <Navbar />
 
       <header className={`${s.hero} ${s.wrap}`} data-hero>
-        <h1 className={s.h1} aria-label={`${lead} anyone you can name.`}>
+        <h1 className={s.h1} aria-label={launched ? `${lead} anyone you can name.` : `${lead} Never buy a fake.`}>
           <span className={s.row}><span>{lead}</span></span>
-          <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
+          <span className={s.row}><span><span className={s.swatch}>{launched ? <Rotator words={NAMES} /> : "Never buy a fake."}</span></span></span>
         </h1>
         {launched ? (
           <p className={s.sub}>
@@ -80,8 +81,8 @@ export default function LandingPage() {
           </p>
         ) : (
           <p className={s.sub}>
-            Your own AI on Solana. It <strong>trades anything</strong>, holds the S&amp;P, pays anyone you can name, buys
-            things, runs your DCA. Say it in plain English and it does the rest.
+            An AI agent with its own wallet. <strong>Type a handle and it pays them.</strong> Paste a token and it
+            checks it first, then buys in one click or tells you why not.
           </p>
         )}
         <div className={s.ctas}>
@@ -104,21 +105,21 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>{launched ? "Our money first. 80% of the upside is yours." : "One agent. All of it."}</h2>
+          <h2 className={s.big}>{launched ? "Our money first. 80% of the upside is yours." : "Buys in one click. Refuses the fakes. Pays by @."}</h2>
           {soon && <p className={s.eyebrow} style={{ marginTop: 10 }}>Funding opens soon · pay your five now and be first in line</p>}
         </div>
         <div className={s.capGrid} data-stagger>
           {launched ? (
             <>
               <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""}</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click, refuses fakes</h3><p>Any token the passport clears, tokenised stocks too. From a chart, a pasted address or a sentence. An impersonator is refused with the reason.</p></div>
               <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. 80% of what it makes, realised, is yours, from the first settlement.</p></div>
             </>
           ) : (
             <>
-              <div className={s.cap}><span className={s.n}>01</span><h3>Pays by name</h3><p>Any X or Telegram handle, a dollar or a hundred. Not on Atcha yet? They claim it by logging in. Every name is checked before a cent moves.</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
-              <div className={s.cap}><span className={s.n}>03</span><h3>Does the rest</h3><p>Buys things, makes calls, sends email, runs your DCA, watches a price. One message and it handles it, with a receipt for everything.</p></div>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Pays by @</h3><p>Any X or Telegram handle, a dollar or a hundred, from one sentence. Not on Atcha yet? The money waits under their name and is theirs the moment they sign in.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>From a chart or a pasted contract address. No confirm step, a receipt on every fill. Tokens, tokenised stocks, a bit every day or at a price: say it and it&apos;s done.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Refuses the fakes</h3><p>Every token is checked against its passport before a cent moves. An impersonator is refused with the reason. One it can&apos;t verify asks you once. A real one goes straight through.</p></div>
             </>
           )}
         </div>

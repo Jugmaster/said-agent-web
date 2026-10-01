@@ -21,8 +21,8 @@ export function generateMetadata(): Metadata {
   const { launched } = getLaunch();
   const description = launched
     ? "Your AI comes funded. Funded every month, sized by its level. Pay anyone you can name."
-    : "Your own AI on Solana. Trades anything, pays anyone you can name, buys things, runs your DCA.";
-  const short = launched ? "Your AI comes funded. Pay anyone you can name." : "Your own AI on Solana. Pays anyone you can name.";
+    : "Send money like a DM. Never buy a fake. An AI agent with its own wallet: type a handle and it pays them, paste a token and it checks it before it buys.";
+  const short = launched ? "Your AI comes funded. Pay anyone you can name." : "Send money like a DM. Never buy a fake.";
   return {
   metadataBase: new URL("https://atcha.cash"),
   title: "Atcha",
