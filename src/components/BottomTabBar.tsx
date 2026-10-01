@@ -6,13 +6,13 @@ import type { ComponentType } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
-import { ChatIcon, SendIcon, LevelIcon, SettingsIcon } from "./NavIcons";
+import { ChatIcon, SendIcon, TradeIcon, LevelIcon, SettingsIcon } from "./NavIcons";
 
 /** App surfaces where the mobile tab bar belongs (signed-in only). */
 // NOTE: /calls is here so the tab bar RENDERS there (a deep link to Comms
 // otherwise strands the user with no navigation), even though Comms has no
 // tab of its own — six tabs would drop each below a comfortable width.
-export const APP_ROUTES = ["/home", "/chat", "/send", "/level", "/portfolio", "/token", "/activity", "/fund", "/calls", "/settings"];
+export const APP_ROUTES = ["/home", "/chat", "/send", "/trade", "/level", "/portfolio", "/token", "/activity", "/fund", "/calls", "/settings"];
 
 // Agent-first: on a phone the product IS the agent, so Agent is home and the
 // other two are the places you go to look at something. Everything else (send,
@@ -26,6 +26,7 @@ const TABS: { href: string; label: string; icon: ComponentType<{ className?: str
   // already renders recent activity with a "View all" link, so a tab would
   // spend a quarter of the bar on a duplicate.
   { href: "/send", label: "Pay", icon: SendIcon },
+  { href: "/trade", label: "Trade", icon: TradeIcon },
   // Level is the product: the funded card, today's things, the record, the
   // board. Wallet is plumbing and lives behind the card's Add money / Take out.
   { href: "/level", label: "Level", icon: LevelIcon },
