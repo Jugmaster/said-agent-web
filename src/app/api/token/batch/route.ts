@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { iconUrl } from "@/lib/icon";
 import { cached } from "@/lib/server-cache";
 
 /** Name, logo, price and 24h change for up to 30 mints at once (DexScreener), for the positions list. */
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
         const cur = out[a];
         const liq = p.liquidity?.usd ?? 0;
         if (cur && (cur as any)._liq >= liq) continue;
-        out[a] = { symbol: p.baseToken.symbol, name: p.baseToken.name, imageUrl: p.info?.imageUrl ?? null, priceUsd: p.priceUsd != null ? Number(p.priceUsd) : null, marketCapUsd: p.marketCap ?? null, change24h: p.priceChange?.h24 ?? null, ...({ _liq: liq } as object) };
+        out[a] = { symbol: p.baseToken.symbol, name: p.baseToken.name, imageUrl: iconUrl(p.info?.imageUrl), priceUsd: p.priceUsd != null ? Number(p.priceUsd) : null, marketCapUsd: p.marketCap ?? null, change24h: p.priceChange?.h24 ?? null, ...({ _liq: liq } as object) };
       }
       for (const k of Object.keys(out)) delete (out[k] as any)._liq;
       // DexScreener has no picture for many listed tokens (the xStocks among them),
@@ -31,7 +32,7 @@ export async function GET(req: Request) {
           if (!r.ok) throw new Error(`jup ${r.status}`);
           const arr = (await r.json()) as any[];
           const t = arr.find((x) => x?.id === m) ?? null;
-          return t ? { symbol: String(t.symbol ?? ""), name: String(t.name ?? ""), icon: (t.icon as string | null) ?? null, priceUsd: t.usdPrice != null ? Number(t.usdPrice) : null, marketCapUsd: t.mcap != null ? Number(t.mcap) : null, change24h: t.stats24h?.priceChange != null ? Number(t.stats24h.priceChange) : null } : null;
+          return t ? { symbol: String(t.symbol ?? ""), name: String(t.name ?? ""), icon: iconUrl(t.icon as string | null), priceUsd: t.usdPrice != null ? Number(t.usdPrice) : null, marketCapUsd: t.mcap != null ? Number(t.mcap) : null, change24h: t.stats24h?.priceChange != null ? Number(t.stats24h.priceChange) : null } : null;
         }).catch(() => null);
         if (!j) return;
         if (out[m]) { out[m].imageUrl = out[m].imageUrl ?? j.icon; return; }

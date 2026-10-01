@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { iconUrl } from "@/lib/icon";
 
 /** Token search by name, symbol or mint, Solana only, via DexScreener. */
 export async function GET(req: Request) {
@@ -18,7 +19,7 @@ export async function GET(req: Request) {
         mint: p.baseToken.address,
         symbol: p.baseToken.symbol,
         name: p.baseToken.name,
-        imageUrl: p.info?.imageUrl ?? null,
+        imageUrl: iconUrl(p.info?.imageUrl),
         priceUsd: p.priceUsd != null ? Number(p.priceUsd) : null,
         marketCapUsd: p.marketCap ?? null,
         liquidityUsd: p.liquidity?.usd ?? null,

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { iconUrl } from "@/lib/icon";
 import { cached } from "@/lib/server-cache";
 
 /**
@@ -59,7 +60,7 @@ export async function loadTokenStats(mint: string): Promise<TokenStats> {
       mint,
       symbol: p?.baseToken?.symbol ?? (mint === SOL ? "SOL" : mint.slice(0, 4)),
       name: p?.baseToken?.name ?? (mint === SOL ? "Solana" : mint.slice(0, 8)),
-      imageUrl: p?.info?.imageUrl ?? null,
+      imageUrl: iconUrl(p?.info?.imageUrl),
       priceUsd: p?.priceUsd != null ? Number(p.priceUsd) : pool ? Number(pool.attributes.base_token_price_usd) : null,
       marketCapUsd: p?.marketCap ?? (pool?.attributes?.market_cap_usd != null ? Number(pool.attributes.market_cap_usd) : null),
       fdvUsd: p?.fdv ?? (pool?.attributes?.fdv_usd != null ? Number(pool.attributes.fdv_usd) : null),
