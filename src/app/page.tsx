@@ -16,7 +16,7 @@ const TG = "https://t.me/atchacashbot";
 const CHIPS: [string, string][] = [
   ["@little_bro", "got a funded Atcha"],
   ["@yourbarber", "got paid $25"],
-  ["fake NVDAx", "refused"],
+  ["@0xanalyst", "got tipped $20"],
   ["@renata_paints", "got tipped"],
   ["@0xanalyst", "got funded $25"],
   ["@sol_maxi", "reached level 3"],
@@ -69,9 +69,9 @@ export default function LandingPage() {
       <Navbar />
 
       <header className={`${s.hero} ${s.wrap}`} data-hero>
-        <h1 className={s.h1} aria-label={launched ? `${lead} anyone you can name.` : `${lead} Never buy a fake.`}>
+        <h1 className={s.h1} aria-label={launched ? `${lead} anyone you can name.` : `${lead} To anyone you can name.`}>
           <span className={s.row}><span>{lead}</span></span>
-          <span className={s.row}><span><span className={s.swatch}>{launched ? <Rotator words={NAMES} /> : "Never buy a fake."}</span></span></span>
+          <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
         </h1>
         {launched ? (
           <p className={s.sub}>
@@ -81,8 +81,8 @@ export default function LandingPage() {
           </p>
         ) : (
           <p className={s.sub}>
-            An AI agent with its own wallet. <strong>Type a handle and it pays them.</strong> Paste a token and it
-            checks it first, then buys in one click or tells you why not.
+            An AI agent with its own wallet. <strong>Type a handle and an amount and it pays them</strong>, even if
+            they&apos;ve never heard of Atcha: the money waits under their name. It trades for you too, one click from a chart.
           </p>
         )}
         <div className={s.ctas}>
@@ -105,21 +105,21 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>{launched ? "Our money first. 80% of the upside is yours." : "Buys in one click. Refuses the fakes. Pays by @."}</h2>
+          <h2 className={s.big}>{launched ? "Our money first. 80% of the upside is yours." : "Pays by @. Buys in one click. Does the rest."}</h2>
           {soon && <p className={s.eyebrow} style={{ marginTop: 10 }}>Funding opens soon · pay your five now and be first in line</p>}
         </div>
         <div className={s.capGrid} data-stagger>
           {launched ? (
             <>
               <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""}</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click, refuses fakes</h3><p>Any token the passport clears, tokenised stocks too. From a chart, a pasted address or a sentence. An impersonator is refused with the reason.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>Any token, tokenised stocks too. From a chart, a pasted address or a sentence, with a receipt on every fill.</p></div>
               <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. 80% of what it makes, realised, is yours, from the first settlement.</p></div>
             </>
           ) : (
             <>
               <div className={s.cap}><span className={s.n}>01</span><h3>Pays by @</h3><p>Any X or Telegram handle, a dollar or a hundred, from one sentence. Not on Atcha yet? The money waits under their name and is theirs the moment they sign in.</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>From a chart or a pasted contract address. No confirm step, a receipt on every fill. Tokens, tokenised stocks, a bit every day or at a price: say it and it&apos;s done.</p></div>
-              <div className={s.cap}><span className={s.n}>03</span><h3>Refuses the fakes</h3><p>Every token is checked against its passport before a cent moves. An impersonator is refused with the reason. One it can&apos;t verify asks you once. A real one goes straight through.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>From a chart or a pasted contract address. No confirm step, a receipt on every fill. It checks the token is the real one first and says so if it isn&apos;t.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Does the rest</h3><p>A bit every day, at a price, tokenised stocks, buying things, a call or an email. One message and it handles it, with a receipt for everything.</p></div>
             </>
           )}
         </div>
