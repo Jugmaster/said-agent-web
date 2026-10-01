@@ -58,10 +58,10 @@ export default function Navbar() {
   }, [menuOpen, navOpen]);
 
   // Before the mint exists the funded sections and the Fleet are not on the site.
-  const { launched } = useLaunch();
+  const { launched, ticker } = useLaunch();
   const NAV: Array<[string, string]> = launched
     ? [
-        ["/atcha", "The token"],
+        ["/atcha", `$${(ticker ?? "ATCHA").replace(/^\$/, "")}`],
         ["/#funded", "Funded"],
         ["/#how", "How it works"],
         ["/fleet", "Fleet"],
