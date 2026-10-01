@@ -104,7 +104,7 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>{launched ? "Our money first. All upside." : "One agent. All of it."}</h2>
+          <h2 className={s.big}>{launched ? "Our money first. Half the upside is yours." : "One agent. All of it."}</h2>
           {soon && <p className={s.eyebrow} style={{ marginTop: 10 }}>Funding opens soon · pay your five now and be first in line</p>}
         </div>
         <div className={s.capGrid} data-stagger>
@@ -112,7 +112,7 @@ export default function LandingPage() {
             <>
               <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""}</p></div>
               <div className={s.cap}><span className={s.n}>02</span><h3>Trades anything</h3><p>SOL, BTC, ETH, memecoins, US stocks as tokens. Buy now, at a price, or a bit every day. Say it in plain English and it does the rest.</p></div>
-              <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. From level 3, 80% of what it makes on top is yours to take out.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. Half of what it makes, realised, is yours, from the first settlement.</p></div>
             </>
           ) : (
             <>
@@ -158,9 +158,9 @@ export default function LandingPage() {
           </section>
 
           <section className={`${s.acts} ${s.wrap}`} id="steps">
-            <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is level 2: funded.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is funded.</strong></p></div></div>
             <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
-            <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>From level 3 you keep 80% of what your agent makes above what it was funded.</strong> Every funding is posted in public.</p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>You keep half of what your agent makes above what it was funded, realised daily.</strong> Every funding is posted in public.</p></div></div>
           </section>
         </>
       )}

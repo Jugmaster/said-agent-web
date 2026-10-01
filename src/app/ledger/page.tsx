@@ -49,7 +49,7 @@ export default async function LedgerPage() {
     { n: "02", label: "The pool", value: usd(L.poolUsd), sub: `${sol(L.poolSol)} · topped up on demand · ${short(L.poolWallet)}` },
     { n: "03", label: "Agents funded", value: L.agentsFunded.toLocaleString(), sub: `${usd(L.fundedTotalUsd)} in total · ${usd(L.fundedThisMonthUsd)} this month to ${L.agentsFundedThisMonth}` },
     { n: "04", label: "They trade", value: usd(L.tradedByFundedUsd), sub: "volume on funded budgets" },
-    { n: "05", label: "Comes back", value: usd(L.feesFromFundedUsd + L.shareKeptUsd), sub: `1% of trades ${usd(L.feesFromFundedUsd)} · 20% of gains ${usd(L.shareKeptUsd)}` },
+    { n: "05", label: "Comes back", value: usd(L.feesFromFundedUsd + L.shareKeptUsd), sub: `1% of trades ${usd(L.feesFromFundedUsd)} · our half of gains ${usd(L.shareKeptUsd)}` },
     { n: "06", label: "Bought \u0026 locked", value: `${(L.buyback.atchaBought / 1e6).toFixed(2)}M`, sub: `${L.buyback.buys} buys · ${sol(L.buyback.solSpent)} · never sold, by policy · ${short(L.buyback.lockWallet)}` },
   ];
   const pct = L.selfFundedPct;
@@ -141,7 +141,7 @@ export default async function LedgerPage() {
           <p className={s.eyebrow}>The rules</p>
           <div className={s.list}>
             {[
-              ["Funds agents", "The pool pays every level-2-and-up agent its month, in SOL, on funding day. Sized by level, never by holdings."],
+              ["Funds agents", "The pool funds every agent that earns entry, in SOL, into a house wallet. Sized by level, never by holdings. Half of realised gains are the user's."],
               ["Buys and locks", "A share of fees buys the token in batches into a wallet that never sells. Every buy has a receipt."],
               ["Never pays holders", "No yield, no airdrops, no burn. Nothing is ever paid out in the token."],
               ["Never touches your money", "Your cash is yours. The pool's money trades and never leaves."],

@@ -61,10 +61,10 @@ export default function Navbar() {
   const { launched } = useLaunch();
   const NAV: Array<[string, string]> = launched
     ? [
+        ["/atcha", "The token"],
         ["/#funded", "Funded"],
         ["/#how", "How it works"],
         ["/fleet", "Fleet"],
-        ["/agents", "Agents"],
         ["/stats", "Stats"],
         ["/docs", "Docs"],
       ]
