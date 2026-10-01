@@ -9,7 +9,7 @@ import {
   getActivity,
   type BalanceResponse,
   type FullPortfolio,
-  type ActivityReceipt, getPositions, type Position, backfillTrades } from "@/lib/api";
+  type ActivityReceipt, getPositions, type Position, backfillTrades, getHouseBudget, type HouseBudget } from "@/lib/api";
 import AuthGate from "@/components/AuthGate";
 import FundModal from "@/components/FundModal";
 import PositionsList from "@/components/token/PositionsList";
@@ -78,6 +78,10 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
   const total = walletUsdTotal(main);
   const holdings = (main?.tokens ?? []).filter((t) => t.balance > 0).sort((a, b) => (b.usdValue ?? 0) - (a.usdValue ?? 0));
   const [positions, setPositions] = useState<Position[] | null>(null);
+  // The funded budget lives in the house wallet, not in the user's own; shown as its own block.
+  const [house, setHouse] = useState<HouseBudget | null>(null);
+  useEffect(() => { getHouseBudget(platformId).then(setHouse).catch(() => {}); }, [platformId, main]);
+  const houseUsd = house?.portfolio?.totalUsdValue ?? null;
   const [importing, setImporting] = useState(false);
   const importedOnce = useRef(false);
   useEffect(() => { getPositions(platformId).then(setPositions).catch(() => {}); }, [platformId, main]);
@@ -143,6 +147,7 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
             </div>
             <div className="mt-1.5 text-sm text-zinc-400">
               {main ? `${main.solBalance.toFixed(4)} SOL · ${holdings.length} token${holdings.length === 1 ? "" : "s"}` : "—"}
+              {houseUsd != null && houseUsd > 0 ? <span className="text-zinc-500"> · plus {fmtUsd(houseUsd)} funded budget</span> : null}
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -163,6 +168,25 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
 
         {error && (
           <div className="mb-6 rounded-xl border border-red-900 bg-red-950/30 px-4 py-3 text-sm text-red-300">{error}</div>
+        )}
+
+        {/* The funded budget: house money, trades only, in its own wallet. */}
+        {house?.wallet && house.portfolio && (
+          <section className="mb-9">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <h2 className="text-sm font-medium text-zinc-300">Funded budget <span className="ml-2 text-xs font-normal text-grey">credit · trades only</span></h2>
+              <Link href="/level" className="text-xs text-grey underline underline-offset-2 hover:text-ink">Level and funding</Link>
+            </div>
+            <div className="mb-3 flex flex-wrap items-end justify-between gap-3 rounded-2xl border border-line bg-card px-4 py-3">
+              <div>
+                <div className="text-xs text-zinc-500">Budget</div>
+                <div className="text-2xl font-semibold tracking-tight text-white tabular-nums">{fmtUsd(house.portfolio.totalUsdValue ?? 0)}</div>
+                <div className="mt-0.5 text-xs text-zinc-400">{house.portfolio.solBalance.toFixed(4)} SOL · {house.portfolio.tokens.filter((t) => t.balance > 0).length} token{house.portfolio.tokens.filter((t) => t.balance > 0).length === 1 ? "" : "s"}</div>
+              </div>
+              <div className="max-w-xs text-right text-xs text-zinc-500">Our money, in a wallet only your agent&apos;s trades can move. Half of what it realises is paid to your wallet at settlement.<div className="mt-1 font-mono text-[11px] text-zinc-600">{truncMiddle(house.wallet)}</div></div>
+            </div>
+            <PositionsList holdings={house.portfolio.tokens} positions={house.positions} solBalance={house.portfolio.solBalance} solUsd={house.portfolio.solUsdValue ?? null} />
+          </section>
         )}
 
         {/* Positions: what the agent holds, with entry and P&L from the trade log. */}

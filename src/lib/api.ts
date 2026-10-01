@@ -939,6 +939,18 @@ export async function getTrades(platformId: string, opts: { mint?: string; limit
 }
 
 /** Owner-only. Null when the API predates the trade log (so the UI never claims "not bought"). */
+/** The funded budget: the house wallet's balance and positions, owner only. `wallet` null when the account has no house wallet yet. */
+export interface HouseBudget { platformId: string; wallet: string | null; externalId?: string; portfolio: FullPortfolio | null; positions: Position[] }
+export async function getHouseBudget(platformId: string): Promise<HouseBudget | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/credits/house/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function getPositions(platformId: string): Promise<Position[] | null> {
   try {
     const res = await apiFetch(`${API_BASE}/api/positions/${encodeURIComponent(platformId)}`, { headers: await authHeaders() });
