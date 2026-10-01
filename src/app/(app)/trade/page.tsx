@@ -8,6 +8,7 @@ import TokenSearch from "@/components/token/TokenSearch";
 import PositionsList from "@/components/token/PositionsList";
 import { getBalance, getPortfolio, getPositions, getHouseBudget, getCredits, type FullPortfolio, type Position, type HouseBudget, type CreditsSummary } from "@/lib/api";
 import { useLaunch } from "@/components/LaunchProvider";
+import { fmtMc } from "@/components/token/format";
 
 /** One-tap entry points: majors and the stocks credit may trade. Each opens the chart with the Buy row. */
 const MAJORS: Array<{ mint: string; symbol: string; name: string }> = [
@@ -23,6 +24,20 @@ const STOCKS: Array<{ mint: string; symbol: string; name: string }> = [
   { mint: "XsDoVfqeBukxuZHWhdvWHBhgEHjGNst4MLodqsJHzoB", symbol: "TSLAx", name: "Tesla" },
   { mint: "XsP7xzNPvEHS1m6qfanPUGjNmdnmsLKEoNAnHjdxxyZ", symbol: "AAPLx", name: "Apple" },
 ];
+
+interface CpTok { mint: string; symbol: string; name: string; imageUrl: string | null; marketCapUsd: number | null; volume24hUsd: number | null }
+function CpTile({ t }: { t: CpTok }) {
+  return (
+    <Link href={`/token/${t.mint}`} className="flex items-center gap-3 rounded-xl border border-line bg-card px-3 py-2.5 transition hover:border-ring hover:bg-paper">
+      {t.imageUrl ? <img src={t.imageUrl} alt="" className="h-8 w-8 rounded-full bg-card object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-btn text-xs text-grey">{t.symbol.slice(0, 2)}</span>}
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-sm font-semibold text-ink">{t.symbol} <span className="font-normal text-grey">{t.name}</span></span>
+        <span className="block text-xs text-grey">{t.marketCapUsd != null ? `${fmtMc(t.marketCapUsd)} MC` : ""}{t.volume24hUsd != null ? ` · ${fmtMc(t.volume24hUsd)} 24h` : ""}</span>
+      </span>
+      <span className="text-xs text-grey">Buy →</span>
+    </Link>
+  );
+}
 
 function Tile({ mint, symbol, name }: { mint: string; symbol: string; name: string }) {
   return (
@@ -41,6 +56,8 @@ function TradeScreen({ platformId }: { platformId: string }) {
   const [house, setHouse] = useState<HouseBudget | null>(null);
   const [credits, setCredits] = useState<CreditsSummary | null>(null);
   const [ca, setCa] = useState("");
+  const [cp, setCp] = useState<CpTok[] | null>(null);
+  useEffect(() => { fetch("/api/clawpump/verified", { cache: "no-store" }).then((r) => r.json()).then((j) => setCp(j.tokens ?? [])).catch(() => setCp([])); }, []);
 
   useEffect(() => {
     getBalance(platformId).then((b) => { if (b.saidWallet) void getPortfolio(b.saidWallet).then(setMain).catch(() => {}); }).catch(() => {});
@@ -82,6 +99,13 @@ function TradeScreen({ platformId }: { platformId: string }) {
         <h2 className="mb-3 text-sm font-medium text-zinc-300">Majors <span className="ml-2 text-xs font-normal text-grey">what a funded budget trades</span></h2>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{MAJORS.map((t) => <Tile key={t.mint} {...t} />)}</div>
       </section>
+      {cp && cp.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-sm font-medium text-zinc-300">ClawPump verified <span className="ml-2 text-xs font-normal text-grey">teams ClawPump knows; a funded budget can trade these, up to a quarter of it each</span></h2>
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{cp.slice(0, 12).map((t) => <CpTile key={t.mint} t={t} />)}</div>
+        </section>
+      )}
+
       <section className="mb-8">
         <h2 className="mb-3 text-sm font-medium text-zinc-300">Stocks <span className="ml-2 text-xs font-normal text-grey">tokenised, the real ones; the passport knows the copies</span></h2>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{STOCKS.map((t) => <Tile key={t.mint} {...t} />)}</div>
