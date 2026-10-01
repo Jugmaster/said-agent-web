@@ -8,7 +8,7 @@ import MessageText from "@/components/MessageText";
 import TokenChart from "@/components/token/TokenChart";
 import { fmtMc, fmtPrice } from "@/components/token/format";
 import { useAgent } from "@/hooks/useAgent";
-import { chat, getPortfolio, getPositions, getTokenStats, getTrades, type Position, type TokenStats, type TradeRow, getTokenCheck, tradeBuy, tradeSell, type TokenCheck } from "@/lib/api";
+import { chat, getPortfolio, getPositions, getTokenStats, getTrades, type Position, type TokenStats, type TradeRow, getTokenCheck, tradeBuy, tradeSell, type TokenCheck, getHouseBudget } from "@/lib/api";
 import { timeAgo } from "@/lib/format";
 import { requestRefresh } from "@/lib/refresh";
 
@@ -72,8 +72,16 @@ function Token({ platformId, mint }: { platformId: string; mint: string }) {
         setTrades([mk(20, "buy", 25), mk(9, "buy", 10), mk(2, "sell", 20)]);
       } else setTrades(t);
     }).catch(() => {});
-    getPositions(platformId).then((ps) => setPosition(ps?.find((p) => p.mint === mint) ?? null)).catch(() => {});
-    if (wallet) getPortfolio(wallet).then((p) => setQty(mint === "So11111111111111111111111111111111111111112" ? p.solBalance : p.tokens.find((t) => t.mint === mint)?.balance ?? 0)).catch(() => {});
+    // Own positions first; the funded budget's position for this mint stands in when there is no own one.
+    getPositions(platformId).then((ps) => {
+      const own = ps?.find((p) => p.mint === mint) ?? null;
+      if (own) { setPosition(own); return; }
+      getHouseBudget(platformId).then((h) => setPosition(h?.positions.find((p) => p.mint === mint) ?? null)).catch(() => setPosition(null));
+    }).catch(() => {});
+    // What can be sold: own holding plus the house wallet's (a sell from the chart sells credit positions first).
+    const ownQty = wallet ? getPortfolio(wallet).then((p) => (mint === "So11111111111111111111111111111111111111112" ? p.solBalance : p.tokens.find((t) => t.mint === mint)?.balance ?? 0)).catch(() => 0) : Promise.resolve(0);
+    const houseQty = getHouseBudget(platformId).then((h) => (h?.portfolio ? (mint === "So11111111111111111111111111111111111111112" ? 0 : h.portfolio.tokens.find((t) => t.mint === mint)?.balance ?? 0) : 0)).catch(() => 0);
+    Promise.all([ownQty, houseQty]).then(([a, b]) => setQty(a + b)).catch(() => {});
     fetch(`${SAID_API}/api/asset/${mint}`).then((r) => (r.ok ? r.json() : null)).then(setPassport).catch(() => {});
     getTokenCheck(mint).then(setCheck).catch(() => setCheck({ mint, verdict: "amber", why: "Couldn't verify this token right now.", passport: null }));
   }, [mint, platformId, wallet]);
