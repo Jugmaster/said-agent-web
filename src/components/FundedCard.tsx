@@ -135,7 +135,7 @@ export default function FundedCard({
       )}
 
       <p className="mt-3 text-xs text-zinc-500">
-        Credit trades; your cash pays. Gains on credit stay in the account and compound until level 3.
+        Credit trades; your cash pays. 80% of realised gains are paid to your wallet; a 40% equity drawdown stops the account.
       </p>
     </section>
   );

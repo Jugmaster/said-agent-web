@@ -96,12 +96,12 @@ function TradeScreen({ platformId }: { platformId: string }) {
       </div>
 
       <section className="mb-8">
-        <h2 className="mb-3 text-sm font-medium text-zinc-300">Majors <span className="ml-2 text-xs font-normal text-grey">what a funded budget trades</span></h2>
+        <h2 className="mb-3 text-sm font-medium text-zinc-300">Majors <span className="ml-2 text-xs font-normal text-grey">the deep ones; a funded budget can trade any token the passport clears</span></h2>
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{MAJORS.map((t) => <Tile key={t.mint} {...t} />)}</div>
       </section>
       {cp && cp.length > 0 && (
         <section className="mb-8">
-          <h2 className="mb-3 text-sm font-medium text-zinc-300">ClawPump verified <span className="ml-2 text-xs font-normal text-grey">teams ClawPump knows; a funded budget can trade these, up to a quarter of it each</span></h2>
+          <h2 className="mb-3 text-sm font-medium text-zinc-300">ClawPump verified <span className="ml-2 text-xs font-normal text-grey">teams ClawPump knows, up to a quarter of a funded budget each</span></h2>
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">{cp.slice(0, 12).map((t) => <CpTile key={t.mint} t={t} />)}</div>
         </section>
       )}

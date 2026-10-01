@@ -72,7 +72,7 @@ export default async function AtchaPage() {
         {/* Funded */}
         <section id="funded" style={{ marginTop: 64 }} data-reveal>
           <p className={s.eyebrow}>Funded</p>
-          <h2 className={s.big} style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.4rem)" }}>Our money first. Half the upside is yours.</h2>
+          <h2 className={s.big} style={{ fontSize: "clamp(1.6rem, 3.4vw, 2.4rem)" }}>Our money first. 80% of the upside is yours.</h2>
           <div className={s.tiles} data-stagger style={{ marginTop: 24 }}>
             <div className={s.tile}><span className={s.eyebrow} style={{ margin: 0 }}>The pool</span><div className={s.val}>{usd(L?.poolUsd)}</div><div className={s.tsub}>{sol(L?.poolSol)} · {short(L?.poolWallet)} · fed by {tick} creator rewards</div></div>
             <div className={s.tile}><span className={s.eyebrow} style={{ margin: 0 }}>Agents funded</span><div className={s.val}>{(L?.agentsFunded ?? T?.agentsFunded ?? 0).toLocaleString()}</div><div className={s.tsub}>{usd(L?.fundedTotalUsd)} in total · {T?.fundedToday ?? 0} today</div></div>
@@ -81,9 +81,9 @@ export default async function AtchaPage() {
           <div className={s.list} style={{ marginTop: 24, maxWidth: 720 }}>
             {[
               ["Creator rewards split", "60% to the pool, 20% buys and locks the token, 20% to the platform. Fixed, published, receipted."],
-              ["What a funded agent gets", `$${T?.fundingUsd ?? 25} at level 1, paid in SOL into a house wallet. Majors only, never ${tick}. It trades; it cannot be sent or withdrawn.`],
-              ["What you keep", "Half of realised gains, settled daily, withdrawable once the account is three days old. No withdrawal fee."],
-              ["Losses", "Come out of the tranche first. A 50% drawdown pauses the account. What is left returns to the pool when an account goes quiet."],
+              ["What a funded agent gets", `$${T?.fundingUsd ?? 25} at level 1, paid in SOL into a house wallet. Any token the passport clears with $10K of liquidity, up to a quarter of the budget each, never ${tick}. It trades; it cannot be sent or withdrawn.`],
+              ["What you keep", "80% of realised gains, settled daily and paid to your own wallet once the account is three days old. No withdrawal fee."],
+              ["Losses", "Come out of the tranche first. A 40% drawdown on equity, positions marked to market, stops the account: everything is sold to SOL and what is left goes back to the pool the same day."],
             ].map(([t, d]) => (
               <div key={t} className={s.rowItem}><span className={s.rowAvatar}>@</span><span style={{ minWidth: 0 }}><span className={s.rowName}>{t}</span><span className={s.rowMeta}>{d}</span></span><span /></div>
             ))}
@@ -93,8 +93,8 @@ export default async function AtchaPage() {
         {/* How it works */}
         <section id="how" className={s.acts} style={{ marginTop: 64, paddingBottom: 0 }}>
           <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts, five different people. No form, no deposit. <strong>The fifth one lands and your agent is funded.</strong> Every person you pay gets an Atcha with money already in it.</p></div></div>
-          <div className={s.act} data-reveal><span className={s.n}>02 / Trade</span><div><h3>From the chart, one click.</h3><p>Paste a contract address or open any token page. The passport checks it first: an impersonator is refused with the reason, an unverified token asks once, a clean one goes straight through. <strong>Credit trades majors only.</strong></p></div></div>
-          <div className={s.act} data-reveal><span className={s.n}>03 / Settle</span><div><h3>Realised, daily, half yours.</h3><p>At 06:00 UTC the day&apos;s realised gains are split: half credited to you, half stays with the pool. Paper gains never count. <strong>Keep showing up and the level, and next month&apos;s size, climbs.</strong></p></div></div>
+          <div className={s.act} data-reveal><span className={s.n}>02 / Trade</span><div><h3>From the chart, one click.</h3><p>Paste a contract address or open any token page. The passport checks it first: an impersonator is refused with the reason, an unverified token asks once, a clean one goes straight through. <strong>Any token the passport clears; a 40% equity drawdown stops the account.</strong></p></div></div>
+          <div className={s.act} data-reveal><span className={s.n}>03 / Settle</span><div><h3>Realised, daily, 80% yours.</h3><p>At 06:00 UTC the day&apos;s realised gains are split: 80% paid to your wallet, 20% stays with the pool. Paper gains never count. <strong>Keep showing up and the level, and next month&apos;s size, climbs.</strong></p></div></div>
         </section>
 
         {/* Fleet */}
