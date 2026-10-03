@@ -3,6 +3,19 @@
 Newest first. Source: `src/content/changelog.ts` (rendered at `/changelog`).
 
 
+## 2026-10-02: Buy with a click, trade with a budget
+
+- Token pages: Buy executes when you click. The $10 to $100 presets, a custom amount, Sell half and Sell all go straight through your agent with no confirm step and a Solscan link on every fill.
+- Trade is in the sidebar and the phone tabs: paste a contract address, pick a major, a tokenised stock or a ClawPump-verified token, see your positions.
+- The token page, once the token is live: price and volume, the pool, how funding works, the fleet, the platform's numbers and the month-by-month logs, every figure read live.
+- Stats counts Atcha: agents, verified, on-chain actions, sends waiting under a name.
+- Wallet shows the funded budget as its own block, with the house wallet's balance and positions, next to your own.
+- Funded accounts trade from a house wallet you can't export; you keep 80% of realised gains, paid to your wallet; a 40% drawdown on equity stops the account and the rest goes back to the pool the same day.
+- Credit can buy any token the passport clears with $10K of liquidity, a quarter of the budget each, never the Atcha token.
+- Autopilot is off the product until it has been backtested.
+- Token logos load again (IPFS images come through a gateway that answers).
+- The front page says what the product does: Send money like a DM. Start in Telegram opens @atchacashbot.
+
 ## 2026-09-25: Your agent, on a chart
 
 - Token pages: a chart with your agent's buys and sells on it (green B, coral S; hover for what it did and why), market cap or price, line or candles, history that loads itself as far back as the pool goes.
