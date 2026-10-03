@@ -939,17 +939,6 @@ export async function getTrades(platformId: string, opts: { mint?: string; limit
 }
 
 /** Owner-only. Null when the API predates the trade log (so the UI never claims "not bought"). */
-/** The wallet for money addressed to a handle. Public when it exists; creating one for a new X handle needs a signed-in caller. */
-export interface HandleWallet { platform: "x" | "telegram"; handle: string; wallet: string; platformId: string; registered: boolean; verified: boolean; claimed: boolean; created?: boolean; note: string }
-export type HandleWalletLookup = { ok: true; wallet: HandleWallet } | { ok: false; status: number; exists: false; hint?: string; error?: string };
-export async function getHandleWallet(handle: string, platform: "x" | "tg" = "x", opts: { create?: boolean } = {}): Promise<HandleWalletLookup> {
-  const headers: Record<string, string> = opts.create ? await authHeaders() : {};
-  const res = await apiFetch(`${API_BASE}/api/wallet/${platform}/${encodeURIComponent(handle.replace(/^@/, ""))}`, { headers, cache: "no-store" });
-  const j = (await res.json().catch(() => ({}))) as Record<string, unknown>;
-  if (res.ok) return { ok: true, wallet: j as unknown as HandleWallet };
-  return { ok: false, status: res.status, exists: false, hint: j.hint as string | undefined, error: j.error as string | undefined };
-}
-
 /** The funded budget: the house wallet's balance and positions, owner only. `wallet` null when the account has no house wallet yet. */
 export interface HouseBudget { platformId: string; wallet: string | null; externalId?: string; portfolio: FullPortfolio | null; positions: Position[] }
 export async function getHouseBudget(platformId: string): Promise<HouseBudget | null> {
