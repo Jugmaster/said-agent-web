@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import PublicMotion from "@/components/PublicMotion";
 import { getCreditsByHandle } from "@/lib/api";
 import { getLaunch } from "@/lib/launch";
+import HandleAddress from "@/components/HandleAddress";
 import s from "@/app/landing.module.css";
 
 interface PageProps { params: Promise<{ handle: string }> }
@@ -53,6 +54,8 @@ export default async function HandlePage({ params }: PageProps) {
             {a && a.verified && <span className={s.okPill} style={{ alignSelf: "center" }}>✓ verified</span>}
           </div>
         </header>
+
+        <HandleAddress handle={handle} />
 
         {launched && a && (
           <div className={s.tiles} data-stagger>
