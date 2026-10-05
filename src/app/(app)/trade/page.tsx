@@ -27,9 +27,11 @@ const STOCKS: Array<{ mint: string; symbol: string; name: string }> = [
 
 interface CpTok { mint: string; symbol: string; name: string; imageUrl: string | null; marketCapUsd: number | null; volume24hUsd: number | null }
 function CpTile({ t }: { t: CpTok }) {
+  // An image that fails to load gives way to the initials, never a broken icon.
+  const [broken, setBroken] = useState(false);
   return (
     <Link href={`/token/${t.mint}`} className="flex items-center gap-3 rounded-xl border border-line bg-card px-3 py-2.5 transition hover:border-ring hover:bg-paper">
-      {t.imageUrl ? <img src={t.imageUrl} alt="" className="h-8 w-8 rounded-full bg-card object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-btn text-xs text-grey">{t.symbol.slice(0, 2)}</span>}
+      {t.imageUrl && !broken ? <img src={t.imageUrl} alt="" loading="lazy" onError={() => setBroken(true)} className="h-8 w-8 rounded-full bg-card object-cover" /> : <span className="flex h-8 w-8 items-center justify-center rounded-full bg-btn text-xs text-grey">{t.symbol.slice(0, 2)}</span>}
       <span className="min-w-0 flex-1">
         <span className="block truncate text-sm font-semibold text-ink">{t.symbol} <span className="font-normal text-grey">{t.name}</span></span>
         <span className="block text-xs text-grey">{t.marketCapUsd != null ? `${fmtMc(t.marketCapUsd)} MC` : ""}{t.volume24hUsd != null ? ` · ${fmtMc(t.volume24hUsd)} 24h` : ""}</span>

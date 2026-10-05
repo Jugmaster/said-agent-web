@@ -11,3 +11,21 @@ export function iconUrl(u: string | null | undefined): string | null {
   if (!m) return u;
   return `https://wsrv.nl/?url=${encodeURIComponent(IPFS_GATEWAY + m[1])}&w=96&h=96&fit=cover&output=webp`;
 }
+
+/** Resize and re-serve any image through the cached proxy: small, webp, and from a host that answers. */
+function proxied(u: string): string {
+  return `https://wsrv.nl/?url=${encodeURIComponent(u)}&w=96&h=96&fit=cover&output=webp`;
+}
+
+/**
+ * ClawPump's token images. Many come back as a path on their own site
+ * ("/api/token-image/<cid>"), which is a 404 on ours, and the files behind
+ * them run to megabytes. Those are made absolute and served through the
+ * proxy at icon size; everything else goes the usual way.
+ */
+export function clawpumpIconUrl(u: string | null | undefined): string | null {
+  if (!u) return null;
+  if (u.startsWith("//")) return iconUrl(`https:${u}`);
+  if (u.startsWith("/")) return proxied(`https://clawpump.tech${u}`);
+  return iconUrl(u);
+}
