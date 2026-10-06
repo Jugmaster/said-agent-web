@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { usePrivy, getAccessToken, type User } from "@privy-io/react-auth";
 import { useWallets, useCreateWallet } from "@privy-io/react-auth/solana";
 import { claimAgent, type ClaimResponse } from "@/lib/api";
@@ -134,8 +134,14 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
   const { wallets: solanaWallets } = useWallets();
   const { createWallet } = useCreateWallet();
   const [state, setState] = useState<AgentState>({ status: "not-ready" });
+  // Privy returns a fresh createWallet function on every render. Reading it
+  // through a ref keeps it out of the effect's dependencies: listing it there
+  // re-ran the effect on every render, which set state, which rendered, until
+  // React gave up ("Maximum update depth exceeded") and the router froze.
+  const createWalletRef = useRef(createWallet);
+  createWalletRef.current = createWallet;
   // One explicit wallet creation per Privy user per page load (see below).
-  const [createdFor, setCreatedFor] = useState<string | null>(null);
+  const createdFor = useRef<string | null>(null);
 
   // Reactive Solana embedded-wallet address. Privy provisions the embedded
   // wallet asynchronously after login, so this hook is the reliable signal —
@@ -236,9 +242,9 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
       // already has one, which is harmless here: the wallets hook then
       // delivers the address and the claim goes ahead.
       const create = setTimeout(() => {
-        if (createdFor === user.id) return;
-        setCreatedFor(user.id);
-        createWallet().catch((err: unknown) => {
+        if (createdFor.current === user.id) return;
+        createdFor.current = user.id;
+        createWalletRef.current().catch((err: unknown) => {
           const msg = err instanceof Error ? err.message : String(err);
           if (/already/i.test(msg)) return;
           setState((s) =>
@@ -262,7 +268,7 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
     }
 
     void performClaim(user, solanaAddress ?? undefined);
-  }, [ready, authenticated, user, solanaAddress, performClaim, createWallet, createdFor]);
+  }, [ready, authenticated, user, solanaAddress, performClaim]);
 
   const logout = useCallback(() => {
     clearCache();
@@ -276,8 +282,8 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
     // Ask Privy for the wallet again instead; the effect claims once it lands.
     if (!platformId.startsWith("tg_") && !solanaAddress) {
       setState({ status: "linking" });
-      setCreatedFor(user.id);
-      createWallet().catch((err: unknown) => {
+      createdFor.current = user.id;
+      createWalletRef.current().catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         if (/already/i.test(msg)) return;
         setState({ status: "error", error: `Couldn't create your wallet: ${msg}. ${BLOCKER_HINT}` });
@@ -285,7 +291,7 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
       return;
     }
     void performClaim(user, solanaAddress ?? undefined);
-  }, [user, solanaAddress, performClaim, createWallet]);
+  }, [user, solanaAddress, performClaim]);
 
   return { ...state, logout, refresh };
 }
