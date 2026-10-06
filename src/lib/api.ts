@@ -183,7 +183,7 @@ export interface SendResult {
 export async function agentSend(input: {
   platformId: string;
   handle: string;
-  /** "atcha": anyone already on Atcha by their X or Telegram name (the butler resolves across both). */
+  /** Where the name lives: their Atcha name (picked in Settings), their X handle, or their Telegram username. */
   platform: "telegram" | "x" | "atcha";
   asset: "SOL" | "USDC";
   amount: number;

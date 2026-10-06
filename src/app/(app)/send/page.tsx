@@ -242,7 +242,7 @@ function SendsPanel({
               <button
                 key={s.recipientHandle}
                 type="button"
-                onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : "telegram")}
+                onClick={() => onPick(s.recipientHandle, s.platform === "x" ? "x" : s.platform === "atcha" ? "atcha" : "telegram")}
                 className="flex items-center gap-2 rounded-full border border-line bg-card py-1.5 pl-1.5 pr-3.5 transition hover:border-zinc-600"
               >
                 <span className="flex h-6 w-6 items-center justify-center rounded-full bg-zinc-800 text-[10px] font-semibold text-zinc-200">
@@ -280,7 +280,7 @@ function SendsPanel({
                     <div className="min-w-0 flex-1">
                       <div className="truncate text-sm font-medium text-white">
                         @{s.recipientHandle}
-                        <span className="ml-1.5 text-xs text-zinc-500">{s.platform === "x" ? "on X" : "on Telegram"}</span>
+                        <span className="ml-1.5 text-xs text-zinc-500">{s.platform === "x" ? "on X" : s.platform === "atcha" ? "on Atcha" : "on Telegram"}</span>
                       </div>
                       <div className={`text-xs ${st.cls}`}>{st.text}</div>
                     </div>
@@ -313,9 +313,13 @@ function SendScreen({ platformId }: { platformId: string }) {
   const [handle, setHandle] = useState(() =>
     (params.get("to") ?? "").replace(/^@+/, ""),
   );
-  const [platform, setPlatform] = useState<Platform>(() =>
-    params.get("platform") === "x" ? "x" : params.get("platform") === "telegram" ? "telegram" : "atcha",
-  );
+  // Where the name lives. A link can say; otherwise the sender's own platform,
+  // since most people pay the friends they already talk to there.
+  const [platform, setPlatform] = useState<Platform>(() => {
+    const p = params.get("platform");
+    if (p === "x" || p === "telegram" || p === "atcha") return p;
+    return platformId.startsWith("tw_") ? "x" : platformId.startsWith("tg_") ? "telegram" : "atcha";
+  });
   const [amount, setAmount] = useState(() => params.get("amount") ?? "");
   const [asset, setAsset] = useState<Asset>(() =>
     params.get("asset") === "SOL" ? "SOL" : "USDC",
@@ -489,7 +493,7 @@ function SendScreen({ platformId }: { platformId: string }) {
                   ? "border-white bg-white text-black"
                   : "border-zinc-700 text-zinc-400 hover:border-zinc-500"
               }`}
-              title="Anyone already on Atcha, by their X or Telegram name"
+              title="Their Atcha name, the one they picked in Settings"
             >
               Atcha
             </button>
@@ -518,7 +522,7 @@ function SendScreen({ platformId }: { platformId: string }) {
           </div>
           <p className="mb-2 text-xs text-zinc-500">
             {platform === "atcha"
-              ? "Anyone already on Atcha, by their X or Telegram name. Not on it yet? Pick X or Telegram and they get it when they log in."
+              ? "Their Atcha name, the one they picked in Settings. Not on Atcha yet? Pick X or Telegram and the money waits for them."
               : platform === "x"
                 ? "Any X account. If they're not on Atcha yet, the money waits under their name."
                 : "Any Telegram username. If they're not on Atcha yet, the money waits under their name."}
