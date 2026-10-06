@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { usePrivy, getAccessToken, type User } from "@privy-io/react-auth";
-import { useWallets } from "@privy-io/react-auth/solana";
+import { useWallets, useCreateWallet } from "@privy-io/react-auth/solana";
 import { claimAgent, type ClaimResponse } from "@/lib/api";
 
 /**
@@ -74,6 +74,8 @@ export type AgentState =
   | { status: "error"; error: string };
 
 const STORAGE_KEY = "said-agent:linked";
+/** The wallet lives in a Privy frame; content blockers that stop it are the usual reason it never appears. */
+const BLOCKER_HINT = "If you use an ad blocker, Brave Shields or strict tracking protection, allow privy.io for this site and tap retry.";
 
 // useAgent is instantiated by several components at once (AppShell, AuthGate,
 // Navbar, pages). On a cache-cold login they all reach performClaim in the
@@ -130,7 +132,10 @@ function clearCache() {
 export function useAgent(): AgentState & { logout: () => void; refresh: () => void } {
   const { ready, authenticated, user, logout: privyLogout } = usePrivy();
   const { wallets: solanaWallets } = useWallets();
+  const { createWallet } = useCreateWallet();
   const [state, setState] = useState<AgentState>({ status: "not-ready" });
+  // One explicit wallet creation per Privy user per page load (see below).
+  const [createdFor, setCreatedFor] = useState<string | null>(null);
 
   // Reactive Solana embedded-wallet address. Privy provisions the embedded
   // wallet asynchronously after login, so this hook is the reliable signal —
@@ -225,21 +230,39 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
     const platformId = derivePlatformId(user);
     if (!platformId.startsWith("tg_") && !solanaAddress) {
       setState({ status: "linking" });
+      // Privy is meant to create the wallet on login. When it hasn't after a
+      // few seconds (a blocked wallet frame, a missed hook, a slow network),
+      // ask for it outright. Privy rejects a second creation for a user who
+      // already has one, which is harmless here: the wallets hook then
+      // delivers the address and the claim goes ahead.
+      const create = setTimeout(() => {
+        if (createdFor === user.id) return;
+        setCreatedFor(user.id);
+        createWallet().catch((err: unknown) => {
+          const msg = err instanceof Error ? err.message : String(err);
+          if (/already/i.test(msg)) return;
+          setState((s) =>
+            s.status === "linking"
+              ? { status: "error", error: `Couldn't create your wallet: ${msg}. ${BLOCKER_HINT}` }
+              : s,
+          );
+        });
+      }, 4000);
       const t = setTimeout(() => {
         setState((s) =>
           s.status === "linking"
             ? {
                 status: "error",
-                error: "Wallet is taking longer than usual — tap retry.",
+                error: `Wallet is taking longer than usual. ${BLOCKER_HINT}`,
               }
             : s,
         );
       }, 25000);
-      return () => clearTimeout(t);
+      return () => { clearTimeout(create); clearTimeout(t); };
     }
 
     void performClaim(user, solanaAddress ?? undefined);
-  }, [ready, authenticated, user, solanaAddress, performClaim]);
+  }, [ready, authenticated, user, solanaAddress, performClaim, createWallet, createdFor]);
 
   const logout = useCallback(() => {
     clearCache();
@@ -247,8 +270,22 @@ export function useAgent(): AgentState & { logout: () => void; refresh: () => vo
   }, [privyLogout]);
 
   const refresh = useCallback(() => {
-    if (user) void performClaim(user, solanaAddress ?? undefined);
-  }, [user, solanaAddress, performClaim]);
+    if (!user) return;
+    const platformId = derivePlatformId(user);
+    // Retrying without a wallet would claim without one and come back 404.
+    // Ask Privy for the wallet again instead; the effect claims once it lands.
+    if (!platformId.startsWith("tg_") && !solanaAddress) {
+      setState({ status: "linking" });
+      setCreatedFor(user.id);
+      createWallet().catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : String(err);
+        if (/already/i.test(msg)) return;
+        setState({ status: "error", error: `Couldn't create your wallet: ${msg}. ${BLOCKER_HINT}` });
+      });
+      return;
+    }
+    void performClaim(user, solanaAddress ?? undefined);
+  }, [user, solanaAddress, performClaim, createWallet]);
 
   return { ...state, logout, refresh };
 }
