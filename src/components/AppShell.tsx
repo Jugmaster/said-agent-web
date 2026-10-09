@@ -19,7 +19,7 @@ import {
   PhoneIcon,
   PlusIcon,
   SendIcon,
-  WalletIcon, LevelIcon, SettingsIcon, TradeIcon } from "./NavIcons";
+  WalletIcon, LevelIcon, SettingsIcon, TradeIcon, RocketIcon } from "./NavIcons";
 import { useLaunch } from "@/components/LaunchProvider";
 
 const NAV = [
@@ -27,6 +27,7 @@ const NAV = [
   { href: "/chat", label: "Chat", icon: ChatIcon, key: "c" },
   { href: "/send", label: "Pay", icon: SendIcon, key: "s" },
   { href: "/trade", label: "Trade", icon: TradeIcon, key: "t" },
+  { href: "/launch", label: "Launch", icon: RocketIcon, key: "n" },
   { href: "/level", label: "Level", icon: LevelIcon, key: "v" },
   { href: "/portfolio", label: "Wallet", icon: WalletIcon, key: "w" },
   { href: "/calls", label: "Comms", icon: PhoneIcon, key: "l" },

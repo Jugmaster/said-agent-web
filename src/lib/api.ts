@@ -127,6 +127,26 @@ export async function tradeBuy(platformId: string, mint: string, usd: number, an
   if (!res.ok) return { ok: false, error: (j as { error?: string } | null)?.error ?? `That didn't go through (${res.status}).` };
   return (j as TradeResult) ?? { ok: false, error: "That didn't go through." };
 }
+export interface LaunchRecord { mint: string; platformId: string; name: string; symbol: string; quoteSymbol: string; creatorFeeBps: number; cashback: boolean; tx: string | null; createdAt: string }
+export type LaunchResult = { ok: true; mint: string; symbol: string; quoteSymbol: string; tx: string; pumpUrl: string; tokenUrl: string } | { ok: false; error: string };
+/** Launch a coin paired with $SAID from the user's own agent. The click is the confirmation. */
+export async function launchCoin(input: { platformId: string; name: string; symbol: string; description?: string; imageBase64: string; twitter?: string; website?: string; cashback?: boolean }): Promise<LaunchResult> {
+  const res = await apiFetch(`${API_BASE}/api/trade/launch`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+    body: JSON.stringify(input),
+  });
+  const j = (await res.json().catch(() => null)) as LaunchResult | { error?: string } | null;
+  if (!res.ok) return { ok: false, error: (j as { error?: string } | null)?.error ?? `That didn't go through (${res.status}).` };
+  return (j as LaunchResult) ?? { ok: false, error: "That didn't go through." };
+}
+export async function getAtchaLaunches(platformId?: string): Promise<{ enabled: boolean; quote: string; launches: LaunchRecord[] }> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/trade/launches${platformId ? `?platformId=${encodeURIComponent(platformId)}` : ""}`);
+    if (!res.ok) return { enabled: false, quote: "SAID", launches: [] };
+    return (await res.json()) as { enabled: boolean; quote: string; launches: LaunchRecord[] };
+  } catch { return { enabled: false, quote: "SAID", launches: [] }; }
+}
 export async function tradeSell(platformId: string, mint: string, pct: number): Promise<TradeResult> {
   const res = await apiFetch(`${API_BASE}/api/trade/sell`, {
     method: "POST",

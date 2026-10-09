@@ -104,3 +104,14 @@ export function LevelIcon({ className = ICON }: { className?: string }) {
     </svg>
   );
 }
+
+export function RocketIcon({ className = ICON }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className} aria-hidden>
+      <path d="M5 15c-1.5 1.5-2 4-2 6 2 0 4.5-.5 6-2" />
+      <path d="M9 12a12 12 0 0 1 11-9 12 12 0 0 1-9 11l-2.5-2.5Z" />
+      <path d="M9 12H5l2-4h4M12 15v4l4-2v-4" />
+      <circle cx="15" cy="9" r="1.2" />
+    </svg>
+  );
+}
