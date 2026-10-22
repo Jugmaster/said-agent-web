@@ -76,13 +76,19 @@ function TradeScreen({ platformId }: { platformId: string }) {
       <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight text-white md:text-3xl">Trade</h1>
-          <p className="mt-1 text-sm text-zinc-400">Paste a contract address or pick a token. One click buys; the passport refuses fakes first.</p>
+          <p className="mt-1 text-sm text-zinc-400">Paste a contract address or pick a token. One click to buy.</p>
         </div>
         {credits?.funded && (
-          <div className="rounded-xl border border-line bg-card px-4 py-2.5 text-right">
+          <div className="rounded-xl border border-line bg-card px-4 py-2.5">
             <div className="text-[11px] uppercase tracking-wider text-grey">Funded budget</div>
-            <div className="text-lg font-semibold tabular-nums text-white">${houseUsd.toFixed(2)}</div>
-            <div className="text-[11px] text-zinc-500">{credits.limits.tradeLeft > 0 ? `$${credits.limits.tradeLeft.toFixed(0)} of $${credits.limits.trade} left today` : "daily allowance used"}</div>
+            <div className="text-lg font-semibold tabular-nums text-ink">${houseUsd.toFixed(2)} <span className="text-xs font-normal text-grey">to trade with</span></div>
+            <div className="text-[11px] text-grey">
+              {credits.limits.tradeLeft >= credits.limits.trade
+                ? `Trades up to $${credits.limits.trade} a day`
+                : credits.limits.tradeLeft > 0
+                  ? `$${credits.limits.tradeLeft.toFixed(0)} of today's $${credits.limits.trade} trading left`
+                  : `Today's $${credits.limits.trade} of trading is used; resets at midnight UTC`}
+            </div>
           </div>
         )}
       </div>
