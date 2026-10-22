@@ -1199,3 +1199,54 @@ export async function runAutopilot(platformId: string): Promise<AutopilotDecisio
     return [];
   }
 }
+
+// ─── The proof: the autopilot's public record ───────────────────────────────
+
+export interface ProofDecision { id: number; strategy: string; mint: string | null; symbol: string | null; action: string; sizeUsd: number | null; reason: string; executed: boolean; tx: string | null; error: string | null; at: string }
+export interface ProofAccount {
+  id: string;
+  name: string;
+  wallet: string | null;
+  strategies: string[];
+  risk: string;
+  enabled: boolean;
+  shadow: boolean;
+  startedAt: string | null;
+  days: number;
+  principalUsd: number;
+  equityUsd: number | null;
+  pnlUsd: number | null;
+  pnlPct: number | null;
+  solHoldUsd: number | null;
+  solHoldPct: number | null;
+  vsSolUsd: number | null;
+  trades: { executed: number; refused: number; closed: number; open: number; realizedUsd: number };
+  feesUsd: number | null;
+  decisions: ProofDecision[];
+}
+export interface Proof {
+  generatedAt: string;
+  autopilot: boolean;
+  verdict: boolean;
+  principalUsd: number;
+  equityUsd: number | null;
+  pnlUsd: number | null;
+  pnlPct: number | null;
+  solHoldUsd: number | null;
+  solHoldPct: number | null;
+  vsSolUsd: number | null;
+  days: number;
+  bar: { minDays: number; minTrades: number; days: number; closedTrades: number; beatsSol: boolean | null; met: boolean };
+  accounts: ProofAccount[];
+}
+
+/** Public. Null when the API is unreachable or predates the proof. */
+export async function getProof(): Promise<Proof | null> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/proof`, { cache: "no-store" });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
