@@ -28,7 +28,7 @@ export default function ProofPage() {
         <ProofBoard />
         <footer className={s.pageFoot}>
           How to check it yourself: open any wallet on Solscan and replay the trades; the reasons here are written before each one goes out. The SOL benchmark buys SOL with each piece of principal at the price on the day it arrived.
-          {" "}<a href="/">Atcha</a>.
+          {" "}<a href="/how-it-trades">How it trades</a> · <a href="/">Atcha</a>.
         </footer>
       </main>
     </div>

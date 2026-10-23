@@ -1166,10 +1166,28 @@ export const HANDLE_REASONS: Record<HandleReason, string> = {
 // ─── Autopilot ─────────────────────────────────────────────────────────────
 
 export type AutopilotRisk = "careful" | "normal" | "degen";
-export type AutopilotStrategy = "exit" | "trend" | "scout";
-export interface AutopilotConfig { agentId: string; enabled: boolean; risk: AutopilotRisk; strategies: AutopilotStrategy[]; shadow: boolean; updatedAt: string }
+export type AutopilotStrategy = "exit" | "trend" | "scout" | "verdict" | "thesis";
+export interface AutopilotConfig { agentId: string; enabled: boolean; risk: AutopilotRisk; strategies: AutopilotStrategy[]; shadow: boolean; approve: boolean; updatedAt: string }
 export interface AutopilotDecision { id: number; strategy: string; mint: string | null; symbol: string | null; action: string; sizeUsd: number | null; reason: string; jev: unknown; executed: boolean; tx: string | null; error: string | null; at: string }
-export interface AutopilotState { config: AutopilotConfig; decisions: AutopilotDecision[]; jev: boolean; globalShadow: boolean; enabled: boolean }
+/** The thesis in its fixed shape: written before the order, the position is held to it. */
+export interface Thesis {
+  call: "buy" | "pass"; headline: string; whyNow: string; evidence: string[]; expected: string; horizonHours: number; sizeFraction: number;
+  invalidation: { priceUnderUsd: number | null; liquidityUnderUsd: number | null; hoursMax: number | null; note: string | null };
+  target: { takeProfitPct: number; sellFraction: number; trailPct: number };
+  confidence: number; risks: string[];
+}
+export type ThesisStatus = "proposed" | "open" | "closed" | "passed" | "skipped" | "shadow" | "failed";
+export interface ThesisRow {
+  id: number; mint: string; symbol: string | null; call: "buy" | "pass"; status: ThesisStatus; thesis: Thesis; model: string | null;
+  priceAtUsd: number | null; sizeUsd: number | null; entryUsd: number | null; tx: string | null; openedAt: string | null; closedAt: string | null;
+  exitReason: string | null; exitTx: string | null; pnlPct: number | null; gradedAt: string | null; wasRight: boolean | null; outcome: Record<string, unknown> | null; createdAt: string;
+}
+export interface Scoreboard {
+  buys: { n: number; right: number; hitRate: number | null; avgPnlPct: number | null; totalPnlPct: number | null };
+  passes: { n: number; right: number; hitRate: number | null };
+  open: number; rule: string;
+}
+export interface AutopilotState { config: AutopilotConfig; decisions: AutopilotDecision[]; theses?: ThesisRow[]; scoreboard?: Scoreboard; jev: boolean; desk?: boolean; verdict?: boolean; globalShadow: boolean; enabled: boolean }
 
 /** Owner-only. Null when the API predates Autopilot. */
 export async function getAutopilot(platformId: string): Promise<AutopilotState | null> {
@@ -1181,7 +1199,7 @@ export async function getAutopilot(platformId: string): Promise<AutopilotState |
     return null;
   }
 }
-export async function setAutopilot(platformId: string, patch: Partial<Pick<AutopilotConfig, "enabled" | "risk" | "strategies" | "shadow">>): Promise<AutopilotConfig | null> {
+export async function setAutopilot(platformId: string, patch: Partial<Pick<AutopilotConfig, "enabled" | "risk" | "strategies" | "shadow" | "approve">>): Promise<AutopilotConfig | null> {
   try {
     const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}`, { method: "POST", headers: { ...(await authHeaders()), "Content-Type": "application/json" }, body: JSON.stringify(patch) });
     if (!res.ok) return null;
@@ -1197,6 +1215,16 @@ export async function runAutopilot(platformId: string): Promise<AutopilotDecisio
     return ((await res.json()) as { decisions: AutopilotDecision[] }).decisions ?? [];
   } catch {
     return [];
+  }
+}
+
+/** Owner-only: say yes or no to a thesis the desk proposed. */
+export async function answerThesis(platformId: string, thesisId: number, approve: boolean): Promise<{ ok: boolean; text: string; tx?: string }> {
+  try {
+    const res = await apiFetch(`${API_BASE}/api/autopilot/${encodeURIComponent(platformId)}/thesis/${thesisId}/${approve ? "approve" : "skip"}`, { method: "POST", headers: await authHeaders() }, 90_000);
+    return (await res.json()) as { ok: boolean; text: string; tx?: string };
+  } catch {
+    return { ok: false, text: "Couldn't reach your agent." };
   }
 }
 
@@ -1223,11 +1251,15 @@ export interface ProofAccount {
   trades: { executed: number; refused: number; closed: number; open: number; realizedUsd: number };
   feesUsd: number | null;
   decisions: ProofDecision[];
+  theses?: ThesisRow[];
+  scoreboard?: Scoreboard;
 }
 export interface Proof {
   generatedAt: string;
   autopilot: boolean;
   verdict: boolean;
+  desk?: boolean;
+  scoreboard?: Scoreboard;
   principalUsd: number;
   equityUsd: number | null;
   pnlUsd: number | null;
