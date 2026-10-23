@@ -10,12 +10,16 @@ import Preloader from "@/components/Preloader";
 import { useLaunch } from "@/components/LaunchProvider";
 import s from "./landing.module.css";
 
-// Only handles: the product pays a person by name. No group pay, so no group in the rotation.
-const NAMES = ["@that_plumber", "@renata_paints", "@little_bro", "@0xanalyst", "@yourbarber", "@anyone."];
+// The desk is the headline: what it trades with, in rotation. Paying by @ is in the chips and the copy, not the hero.
+const WORDS = ["with a thesis.", "for a reason.", "in public.", "on its own money.", "for you."];
+const PRELAUNCH_WORDS = WORDS.filter((w) => !/own money/.test(w));
 const TG = "https://t.me/atchacashbot";
 const CHIPS: [string, string][] = [
   ["@little_bro", "got a funded Atcha"],
+  ["@0xanalyst", "approved a thesis"],
+  ["$FOUR", "passed: deployer record fails"],
   ["@yourbarber", "got paid $25"],
+  ["@sol_maxi", "desk closed +31%, receipt: right"],
   ["@0xanalyst", "got tipped $20"],
   ["@renata_paints", "got tipped"],
   ["@0xanalyst", "got funded $25"],
@@ -54,7 +58,8 @@ export default function LandingPage() {
 
   const cta = !ready ? "Loading…" : authenticated ? "Open your Atcha" : fundingOpen ? "Get your funded Atcha" : "Get your Atcha";
   const chips = launched ? CHIPS : PRELAUNCH_CHIPS;
-  const lead = launched ? "Comes funded. Pays" : "Send money like a DM.";
+  const lead = launched ? "Comes funded. Trades" : "An agent that trades";
+  const words = launched ? WORDS : PRELAUNCH_WORDS;
 
   return (
     <div className={s.page}>
@@ -69,20 +74,20 @@ export default function LandingPage() {
       <Navbar />
 
       <header className={`${s.hero} ${s.wrap}`} data-hero>
-        <h1 className={s.h1} aria-label={launched ? `${lead} anyone you can name.` : `${lead} To anyone you can name.`}>
+        <h1 className={s.h1} aria-label={`${lead} with a thesis.`}>
           <span className={s.row}><span>{lead}</span></span>
-          <span className={s.row}><span><span className={s.swatch}><Rotator words={NAMES} /></span></span></span>
+          <span className={s.row}><span><span className={s.swatch}><Rotator words={words} /></span></span></span>
         </h1>
         {launched ? (
           <p className={s.sub}>
-            {soon ? <>It will start with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}, once funding opens,</> : <>It starts with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}</>}{" "}and it does everything: trades anything on Solana, holds the
-            S&amp;P, pays anyone you can name, buys things, runs your DCA. <strong>Level up</strong> and it gets more to
-            work with, every month.
+            {soon ? <>It will start with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}, once funding opens.</> : <>It starts with <strong>money in it</strong>{tick ? <>, funded by {tick}</> : null}.</>}{" "}
+            Before every trade it <strong>writes why</strong>: what it sees, what has to happen, what gets it out. It holds the position to that, and every call is
+            graded in public. Our money takes the first loss; <strong>80% of the upside is yours</strong>. It pays anyone you can name, too.
           </p>
         ) : (
           <p className={s.sub}>
-            An AI agent with its own wallet. <strong>Type a handle and an amount and it pays them</strong>, even if
-            they&apos;ve never heard of Atcha: the money waits under their name. It trades for you too, one click from a chart.
+            A trading desk in a chat, with its own wallet. Before every trade it <strong>writes why</strong>: what it sees, what has to happen,
+            what gets it out. It holds the position to that, and every call is graded in public. It pays anyone you can name, too: type a handle and an amount.
           </p>
         )}
         <div className={s.ctas}>
@@ -105,21 +110,21 @@ export default function LandingPage() {
       <section className={`${s.caps} ${s.wrap}`} id={launched ? "funded" : "what"}>
         <div className={s.capsHead} data-reveal>
           <p className={s.eyebrow}>What it does</p>
-          <h2 className={s.big}>{launched ? "Our money first. 80% of the upside is yours." : "Pays by @. Buys in one click. Does the rest."}</h2>
+          <h2 className={s.big}>{launched ? "Our money first. A reason for every trade. 80% of the upside is yours." : "Writes the thesis. Trades it. Shows the record."}</h2>
           {soon && <p className={s.eyebrow} style={{ marginTop: 10 }}>Funding opens soon · pay your five now and be first in line</p>}
         </div>
         <div className={s.capGrid} data-stagger>
           {launched ? (
             <>
-              <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""}</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>Any token, tokenised stocks too. From a chart, a pasted address or a sentence, with a receipt on every fill.</p></div>
-              <div className={s.cap}><span className={s.n}>03</span><h3>Levels up</h3><p>Show up and the budget grows: a higher level means a bigger month. 80% of what it makes, realised, is yours, from the first settlement.</p></div>
+              <div className={s.cap}><span className={s.n}>01</span><h3>{soon ? "Comes funded, soon" : "Comes funded"}</h3><p>Pay five verified X accounts by name and your agent gets a monthly budget of its own{tick ? <>, paid for by {tick}</> : null}. That budget is what&apos;s at risk, not your money.{soon ? " The first budgets land when funding opens." : ""} Level up and it grows.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Writes a thesis</h3><p>Before every trade: why now, what has to happen, the price and the hour that get it out. It checks who deployed the token, not just the chart. A pass is a normal answer.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Graded in public</h3><p>Every thesis gets a receipt. Every account trading for real is on <Link href="/proof">the record</Link>, good week or bad, against just holding SOL. <Link href="/how-it-trades">How it trades</Link>.</p></div>
             </>
           ) : (
             <>
-              <div className={s.cap}><span className={s.n}>01</span><h3>Pays by @</h3><p>Any X or Telegram handle, a dollar or a hundred, from one sentence. Not on Atcha yet? The money waits under their name and is theirs the moment they sign in.</p></div>
-              <div className={s.cap}><span className={s.n}>02</span><h3>Buys in one click</h3><p>From a chart or a pasted contract address. No confirm step, a receipt on every fill. It checks the token is the real one first and says so if it isn&apos;t.</p></div>
-              <div className={s.cap}><span className={s.n}>03</span><h3>Does the rest</h3><p>A bit every day, at a price, tokenised stocks, buying things, a call or an email. One message and it handles it, with a receipt for everything.</p></div>
+              <div className={s.cap}><span className={s.n}>01</span><h3>Writes a thesis</h3><p>Before every trade: why now, what has to happen, the price and the hour that get it out. It checks who deployed the token, not just the chart. A pass is a normal answer.</p></div>
+              <div className={s.cap}><span className={s.n}>02</span><h3>Holds it to the numbers</h3><p>Its own stop, its own time limit, its own target. Paper first, live when you say. Or have it ask you before each trade, with the thesis attached.</p></div>
+              <div className={s.cap}><span className={s.n}>03</span><h3>Graded in public</h3><p>Every thesis gets a receipt. Every account trading for real is on <Link href="/proof">the record</Link>, good week or bad, against just holding SOL. It pays anyone by @ and buys in one click, too. <Link href="/how-it-trades">How it trades</Link>.</p></div>
             </>
           )}
         </div>
@@ -160,7 +165,7 @@ export default function LandingPage() {
 
           <section className={`${s.acts} ${s.wrap}`} id="steps">
             <div className={s.act} data-reveal><span className={s.n}>01 / Enter</span><div><h3>Five blue ticks. That&apos;s the entry.</h3><p>Pay $1 or more to five verified X accounts. No form, no deposit, no waitlist. <strong>The fifth one lands and your agent is funded.</strong></p></div></div>
-            <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. Your agent trades it on anything Solana has: majors, memecoins, stocks. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
+            <div className={s.act} data-reveal><span className={s.n}>02 / Funded</span><div><h3>Same day, every month.</h3><p>Funding lands with everyone else&apos;s, sized by your level. The desk trades it on anything Solana has, with a written thesis per trade and the position held to it. <strong>Your own money comes and goes whenever you like.</strong></p></div></div>
             <div className={s.act} data-reveal><span className={s.n}>03 / Level up</span><div><h3>Show up, get more.</h3><p>Keep the streak and the level climbs; the level sets next month&apos;s size. <strong>You keep 80% of what your agent makes above what it was funded, realised daily.</strong> Every funding is posted in public.</p></div></div>
           </section>
         </>
@@ -206,6 +211,8 @@ export default function LandingPage() {
               ) : (
                 <a href="#what">what it does</a>
               )}
+              <Link href="/proof">the record</Link>
+              <Link href="/how-it-trades">how it trades</Link>
               <Link href="/docs">docs</Link>
               <Link href="/changelog">changelog</Link>
             </div>
