@@ -181,9 +181,9 @@ function PortfolioScreen({ platformId }: { platformId: string }) {
               <div>
                 <div className="text-xs text-zinc-500">Budget</div>
                 <div className="text-2xl font-semibold tracking-tight text-white tabular-nums">{fmtUsd(house.portfolio.totalUsdValue ?? 0)}</div>
-                <div className="mt-0.5 text-xs text-zinc-400">{house.portfolio.solBalance.toFixed(4)} SOL · {house.portfolio.tokens.filter((t) => t.balance > 0).length} token{house.portfolio.tokens.filter((t) => t.balance > 0).length === 1 ? "" : "s"}</div>
+                <div className="mt-0.5 text-xs text-zinc-400">{fmtUsd(Math.max(0, (house.portfolio.solUsdValue ?? 0)))} free to trade · {house.portfolio.solBalance.toFixed(4)} SOL · {house.portfolio.tokens.filter((t) => t.balance > 0).length} token{house.portfolio.tokens.filter((t) => t.balance > 0).length === 1 ? "" : "s"}</div>
               </div>
-              <div className="max-w-xs text-right text-xs text-zinc-500">Our money, in a wallet only your agent&apos;s trades can move. Half of what it realises is paid to your wallet at settlement.<div className="mt-1 font-mono text-[11px] text-zinc-600">{truncMiddle(house.wallet)}</div></div>
+              <div className="max-w-xs text-right text-xs text-zinc-500">Our money, in a wallet only your agent&apos;s trades can move. 80% of what it realises is paid to your wallet at settlement.<div className="mt-1 font-mono text-[11px] text-zinc-600">{truncMiddle(house.wallet)}</div></div>
             </div>
             <PositionsList holdings={house.portfolio.tokens} positions={house.positions} solBalance={house.portfolio.solBalance} solUsd={house.portfolio.solUsdValue ?? null} />
           </section>

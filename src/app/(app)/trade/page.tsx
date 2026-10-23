@@ -68,7 +68,10 @@ function TradeScreen({ platformId }: { platformId: string }) {
     getCredits(platformId).then(setCredits).catch(() => {});
   }, [platformId]);
 
-  const houseUsd = house?.portfolio?.totalUsdValue ?? 0;
+  // Spendable = SOL above the float; positions bought with the budget are budget too, but not cash until sold.
+  const houseSolUsd = Math.max(0, (house?.portfolio?.solUsdValue ?? 0) - ((house?.portfolio?.solUsdValue ?? 0) / Math.max(house?.portfolio?.solBalance ?? 1, 1e-9)) * 0.003);
+  const housePositionsUsd = Math.max(0, (house?.portfolio?.totalUsdValue ?? 0) - (house?.portfolio?.solUsdValue ?? 0));
+  const houseUsd = houseSolUsd;
   const openCa = (e: React.FormEvent) => { e.preventDefault(); const s = ca.trim(); if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(s)) router.push(`/token/${s}`); };
 
   return (
@@ -82,6 +85,7 @@ function TradeScreen({ platformId }: { platformId: string }) {
           <div className="rounded-xl border border-line bg-card px-4 py-2.5">
             <div className="text-[11px] uppercase tracking-wider text-grey">Funded budget</div>
             <div className="text-lg font-semibold tabular-nums text-ink">${houseUsd.toFixed(2)} <span className="text-xs font-normal text-grey">to trade with</span></div>
+            {housePositionsUsd > 0.5 && <div className="text-[11px] text-grey">plus ${housePositionsUsd.toFixed(2)} in open positions</div>}
             <div className="text-[11px] text-grey">
               {credits.limits.tradeLeft >= credits.limits.trade
                 ? `Trades up to $${credits.limits.trade} a day`
